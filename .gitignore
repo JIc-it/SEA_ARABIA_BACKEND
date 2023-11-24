@@ -1,0 +1,19 @@
+!__init__py
+*.sqlite3
+**/__pycache__
+**/migrations/*.py
+!**/migrations/__init__.py
+!.empty
+*.log
+*.pot
+*.pyc
+*.zip
+*.jpg
+*.jpeg
+*.gif
+*.png
+assets/media/
+assets/static/
+# Ignore IDE specific files
+.idea/
+.vscode/
