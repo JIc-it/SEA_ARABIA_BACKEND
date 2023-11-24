@@ -1,3 +1,42 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+
+@admin.register(Occasion)
+class OcassionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(VendorPriceType)
+class VendorPriceTypeAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Destination)
+class DestinationAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Amenity)
+class AmenityAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(SubCategory)
+class SubCategoryAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Price)
+class PriceAdmin(admin.ModelAdmin):
+    pass

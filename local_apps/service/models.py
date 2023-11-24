@@ -15,19 +15,19 @@ for day_count in range(1, 15):
     NUMBER_CHOICES.append((three, three))
 
 SERVICE_TYPE = (
-    ('Service', "Service"),
-    ('Activity', "Activity"),
+    ("Service", "Service"),
+    ("Activity", "Activity"),
 )
 
 VENDOR_PRICE_TYPE = (
-    ('Percentage', "Percentage"),
-    ('Amount', "Amount"),
+    ("Percentage", "Percentage"),
+    ("Amount", "Amount"),
 )
 
 VENDOR_PERIOD_TYPE = (
-    ('Per Service', "Per Service"),
-    ('Monthly', "Monthly"),
-    ('Yearly', "Yearly"),
+    ("Per Service", "Per Service"),
+    ("Monthly", "Monthly"),
+    ("Yearly", "Yearly"),
 )
 
 
@@ -45,8 +45,20 @@ class Occasion(Main):
 
 class VendorPriceType(Main):
     name = models.CharField(max_length=255)
-    type = models.CharField(choices=VENDOR_PRICE_TYPE, max_length=100, default='Amount', blank=True, null=True)
-    period = models.CharField(choices=VENDOR_PERIOD_TYPE, max_length=100, default='Per Service', blank=True, null=True)
+    type = models.CharField(
+        choices=VENDOR_PRICE_TYPE,
+        max_length=100,
+        default="Amount",
+        blank=True,
+        null=True,
+    )
+    period = models.CharField(
+        choices=VENDOR_PERIOD_TYPE,
+        max_length=100,
+        default="Per Service",
+        blank=True,
+        null=True,
+    )
     vendor = models.PositiveIntegerField(blank=True, null=True)
     sea_arabia = models.PositiveIntegerField(blank=True, null=True)
 
@@ -55,8 +67,8 @@ class VendorPriceType(Main):
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
-        verbose_name = 'Vendor Price Type'
-        verbose_name_plural = 'Vendor Price Types'
+        verbose_name = "Vendor Price Type"
+        verbose_name_plural = "Vendor Price Types"
 
 
 class Destination(Main):
@@ -69,21 +81,21 @@ class Destination(Main):
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
-        verbose_name = 'Destination'
-        verbose_name_plural = 'Destinations'
+        verbose_name = "Destination"
+        verbose_name_plural = "Destinations"
 
 
 class Amenity(Main):
     name = models.CharField(max_length=255)
-    image = models.FileField(upload_to='service/amenity/image', blank=True, null=True)
+    image = models.FileField(upload_to="service/amenity/image", blank=True, null=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
-        verbose_name = 'Amenity'
-        verbose_name_plural = 'Amenities'
+        verbose_name = "Amenity"
+        verbose_name_plural = "Amenities"
 
 
 class Category(Main):
@@ -94,12 +106,14 @@ class Category(Main):
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
 
 
 class SubCategory(Main):
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, blank=True, null=True
+    )
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -107,38 +121,52 @@ class SubCategory(Main):
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
-        verbose_name = 'Sub Category'
-        verbose_name_plural = 'Sub Categories'
+        verbose_name = "Sub Category"
+        verbose_name_plural = "Sub Categories"
 
 
 class Service(Main):
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    type = models.CharField(choices=SERVICE_TYPE, max_length=100, default='Service', blank=True, null=True)
-    category = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, blank=True, null=True)
+    type = models.CharField(
+        choices=SERVICE_TYPE, max_length=100, default="Service", blank=True, null=True
+    )
+    category = models.ForeignKey(
+        SubCategory, on_delete=models.SET_NULL, blank=True, null=True
+    )
     occasions = models.ManyToManyField(Occasion, blank=True)
     other_type = models.CharField(max_length=200, blank=True, null=True)
     name = models.CharField(max_length=200, blank=True, null=True)
     machine_id = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     pickup_point = models.CharField(max_length=200, blank=True, null=True)
-    destination = models.ForeignKey(Destination, on_delete=models.SET_NULL, blank=True, null=True)
+    destination = models.ForeignKey(
+        Destination, on_delete=models.SET_NULL, blank=True, null=True
+    )
     capacity = models.CharField(max_length=200, blank=True, null=True)
     amenities = models.ManyToManyField(Amenity, blank=True)
-    duration = models.CharField(choices=NUMBER_CHOICES, max_length=100, blank=True, null=True)
-    pricing_type = models.ForeignKey(VendorPriceType, on_delete=models.SET_NULL, blank=True, null=True)
+    duration = models.CharField(
+        choices=NUMBER_CHOICES, max_length=100, blank=True, null=True
+    )
+    pricing_type = models.ForeignKey(
+        VendorPriceType, on_delete=models.SET_NULL, blank=True, null=True
+    )
     default_price = models.PositiveIntegerField(blank=True, null=True)
-    privacy_policy = models.FileField(upload_to='service/service/privacy_policy', blank=True, null=True)
-    return_policy = models.FileField(upload_to='service/service/return_policy', blank=True, null=True)
+    privacy_policy = models.FileField(
+        upload_to="service/service/privacy_policy", blank=True, null=True
+    )
+    return_policy = models.FileField(
+        upload_to="service/service/return_policy", blank=True, null=True
+    )
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
-        verbose_name = 'Service'
-        verbose_name_plural = 'Services'
+        verbose_name = "Service"
+        verbose_name_plural = "Services"
 
     def __str__(self):
-        return self.name if self.name else 'No Service Name'
+        return self.name if self.name else "No Service Name"
 
     # def save(self, *args, **kwargs):
     #     try:
@@ -177,9 +205,13 @@ class Price(Main):
 
 
 class ServiceImage(Main):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="service_image")
+    service = models.ForeignKey(
+        Service, on_delete=models.CASCADE, related_name="service_image"
+    )
     image = models.ImageField(upload_to="service/service/image", blank=True, null=True)
-    thumbnail = models.ImageField(upload_to="service/service/image", blank=True, null=True)
+    thumbnail = models.ImageField(
+        upload_to="service/service/image", blank=True, null=True
+    )
     is_thumbnail = models.BooleanField(default=False)
 
     class Meta:
@@ -188,4 +220,8 @@ class ServiceImage(Main):
         verbose_name_plural = "Service Images"
 
     def __str__(self):
-        return self.service.name if self.service and self.service.name else "No service name"
+        return (
+            self.service.name
+            if self.service and self.service.name
+            else "No service name"
+        )
