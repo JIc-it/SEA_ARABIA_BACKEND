@@ -45,17 +45,51 @@ class PriceSerializer(serializers.ModelSerializer):
         extra_kwargs = {"service": {"required": False}}
 
 
+class ServiceImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceImage
+        exclude = ["created_at", "updated_at"]
+        extra_kwargs = {"service": {"required": False}}
+
+
 class ServiceSerializer(serializers.ModelSerializer):
-    # service_price = PriceSerializer(many=True, required=False)
+    service_price = PriceSerializer(many=True)
+    service_image = ServiceImageSerializer(many=True)
 
     class Meta:
         model = Service
         exclude = ["created_at", "updated_at"]
-        # extra_kwargs = {"service_price": {"required": True}}
 
-    # def create(self, validated_data):
-    #     service_prices = validated_data.pop("service_price", [])
-    #     service_instance = Service.objects.create(**validated_data)
-    #     for price in service_prices:
-    #         Price.objects.create(service=service_instance, **price)
-    #     return service_instance
+        extra_kwargs = {
+            "service_price": {"required": False},
+            "service_image": {"required": False},
+        }
+
+    def create(self, validated_data):
+        service_prices = validated_data.pop("service_price", [])
+        service_images = validated_data.pop("service_image", [])
+        ocassions = validated_data.pop("occasions", [])
+        amenities = validated_data.pop("amenities", [])
+        service_instance = Service.objects.create(**validated_data)
+        service_instance.occasions.set(ocassions)
+        service_instance.amenities.set(amenities)
+        for price in service_prices:
+            Price.objects.create(service=service_instance, **price)
+
+        for service_image in service_images:
+            ServiceImage.objects.create(service=service_instance, **service_image)
+        return service_instance
+
+    def update(self, instance, validated_data):
+        service_prices = validated_data.pop("service_price", [])
+        service_images = validated_data.pop("service_image", [])
+        ocassions = validated_data.pop("occasions", [])
+        amenities = validated_data.pop("amenities", [])
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+
+        instance.occasions.set(ocassions)
+        instance.amenities.set(amenities)
+
+        return instance

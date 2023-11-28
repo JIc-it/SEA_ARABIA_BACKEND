@@ -80,4 +80,16 @@ urlpatterns = [
         ServiceUpdate.as_view(),
         name="service_update",
     ),
+    #   Service Price urls
+    path(
+        "service-price-update/<uuid:pk>",
+        ServicePriceUpdate.as_view(),
+        name="service-price-update",
+    ),
+    #   Service Image urls
+    path(
+        "service-image-update/<uuid:pk>",
+        ServiceImageUpdate.as_view(),
+        name="service-image-update",
+    ),
 ]

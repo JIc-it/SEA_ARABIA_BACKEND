@@ -116,12 +116,19 @@ class ServiceUpdate(generics.UpdateAPIView):
     serializer_class = ServiceSerializer
 
 
-# # Service Type Views
+# Service Price Views
 
 
-# class ServiceList(generics.ListAPIView):
-#     # permission_classes = [IsAuthenticated]
-#     queryset = Service.objects.all()
-#     serializer_class = ServiceSerializer
-#     filter_backends = [DjangoFilterBackend, SearchFilter]
-#     filterset_class = ServiceFilter
+class ServicePriceUpdate(generics.UpdateAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = Price.objects.all()
+    serializer_class = PriceSerializer
+
+
+# Service Image Views
+
+
+class ServiceImageUpdate(generics.UpdateAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = ServiceImage.objects.all()
+    serializer_class = ServiceImageSerializer
