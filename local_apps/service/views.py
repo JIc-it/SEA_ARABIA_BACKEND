@@ -95,6 +95,12 @@ class ServiceList(generics.ListAPIView):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = [
+        "name",
+        "occasions__name",
+        "amenities__name",
+        "destination__name",
+    ]
     filterset_class = ServiceFilter
 
 
