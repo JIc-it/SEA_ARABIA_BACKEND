@@ -3,6 +3,12 @@ from .views import *
 
 
 urlpatterns = [
+    #   ServiceTag urls
+    path(
+        "servicetag-list",
+        ServiceTagList.as_view(),
+        name="servicetag-list",
+    ),
     # Company urls
     path(
         "company-list/",

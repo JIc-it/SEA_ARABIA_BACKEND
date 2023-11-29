@@ -9,6 +9,14 @@ from .models import *
 from .serializers import *
 from .filters import *
 
+#   service CRUD view
+
+
+class ServiceTagList(generics.ListAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = ServiceTag.objects.all()
+    serializer_class = ServiceTagSerializer
+
 
 # Company CRUD view
 

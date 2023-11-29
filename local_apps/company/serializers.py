@@ -2,6 +2,12 @@ from rest_framework import serializers
 from .models import *
 
 
+class ServiceTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceTag
+        exclude = ["created_at", "updated_at"]
+
+
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
