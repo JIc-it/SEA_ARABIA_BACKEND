@@ -167,6 +167,7 @@ class Proposal(Main):
         if old_file and self.attachment and old_file != self.attachment:
             remove_file(old_file)
 
+
     def delete(self, *args, **kwargs):
         if self.attachment:
             remove_file(self.attachment)
