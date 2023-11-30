@@ -51,6 +51,12 @@ urlpatterns = [
         MiscellaneousUpdate.as_view(),
         name="miscellaneous-update",
     ),
+    # qualifications list
+    path(
+        "qualification-list",
+        QualificationsList.as_view(),
+        name="qualification-list",
+    ),
     # SiteVisit urls
     path(
         "sitevisit-list/",

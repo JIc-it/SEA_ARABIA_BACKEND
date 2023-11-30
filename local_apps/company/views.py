@@ -79,6 +79,14 @@ class MiscellaneousView(generics.RetrieveAPIView):
     serializer_class = MiscellaneousSerializer
 
 
+# Quafification CRUD Views
+
+
+class QualificationsList(generics.ListAPIView):
+    queryset = Qualifications.objects.all()
+    serializer_class = QualificationSerializer
+
+
 # SiteVisit CRUD Views
 
 

@@ -92,4 +92,10 @@ urlpatterns = [
         ServiceImageUpdate.as_view(),
         name="service-image-update",
     ),
+    #   Top Service Suggestions urls
+    path(
+        "service-top-suggestions",
+        ServiceTopSuggestion.as_view(),
+        name="service-top-suggestions",
+    ),
 ]

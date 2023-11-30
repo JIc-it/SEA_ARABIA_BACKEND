@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import *
+from local_apps.company.serializers import CompanyStatusSerializer
 
 # user serializers
 
@@ -16,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "password",
         ]
-        extra_kwargs = {"password": {"read_only": True}}
+        extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
         password = validated_data.pop("password", None)
@@ -28,10 +29,37 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
+class VendorProfileExtraSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfileExtra
+        fields = [
+            "location",
+        ]
+
+
+class VendorSerializer(serializers.ModelSerializer):
+    company_company_user = CompanyStatusSerializer()
+    profileextra = VendorProfileExtraSerializer()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "mobile",
+            "role",
+            "first_name",
+            "last_name",
+            "created_at",
+            "company_company_user",
+            "profileextra",
+        ]
+
+
 class ProfileExtraSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfileExtra
-        fields = "__all__"
+        fields = ["id", "location", "image", "dob", "gender"]
 
 
 class UserIdentificationTypeSerializer(serializers.ModelSerializer):

@@ -12,4 +12,5 @@ class CompanyFilter(django_filters.FilterSet):
             "is_active",
             "assigned_to",
             "service_summary",
+            "status",
         ]

@@ -7,7 +7,8 @@ from rest_framework.filters import SearchFilter
 
 from .models import *
 from .serializers import *
-
+from local_apps.company.filters import CompanyFilter
+from .filters import *
 
 #   User CRUD View
 
@@ -26,7 +27,7 @@ class UserList(generics.ListAPIView):
 class UserUpdate(generics.UpdateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
-    serializer_class = UserSerializerApp
+    serializer_class = UserSerializer
 
 
 class UserDelete(generics.DestroyAPIView):
@@ -47,3 +48,17 @@ class UserSerializerView(generics.RetrieveAPIView):
 class ProfileExtraCreate(generics.CreateAPIView):
     # permission_classes = [IsAuthenticated]
     serializer_class = ProfileExtraSerializer
+
+
+class VendorSerializerList(generics.ListAPIView):
+    queryset = User.objects.filter(role="Vendor")
+    serializer_class = VendorSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = [
+        "mobile",
+        "email",
+        "first_name",
+        "last_name",
+        "profileextra__location",
+    ]
+    filterset_class = VendorFilter

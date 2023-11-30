@@ -2,6 +2,7 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
+    # user urls
     path(
         "user-create",
         UserCreate.as_view(),
@@ -32,5 +33,11 @@ urlpatterns = [
         "user-profile-create",
         ProfileExtraCreate.as_view(),
         name="user-profile-create",
+    ),
+    # Vendor List urls
+    path(
+        "vendor-list",
+        VendorSerializerList.as_view(),
+        name="vendor-list",
     ),
 ]

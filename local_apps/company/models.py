@@ -4,6 +4,17 @@ from django.conf import settings
 from utils.file_handle import remove_file
 
 
+COMPANY_STATUS = (
+    ("New Lead", "New Lead"),
+    ("Initial Contact", "Initial Contact"),
+    ("Site Visit", "Site Visit"),
+    ("Proposal", "Proposal"),
+    ("Negotations", "Negotations"),
+    ("MOU/Charter", "MOU/Charter"),
+    ("Onboard", "Onboard"),
+)
+
+
 class ServiceTag(Main):
     name = models.CharField(max_length=255)
 
@@ -37,6 +48,9 @@ class Company(Main):
     address = models.TextField(blank=True, null=True)
     website = models.CharField(max_length=200, blank=True, null=True)
     service_summary = models.ManyToManyField(ServiceTag, blank=True)
+    status = models.CharField(
+        choices=COMPANY_STATUS, default="New Lead", max_length=100
+    )
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -98,6 +112,22 @@ class Miscellaneous(Main):
         super(Miscellaneous, self).delete(*args, **kwargs)
 
 
+class Qualifications(Main):
+    name = models.CharField(max_length=255, null=True, blank=True)
+    short_description = models.TextField(null=True, blank=True)
+    icon = models.ImageField(
+        upload_to="company/qualifications/icon", null=True, blank=True
+    )
+
+    class Meta:
+        ordering = ["-created_at", "-updated_at"]
+        verbose_name = "Qualification"
+        verbose_name_plural = "Qualifications"
+
+    def __str__(self):
+        return self.name if self.name else "No Name"
+
+
 class SiteVisit(Main):
     company = models.ForeignKey(
         Company, on_delete=models.CASCADE, related_name="company_site_visit_company"
@@ -106,6 +136,7 @@ class SiteVisit(Main):
     attachment = models.FileField(
         upload_to="company/site_visit/attachment", blank=True, null=True
     )
+    qualifications = models.ManyToManyField(Qualifications, blank=True)
     note = models.TextField(blank=True, null=True)
     datetime = models.DateTimeField(blank=True, null=True)
 
@@ -166,7 +197,6 @@ class Proposal(Main):
 
         if old_file and self.attachment and old_file != self.attachment:
             remove_file(old_file)
-
 
     def delete(self, *args, **kwargs):
         if self.attachment:

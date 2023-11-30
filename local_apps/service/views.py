@@ -138,3 +138,11 @@ class ServiceImageUpdate(generics.UpdateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = ServiceImage.objects.all()
     serializer_class = ServiceImageSerializer
+
+
+#   Service top suggestion api
+
+
+class ServiceTopSuggestion(generics.ListAPIView):
+    queryset = Service.objects.filter(is_top_suggestion=True)
+    serializer_class = ServiceSerializer

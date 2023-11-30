@@ -40,3 +40,8 @@ class NegotiationAdmin(admin.ModelAdmin):
 @admin.register(MOUorCharter)
 class MOUorCharterAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(Qualifications)
+class QualificationsAdmin(admin.ModelAdmin):
+    pass

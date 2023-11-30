@@ -8,10 +8,22 @@ class ServiceTagSerializer(serializers.ModelSerializer):
         exclude = ["created_at", "updated_at"]
 
 
+class QualificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Qualifications
+        exclude = ["created_at", "updated_at"]
+
+
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         exclude = ["created_at", "updated_at"]
+
+
+class CompanyStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = ["status"]
 
 
 class MiscellaneousSerializer(serializers.ModelSerializer):
