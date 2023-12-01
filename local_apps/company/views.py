@@ -52,6 +52,14 @@ class CompanyUpdate(generics.UpdateAPIView):
     serializer_class = CompanySerializer
 
 
+# Miscellaneous Types Views
+
+
+class MiscellaneousTypeList(generics.ListAPIView):
+    queryset = MiscellaneousType.objects.all()
+    serializer_class = MiscellaneousTypeSerializer
+
+
 # Miscellaneous CRUD Views
 
 

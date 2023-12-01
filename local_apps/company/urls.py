@@ -9,7 +9,7 @@ urlpatterns = [
         ServiceTagList.as_view(),
         name="servicetag-list",
     ),
-    # Company urls
+    #   Company urls
     path(
         "company-list/",
         CompanyList.as_view(),
@@ -30,7 +30,12 @@ urlpatterns = [
         CompanyUpdate.as_view(),
         name="companydetails-update",
     ),
-    # Miscellaneous urls
+    #   Miscellaneous urls
+    path(
+        "miscellaneoustype-list",
+        MiscellaneousTypeList.as_view(),
+        name="miscellaneoustype-list",
+    ),
     path(
         "miscellaneous-list/",
         MiscellaneousList.as_view(),

@@ -20,15 +20,15 @@ class CompanySerializer(serializers.ModelSerializer):
         exclude = ["created_at", "updated_at"]
 
 
-class CompanyStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Company
-        fields = ["status"]
-
-
 class MiscellaneousSerializer(serializers.ModelSerializer):
     class Meta:
         model = Miscellaneous
+        exclude = ["created_at", "updated_at"]
+
+
+class MiscellaneousTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MiscellaneousType
         exclude = ["created_at", "updated_at"]
 
 

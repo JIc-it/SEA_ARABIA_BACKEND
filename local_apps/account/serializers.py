@@ -1,11 +1,86 @@
 from rest_framework import serializers
 from .models import *
-from local_apps.company.serializers import CompanyStatusSerializer
 
-# user serializers
+# user cms serializers
+
+
+class VendorSerializer(serializers.ModelSerializer):
+    """vendor listing serializer"""
+
+    location = serializers.CharField(source="profileextra.location")
+    status = serializers.CharField(source="company_company_user.status")
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "mobile",
+            "role",
+            "first_name",
+            "last_name",
+            "created_at",
+            "location",
+            "status",
+        ]
+
+
+class VendorAddSerializer(serializers.ModelSerializer):
+    """serializer for adding the vendor"""
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "mobile",
+            "role",
+            "first_name",
+            "last_name",
+        ]
+
+
+class UserIdentificationTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserIdentificationType
+        fields = "__all__"
+
+
+class UserIdentificationDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserIdentificationData
+        fields = "__all__"
+
+
+# Serializers for viewing in app
+class ProfileExtraSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfileExtra
+        fields = ["id", "location", "image", "dob", "gender"]
+
+
+class UserSerializerApp(serializers.ModelSerializer):
+
+    """serializer for showing the profile details of the user"""
+
+    profileextra = ProfileExtraSerializer()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "mobile",
+            "role",
+            "first_name",
+            "last_name",
+            "profileextra",
+        ]
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """user create serialzier"""
+
     class Meta:
         model = User
         fields = [
@@ -27,70 +102,3 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
-
-
-class VendorProfileExtraSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProfileExtra
-        fields = [
-            "location",
-        ]
-
-
-class VendorSerializer(serializers.ModelSerializer):
-    company_company_user = CompanyStatusSerializer()
-    profileextra = VendorProfileExtraSerializer()
-
-    class Meta:
-        model = User
-        fields = [
-            "id",
-            "email",
-            "mobile",
-            "role",
-            "first_name",
-            "last_name",
-            "created_at",
-            "company_company_user",
-            "profileextra",
-        ]
-
-
-class ProfileExtraSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProfileExtra
-        fields = ["id", "location", "image", "dob", "gender"]
-
-
-class UserIdentificationTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserIdentificationType
-        fields = "__all__"
-
-
-class UserIdentificationDataSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserIdentificationData
-        fields = "__all__"
-
-
-# Serializers for viewing in app
-
-
-class UserSerializerApp(serializers.ModelSerializer):
-
-    """serializer for showing the profile details of the user"""
-
-    profileextra = ProfileExtraSerializer()
-
-    class Meta:
-        model = User
-        fields = [
-            "id",
-            "email",
-            "mobile",
-            "role",
-            "first_name",
-            "last_name",
-            "profileextra",
-        ]
