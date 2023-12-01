@@ -122,6 +122,7 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
             "name",
             "pickup_point",
             "service_price",
+            "capacity",
             "service_image",
             "destination",
             "company",

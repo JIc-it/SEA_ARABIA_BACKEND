@@ -9,6 +9,7 @@ from .models import *
 from .serializers import *
 from local_apps.company.filters import CompanyFilter
 from .filters import *
+from local_apps.company.models import Company
 
 #   User CRUD View
 
@@ -86,3 +87,4 @@ class VendorAdd(generics.CreateAPIView):
             profile_extra = ProfileExtra.objects.create(
                 user=user, location=location_data
             )
+        Company.objects.create(user=user)
