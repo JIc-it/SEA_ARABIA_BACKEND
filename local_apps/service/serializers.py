@@ -55,6 +55,14 @@ class ServiceImageSerializer(serializers.ModelSerializer):
 class ServiceSerializer(serializers.ModelSerializer):
     service_price = PriceSerializer(many=True)
     service_image = ServiceImageSerializer(many=True)
+    destination = serializers.CharField(source="destination.name")
+    company = serializers.CharField(source="company.name")
+    category = serializers.CharField(source="category.name")
+    pricing_type = serializers.CharField(source="pricing_type.name")
+    occasions = serializers.SlugRelatedField(
+        slug_field="name", queryset=Occasion.objects.all()
+    )
+    # amenities = serializers.SlugRelatedField(source="amenities.name")
 
     class Meta:
         model = Service
@@ -93,3 +101,36 @@ class ServiceSerializer(serializers.ModelSerializer):
         instance.amenities.set(amenities)
 
         return instance
+
+
+class ExploreMoreSerializer(serializers.ModelSerializer):
+    service_price = PriceSerializer(many=True)
+    service_image = ServiceImageSerializer(many=True)
+    destination = serializers.CharField(source="destination.name")
+    company = serializers.CharField(source="company.name")
+    # category = serializers.CharField(source="category.name")
+    # pricing_type = serializers.CharField(source="pricing_type.name")
+    # occasions = serializers.SlugRelatedField(
+    #     many=True, slug_field="name", queryset=Occasion.objects.all()
+    # )
+    amenities = AmenitySerializer(many=True)
+
+    class Meta:
+        model = Service
+        fields = [
+            "id",
+            "name",
+            "pickup_point",
+            "service_price",
+            "service_image",
+            "destination",
+            "company",
+            "amenities",
+            "description",
+            "duration",
+        ]
+
+        extra_kwargs = {
+            "service_price": {"required": False},
+            "service_image": {"required": False},
+        }

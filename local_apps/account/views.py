@@ -69,6 +69,7 @@ class VendorSerializerList(generics.ListAPIView):
         "first_name",
         "last_name",
         "created_at",
+        "profileextra__location",
     ]
     filterset_class = VendorFilter
 

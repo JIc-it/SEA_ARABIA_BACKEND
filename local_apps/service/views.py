@@ -140,9 +140,17 @@ class ServiceImageUpdate(generics.UpdateAPIView):
     serializer_class = ServiceImageSerializer
 
 
-#   Service top suggestion api
+#   App views
 
 
-class ServiceTopSuggestion(generics.ListAPIView):
-    queryset = Service.objects.filter(is_top_suggestion=True)
-    serializer_class = ServiceSerializer
+# class ServiceTopSuggestion(generics.ListAPIView):
+#     queryset = Service.objects.filter(is_top_suggestion=True)
+#     serializer_class = ExploreMoreSerializer
+
+
+class ExploreMore(generics.ListAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = Service.objects.all()
+    serializer_class = ExploreMoreSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ServiceFilter
