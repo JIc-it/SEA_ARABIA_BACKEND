@@ -7,7 +7,7 @@ from local_apps.service.models import Service
 class Booking(Main):
     booking_id = models.CharField(max_length=255, unique=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    # offer = models.ForeignKey(Offer, blank=True, null=True, on_delete=models.CASCADE, related_name='booking_offer')
+    # offer = models.ForeignKey(Offer, blank=True, null=True, on_delete=models.CASCADE, related_name='booking_offer')  #
     service = models.ForeignKey(Service, blank=True, null=True, on_delete=models.CASCADE, related_name='booking_service')
     date_booked = models.DateTimeField(auto_now_add=True)
     start_date = models.DateField()
