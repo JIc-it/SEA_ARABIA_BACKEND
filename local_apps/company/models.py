@@ -3,7 +3,6 @@ from local_apps.core.models import Main
 from django.conf import settings
 from utils.file_handle import remove_file
 
-
 COMPANY_STATUS = (
     ("New Lead", "New Lead"),
     ("Initial Contact", "Initial Contact"),
@@ -13,6 +12,19 @@ COMPANY_STATUS = (
     ("MOU/Charter", "MOU/Charter"),
     ("Onboard", "Onboard"),
 )
+
+
+class OnboardStatus(Main):
+    name = models.CharField(max_length=255)
+    order = models.PositiveIntegerField(default=0, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["-created_at", "-updated_at"]
+        verbose_name = "OnBoard Status"
+        verbose_name_plural = "Onboard Status"
 
 
 class ServiceTag(Main):
@@ -45,12 +57,15 @@ class Company(Main):
     )
     name = models.CharField(max_length=200, blank=True, null=True)
     registration_number = models.CharField(max_length=200, blank=True, null=True)
-    address = models.TextField(blank=True, null=True)
+    address = models.TextField(max_length=200, blank=True, null=True)
     website = models.CharField(max_length=200, blank=True, null=True)
     service_summary = models.ManyToManyField(ServiceTag, blank=True)
-    status = models.CharField(
-        choices=COMPANY_STATUS, default="New Lead", max_length=100
-    )
+    # status = models.CharField(
+    #     choices=COMPANY_STATUS, default="New Lead", max_length=100
+    # )
+    status = models.ForeignKey(OnboardStatus, on_delete=models.SET_NULL, blank=True, null=True,
+                               related_name="company_company_status")
+    third_party_ownership = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]

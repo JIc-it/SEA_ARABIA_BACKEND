@@ -14,6 +14,8 @@ for day_count in range(1, 15):
     NUMBER_CHOICES.append((two, two))
     NUMBER_CHOICES.append((three, three))
 
+DAY_CHOICES = [(i, str(i)) for i in range(1, 30)]
+
 SERVICE_TYPE = (
     ("Service", "Service"),
     ("Activity", "Activity"),
@@ -28,6 +30,7 @@ VENDOR_PERIOD_TYPE = (
     ("Per Service", "Per Service"),
     ("Monthly", "Monthly"),
     ("Yearly", "Yearly"),
+    ("Per Ticket", "Per Ticket")
 )
 
 
@@ -148,9 +151,8 @@ class Service(Main):
     )
     capacity = models.CharField(max_length=200, blank=True, null=True)
     amenities = models.ManyToManyField(Amenity, blank=True)
-    duration = models.CharField(
-        choices=NUMBER_CHOICES, max_length=100, blank=True, null=True
-    )
+    day = models.CharField(choices=NUMBER_CHOICES, max_length=100, blank=True, null=True)
+    night = models.CharField(choices=NUMBER_CHOICES, max_length=100, blank=True, null=True)
     pricing_type = models.ForeignKey(
         VendorPriceType, on_delete=models.SET_NULL, blank=True, null=True
     )
