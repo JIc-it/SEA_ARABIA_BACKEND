@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from local_apps.account.managers import CustomUserManager
 from local_apps.core.models import Main
 from utils.file_handle import remove_file
+from django.utils import timezone
 
 USER_ROLE = (
     ('Admin', "Admin"),
@@ -146,3 +147,16 @@ class UserIdentificationData(Main):
         ordering = ["-created_at", "-updated_at"]
         verbose_name = 'User Identification Data'
         verbose_name_plural = 'User Identification Datas'
+
+
+
+
+class PasswordReset(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(default=timezone.now() + timezone.timedelta(minutes=5))
+
+    @property
+    def is_expired(self):
+        return timezone.now() > self.expires_at

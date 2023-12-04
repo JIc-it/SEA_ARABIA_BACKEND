@@ -39,15 +39,17 @@ class Booking(Main):
         ordering = ["-created_at", "-updated_at"]
         verbose_name = 'Booking'
         verbose_name_plural = 'Bookings'
-
-    def __str__(self):
-        return self.booking_id
-
     def save(self, *args, **kwargs):
         if not self.booking_id:
             self.booking_id = str('SA-BOK-' + shortuuid.ShortUUID().random(length=12))
 
         super(Booking, self).save(*args, **kwargs)
+        
+
+    def __str__(self):
+        return self.booking_id
+
+
 
 class PassengerDetails(Main):
     booking = models.ForeignKey(

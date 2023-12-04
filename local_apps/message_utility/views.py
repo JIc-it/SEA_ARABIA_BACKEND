@@ -1,3 +1,19 @@
-from django.shortcuts import render
+from .tasks import single_send_mail, multiple_send_mail
+from django.template.loader import render_to_string
 
-# Create your views here.
+
+def mail_handler(mail_type=None, to=None, subject=None, data=None, template=None, cc=None, bcc=None, reply_to=None):
+    if to and subject and data and template:
+        message = render_to_string(template, context={'data': data, })
+        if mail_type == 'single':
+            send = single_send_mail.delay(subject=subject, message=message, to_list=to, cc_list=cc, bcc_list=bcc,
+                                          reply_to=reply_to)
+            return send
+        elif mail_type == 'multiple':
+            send = multiple_send_mail.delay(subject=subject, message=message, to_list=to, cc_list=cc, bcc_list=bcc,
+                                            reply_to=reply_to)
+            return send
+        else:
+            return False
+    else:
+        print('email view failed. else part')

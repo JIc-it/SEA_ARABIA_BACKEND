@@ -104,3 +104,33 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
+
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    current_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_password = serializers.CharField(required=True)
+
+
+class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class PasswordResetSerializerTwo(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True)
+
+
+class OTPVerificationSerializer(serializers.Serializer):
+    user_id = serializers.UUIDField()  # User ID associated with the OTP
+    otp = serializers.CharField(max_length=6)  # OTP entered by the user
+
+    def validate(self, data):
+        # Custom validation logic can be added here, if needed
+        return data
+    
+    
+class ForgotPasswordResetSerializer(serializers.Serializer):
+    user_id = serializers.UUIDField()
+    new_password = serializers.CharField(required=True)
+  
