@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from .models import *
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class ServiceTagSerializer(serializers.ModelSerializer):
@@ -15,6 +18,21 @@ class QualificationSerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        exclude = ["created_at", "updated_at"]
+
+
+class CompanyListSerializer(serializers.ModelSerializer):
+    service_summary = serializers.SlugRelatedField(
+        many=True, slug_field="name", queryset=ServiceTag.objects.all()
+    )
+    staffs = serializers.SlugRelatedField(
+        many=True,
+        slug_field="id",
+        queryset=User.objects.all(),
+    )
+
     class Meta:
         model = Company
         exclude = ["created_at", "updated_at"]

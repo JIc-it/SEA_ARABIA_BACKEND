@@ -9,6 +9,7 @@ class VendorSerializer(serializers.ModelSerializer):
 
     location = serializers.CharField(source="profileextra.location")
     status = serializers.CharField(source="company_company_user.status")
+    company_id = serializers.CharField(source="company_company_user.id")
 
     class Meta:
         model = User
@@ -22,6 +23,7 @@ class VendorSerializer(serializers.ModelSerializer):
             "created_at",
             "location",
             "status",
+            "company_id",
         ]
 
 

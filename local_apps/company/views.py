@@ -24,7 +24,7 @@ class ServiceTagList(generics.ListAPIView):
 class CompanyList(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = Company.objects.all()
-    serializer_class = CompanySerializer
+    serializer_class = CompanyListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = [
         "name",
