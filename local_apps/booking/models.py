@@ -4,10 +4,21 @@ import shortuuid
 from local_apps.core.models import Main
 from local_apps.service.models import Service
 
+class Offers(Main):
+    offername = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.offername
+
+    class Meta:
+        ordering = ["-created_at", "-updated_at"]
+        verbose_name = "Offer"
+        verbose_name_plural = "Offers"
+
 class Booking(Main):
     booking_id = models.CharField(max_length=255, unique=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    # offer = models.ForeignKey(Offer, blank=True, null=True, on_delete=models.CASCADE, related_name='booking_offer')  #
+    offer = models.ForeignKey(Offers, blank=True, null=True, on_delete=models.CASCADE, related_name='booking_offer')
     service = models.ForeignKey(Service, blank=True, null=True, on_delete=models.CASCADE, related_name='booking_service')
     date_booked = models.DateTimeField(auto_now_add=True)
     start_date = models.DateField()
@@ -38,14 +49,12 @@ class Booking(Main):
 
         super(Booking, self).save(*args, **kwargs)
 
-
-
-class PassengerDetials(Main):
+class PassengerDetails(Main):
     booking = models.ForeignKey(
-        Booking, on_delete=models.CASCADE, blank=True, null=True ,related_name='booking_passenger'
+        Booking, on_delete=models.CASCADE, blank=True, null=True, related_name='booking_passenger'
     )
     name = models.CharField(max_length=255)
-    age = models.CharField(max_length=255)
+    age = models.IntegerField()
     gender = models.CharField(max_length=255)
 
     def __str__(self):
@@ -53,5 +62,5 @@ class PassengerDetials(Main):
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
-        verbose_name = "PassengerDetial"
-        verbose_name_plural = "PassengerDetials"
+        verbose_name = "PassengerDetail"
+        verbose_name_plural = "PassengerDetails"
