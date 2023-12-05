@@ -141,7 +141,7 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = "infan@jicitsolution.com"
 EMAIL_HOST_PASSWORD = "bw31AZ5f2JM4"
-DEFAULT_FROM_EMAIL = 'infan@jicitsolution.com'
+DEFAULT_FROM_EMAIL = "infan@jicitsolution.com"
 
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
@@ -196,7 +196,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 100,
+    "PAGE_SIZE": 10,
 }
 
 SIMPLE_JWT = {

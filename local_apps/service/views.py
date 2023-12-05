@@ -155,20 +155,26 @@ class ServiceReviewUpdate(generics.CreateAPIView):
 
 
 class ServiceReviewList(generics.ListAPIView):
-    # TODO:: only show the reviews of services belonging to the owner of the particular service
     # permission_classes = [IsAuthenticated]
     queryset = ServiceReview.objects.all()
     serializer_class = ServiceReviewListSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]
-    search_fields = [
-        "rating",
-        "service__name",
-        "review_title",
-    ]
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     queryset = ServiceReview.objects.filter(service__company__user=user)
-    #     return queryset
+    # filter_backends = [DjangoFilterBackend, SearchFilter]
+    # search_fields = [
+    #     "rating",
+    #     "service__name",
+    #     "review_title",
+    # ]
+
+
+class ServiceFilterList(generics.ListAPIView):
+    """View for filtering the service in service review listing section"""
+
+    serializer_class = ServiceFilterList
+
+    def get_queryset(self):
+        user = self.request.user
+        service_list = Service.objects.filter(company__user=user)
+        return service_list
 
 
 # ?---------------------------App views----------------------------------------#

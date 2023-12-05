@@ -103,6 +103,11 @@ urlpatterns = [
         ServiceReviewList.as_view(),
         name="service-review-list",
     ),
+    path(
+        "service-filter-list",
+        ServiceFilterList.as_view(),
+        name="service-filter-list",
+    ),
     #  App Urls
     path(
         "explore-more",

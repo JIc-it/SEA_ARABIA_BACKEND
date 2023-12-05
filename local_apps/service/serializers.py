@@ -48,7 +48,10 @@ class PriceSerializer(serializers.ModelSerializer):
 class ServiceImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceImage
-        exclude = ["created_at", "updated_at"]
+        fields = [
+            "thumbnail",
+            "is_thumbnail",
+        ]
         extra_kwargs = {"service": {"required": False}}
 
 
@@ -139,17 +142,22 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
         }
 
 
-class ServiceReviewList(serializers.ModelSerializer):
+class ServiceFilterList(serializers.ModelSerializer):
     """serializer for service review filter section"""
 
     service_image = ServiceImageSerializer(many=True)
 
     class Meta:
         model = Service
-        fields = ["name", "service_image"]
+        fields = [
+            "name",
+            "service_image",
+        ]
 
 
 class ServiceReviewSerializer(serializers.ModelSerializer):
+    """serializer for creating new review"""
+
     class Meta:
         model = ServiceReview
         fields = [
@@ -162,6 +170,8 @@ class ServiceReviewSerializer(serializers.ModelSerializer):
 
 
 class ServiceReviewListSerializer(serializers.ModelSerializer):
+    """service review listing"""
+
     service = serializers.CharField(source="service.name")
     user = serializers.CharField(source="user.first_name")
 

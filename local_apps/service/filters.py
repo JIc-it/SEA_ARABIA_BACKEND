@@ -14,7 +14,7 @@ class ServiceFilter(django_filters.FilterSet):
         fields = [
             "is_verified",
             "is_active",
-            "category",
+            "category__name",
             "company",
             "occasions",
             "pickup_point",

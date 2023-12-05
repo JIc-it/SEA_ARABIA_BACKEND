@@ -82,17 +82,17 @@ class VendorAdd(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         location_data = self.request.data.get("location")
+        created_by = self.request.user
         user = serializer.save()
         if location_data:
             profile_extra = ProfileExtra.objects.create(
                 user=user, location=location_data
             )
+        Company.objects.create(user=user, created_by=created_by, status="New Lead")
         Company.objects.create(user=user)
 
 
-
-
-#-------------------------reset Password-----------------------------------------------------------------------------------------------------------------------------#
+# -------------------------reset Password-----------------------------------------------------------------------------------------------------------------------------#
 
 from rest_framework.views import APIView
 from django.utils import timezone
@@ -102,9 +102,10 @@ import random
 from local_apps.message_utility.views import mail_handler
 from django.shortcuts import render
 
+
 def generate_otp():
-    print('generate_otp')
-    return ''.join(random.choice('0123456789') for _ in range(6))
+    print("generate_otp")
+    return "".join(random.choice("0123456789") for _ in range(6))
 
 
 class RequestOTPView(APIView):
@@ -112,34 +113,42 @@ class RequestOTPView(APIView):
         try:
             serializer = EmailSerializer(data=request.data)
             if serializer.is_valid():
-                email = serializer.validated_data['email']
+                email = serializer.validated_data["email"]
                 try:
                     print(email)
                     user = User.objects.get(email=email)
                     print(user)
                 except User.DoesNotExist:
-                    return Response({"detail": "User with this email does not exist."},
-                                    status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {"detail": "User with this email does not exist."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
                 otp = generate_otp()
                 expires_at = timezone.now() + timezone.timedelta(minutes=5)
                 password_reset, created = PasswordReset.objects.get_or_create(
-                    user=user,
-                    defaults={'otp': otp, 'expires_at': expires_at}
+                    user=user, defaults={"otp": otp, "expires_at": expires_at}
                 )
                 if not created:
                     password_reset.otp = otp
                     password_reset.expires_at = expires_at
                     password_reset.save()
                 data = {
-                    'name': str(user.first_name) if user.first_name else 'DMS User',
-                    'otp': str(otp),
+                    "name": str(user.first_name) if user.first_name else "DMS User",
+                    "otp": str(otp),
                 }
-                subject = 'Forgot your password?'
-                email_template = 'message_utility/password_otp.html'
-                mail_handler(mail_type='single', to=[email],
-                             subject=subject, data=data, template=email_template)
-                return Response({"detail": "OTP sent successfully.", "user_id": str(user.id)},
-                                status=status.HTTP_200_OK)
+                subject = "Forgot your password?"
+                email_template = "emails/password_otp.html"
+                mail_handler(
+                    mail_type="single",
+                    to=[email],
+                    subject=subject,
+                    data=data,
+                    template=email_template,
+                )
+                return Response(
+                    {"detail": "OTP sent successfully.", "user_id": str(user.id)},
+                    status=status.HTTP_200_OK,
+                )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -150,39 +159,47 @@ class VerifyOTPView(APIView):
         try:
             serializer = OTPVerificationSerializer(data=request.data)
             if serializer.is_valid():
-                user_id = serializer.validated_data['user_id']
-                otp = serializer.validated_data['otp']
-                password_reset = PasswordReset.objects.filter(user_id=user_id, otp=otp).first()
+                user_id = serializer.validated_data["user_id"]
+                otp = serializer.validated_data["otp"]
+                password_reset = PasswordReset.objects.filter(
+                    user_id=user_id, otp=otp
+                ).first()
                 if not password_reset:
-                    return Response({"detail": "Invalid OTP or OTP has expired."},
-                                    status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {"detail": "Invalid OTP or OTP has expired."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
                 if password_reset.expires_at < timezone.now():
-                    return Response({"detail": "OTP has expired."}, status=status.HTTP_400_BAD_REQUEST)
-                return Response({"detail": "OTP verified successfully."},
-                                status=status.HTTP_200_OK)
+                    return Response(
+                        {"detail": "OTP has expired."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                return Response(
+                    {"detail": "OTP verified successfully."}, status=status.HTTP_200_OK
+                )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-        
-        
-        
+
+
 class ForgotResetPasswordViewsnew(APIView):
     def post(self, request):
         try:
             serializer = ForgotPasswordResetSerializer(data=request.data)
             if serializer.is_valid():
-                user_id = serializer.validated_data['user_id']
-                new_password = serializer.validated_data['new_password']
+                user_id = serializer.validated_data["user_id"]
+                new_password = serializer.validated_data["new_password"]
                 password_reset = PasswordReset.objects.get(user_id=user_id)
                 user = password_reset.user
                 user.set_password(new_password)
                 user.save()
                 password_reset.delete()  # Optionally, you can delete the PasswordReset object
-                return Response({"detail": "Password reset successful."}, status=status.HTTP_200_OK)
+                return Response(
+                    {"detail": "Password reset successful."}, status=status.HTTP_200_OK
+                )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class CheckFirstTimeLoginView(APIView):
@@ -190,10 +207,18 @@ class CheckFirstTimeLoginView(APIView):
 
     def get(self, request):
         if request.user.is_first_time:
-            return Response({'is_first_time': True, 'message': 'First-time login. Please reset your password.'},
-                            status=status.HTTP_200_OK)
+            return Response(
+                {
+                    "is_first_time": True,
+                    "message": "First-time login. Please reset your password.",
+                },
+                status=status.HTTP_200_OK,
+            )
         else:
-            return Response({'is_first_time': False, 'message': 'Not a first-time login.'}, status=status.HTTP_200_OK)
+            return Response(
+                {"is_first_time": False, "message": "Not a first-time login."},
+                status=status.HTTP_200_OK,
+            )
 
 
 User = get_user_model()
@@ -204,20 +229,27 @@ class ResetPasswordView(APIView):
 
     def post(self, request):
         user = request.user
-        new_password = request.data.get('new_password')
-        confirm_password = request.data.get('confirm_password')
+        new_password = request.data.get("new_password")
+        confirm_password = request.data.get("confirm_password")
 
         if new_password and confirm_password:
             if new_password == confirm_password:
                 user.set_password(new_password)
                 user.is_first_time = False
                 user.save()
-                return Response({'message': 'Password reset successfully.'}, status=status.HTTP_200_OK)
+                return Response(
+                    {"message": "Password reset successfully."},
+                    status=status.HTTP_200_OK,
+                )
             else:
-                return Response({'error': 'New password and confirm password do not match.'},
-                                status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "New password and confirm password do not match."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         else:
-            return Response({'error': 'Empty passwords '}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Empty passwords "}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class ProfileResetPasswordView(APIView):
@@ -228,24 +260,34 @@ class ProfileResetPasswordView(APIView):
         serializer.is_valid(raise_exception=True)
 
         user = request.user
-        current_password = serializer.validated_data['current_password']
-        new_password = serializer.validated_data['new_password']
-        confirm_password = serializer.validated_data['confirm_password']
+        current_password = serializer.validated_data["current_password"]
+        new_password = serializer.validated_data["new_password"]
+        confirm_password = serializer.validated_data["confirm_password"]
 
         if current_password and new_password and confirm_password:
             if not user.check_password(current_password):
-                return Response({'error': 'Current password is incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Current password is incorrect."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             if new_password == confirm_password:
                 user.set_password(new_password)
                 user.save()
-                return Response({'message': 'Password has been reset successfully.'}, status=status.HTTP_200_OK)
+                return Response(
+                    {"message": "Password has been reset successfully."},
+                    status=status.HTTP_200_OK,
+                )
             else:
-                return Response({'error': 'New password and confirm password do not match.'},
-                                status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "New password and confirm password do not match."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         else:
-            return Response({'error': 'Please provide all fields'},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Please provide all fields"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class UserListView(generics.ListAPIView):
@@ -263,7 +305,5 @@ class UserProfileView(generics.RetrieveAPIView):
         return self.request.user
 
 
-
-
 def emilres(request):
-    return render(request,'email.html')
+    return render(request, "email.html")
