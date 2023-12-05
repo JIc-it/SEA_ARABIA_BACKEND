@@ -65,7 +65,6 @@ class ServiceSerializer(serializers.ModelSerializer):
     occasions = serializers.SlugRelatedField(
         slug_field="name", queryset=Occasion.objects.all()
     )
-    # amenities = serializers.SlugRelatedField(source="amenities.name")
 
     class Meta:
         model = Service

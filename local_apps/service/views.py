@@ -93,7 +93,7 @@ class SubCategoryList(generics.ListAPIView):
 class ServiceList(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
-    serializer_class = ServiceSerializer
+    serializer_class = ExploreMoreSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = [
         "name",
