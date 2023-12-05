@@ -29,6 +29,7 @@ THIRD_PARTY_APPS = [
     "django_filters",
     "debug_toolbar",
     "ckeditor",
+    "celery",
 ]
 
 LOCAL_APPS = [
@@ -138,8 +139,9 @@ EMAIL_HOST = "smtp.zoho.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = "noreply@jicitsolution.com"
-EMAIL_HOST_PASSWORD = "xxxxxxx"
+EMAIL_HOST_USER = "infan@jicitsolution.com"
+EMAIL_HOST_PASSWORD = "bw31AZ5f2JM4"
+DEFAULT_FROM_EMAIL = 'infan@jicitsolution.com'
 
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 

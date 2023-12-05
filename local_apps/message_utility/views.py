@@ -10,7 +10,7 @@ def mail_handler(mail_type=None, to=None, subject=None, data=None, template=None
                                           reply_to=reply_to)
             return send
         elif mail_type == 'multiple':
-            send = multiple_send_mail.delay(subject=subject, message=message, to_list=to, cc_list=cc, bcc_list=bcc,
+            send = single_send_mail.delay(subject=subject, message=message, to_list=to, cc_list=cc, bcc_list=bcc,
                                             reply_to=reply_to)
             return send
         else:
