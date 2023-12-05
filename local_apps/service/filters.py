@@ -21,4 +21,5 @@ class ServiceFilter(django_filters.FilterSet):
             "destination",
             "capacity",
             "amenities",
+            "type",
         ]

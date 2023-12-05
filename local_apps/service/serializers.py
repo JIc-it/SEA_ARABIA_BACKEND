@@ -104,6 +104,8 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 
 class ExploreMoreSerializer(serializers.ModelSerializer):
+    """serializer for showing the data in explore more section"""
+
     service_price = PriceSerializer(many=True)
     service_image = ServiceImageSerializer(many=True)
     destination = serializers.CharField(source="destination.name")
@@ -135,6 +137,16 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
             "service_price": {"required": False},
             "service_image": {"required": False},
         }
+
+
+class ServiceReviewList(serializers.ModelSerializer):
+    """serializer for service review filter section"""
+
+    service_image = ServiceImageSerializer(many=True)
+
+    class Meta:
+        model = Service
+        fields = ["name", "service_image"]
 
 
 class ServiceReviewSerializer(serializers.ModelSerializer):
