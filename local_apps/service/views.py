@@ -140,7 +140,38 @@ class ServiceImageUpdate(generics.UpdateAPIView):
     serializer_class = ServiceImageSerializer
 
 
-#   App views
+# service review views
+
+
+class ServiceReviewCreate(generics.CreateAPIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = ServiceReviewSerializer
+
+
+class ServiceReviewUpdate(generics.CreateAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = ServiceReview.objects.all()
+    serializer_class = ServiceReviewSerializer
+
+
+class ServiceReviewList(generics.ListAPIView):
+    # TODO:: only show the reviews of services belonging to the owner of the particular service
+    # permission_classes = [IsAuthenticated]
+    queryset = ServiceReview.objects.all()
+    serializer_class = ServiceReviewListSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = [
+        "rating",
+        "service__name",
+        "review_title",
+    ]
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     queryset = ServiceReview.objects.filter(service__company__user=user)
+    #     return queryset
+
+
+# ?---------------------------App views----------------------------------------#
 
 
 # class ServiceTopSuggestion(generics.ListAPIView):

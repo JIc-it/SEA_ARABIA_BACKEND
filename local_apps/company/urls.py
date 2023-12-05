@@ -9,6 +9,12 @@ urlpatterns = [
         ServiceTagList.as_view(),
         name="servicetag-list",
     ),
+    #   OrderStatus urls
+    path(
+        "orderstatus-list",
+        OnboardStatusList.as_view(),
+        name="orderstatus-list",
+    ),
     #   Company urls
     path(
         "company-list/",

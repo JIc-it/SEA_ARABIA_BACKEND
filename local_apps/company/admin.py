@@ -45,3 +45,8 @@ class MOUorCharterAdmin(admin.ModelAdmin):
 @admin.register(Qualifications)
 class QualificationsAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(OnboardStatus)
+class OnboardStatusAdmin(admin.ModelAdmin):
+    pass

@@ -92,6 +92,17 @@ urlpatterns = [
         ServiceImageUpdate.as_view(),
         name="service-image-update",
     ),
+    #   Service Review Serializer
+    path(
+        "service-review-create",
+        ServiceReviewCreate.as_view(),
+        name="service-review-create",
+    ),
+    path(
+        "service-review-list",
+        ServiceReviewList.as_view(),
+        name="service-review-list",
+    ),
     #  App Urls
     path(
         "explore-more",

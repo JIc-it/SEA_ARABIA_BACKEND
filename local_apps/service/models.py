@@ -32,7 +32,7 @@ VENDOR_PERIOD_TYPE = (
     ("Per Service", "Per Service"),
     ("Monthly", "Monthly"),
     ("Yearly", "Yearly"),
-    ("Per Ticket", "Per Ticket")
+    ("Per Ticket", "Per Ticket"),
 )
 
 
@@ -153,8 +153,12 @@ class Service(Main):
     )
     capacity = models.CharField(max_length=200, blank=True, null=True)
     amenities = models.ManyToManyField(Amenity, blank=True)
-    day = models.CharField(choices=NUMBER_CHOICES, max_length=100, blank=True, null=True)
-    night = models.CharField(choices=NUMBER_CHOICES, max_length=100, blank=True, null=True)
+    day = models.CharField(
+        choices=NUMBER_CHOICES, max_length=100, blank=True, null=True
+    )
+    night = models.CharField(
+        choices=NUMBER_CHOICES, max_length=100, blank=True, null=True
+    )
     pricing_type = models.ForeignKey(
         VendorPriceType, on_delete=models.SET_NULL, blank=True, null=True
     )
@@ -260,7 +264,6 @@ class ServiceReview(Main):
         blank=True,
         related_name="service_service_review_replied_by",
     )
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

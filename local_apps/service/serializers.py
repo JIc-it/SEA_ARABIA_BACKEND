@@ -135,3 +135,30 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
             "service_price": {"required": False},
             "service_image": {"required": False},
         }
+
+
+class ServiceReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceReview
+        fields = [
+            "service",
+            "user",
+            "review_title",
+            "review_summary",
+            "rating",
+        ]
+
+
+class ServiceReviewListSerializer(serializers.ModelSerializer):
+    service = serializers.CharField(source="service.name")
+    user = serializers.CharField(source="user.first_name")
+
+    class Meta:
+        model = ServiceReview
+        fields = [
+            "service",
+            "user",
+            "review_title",
+            "review_summary",
+            "rating",
+        ]

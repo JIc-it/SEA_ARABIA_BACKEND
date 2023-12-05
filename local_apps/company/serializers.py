@@ -72,3 +72,9 @@ class MOUorCharterSerializer(serializers.ModelSerializer):
     class Meta:
         model = MOUorCharter
         exclude = ["created_at", "updated_at"]
+
+
+class OnboardStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OnboardStatus
+        fields = ["name"]

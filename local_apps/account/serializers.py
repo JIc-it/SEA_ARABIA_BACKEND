@@ -106,7 +106,6 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-
 class PasswordResetSerializer(serializers.Serializer):
     current_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
@@ -128,9 +127,8 @@ class OTPVerificationSerializer(serializers.Serializer):
     def validate(self, data):
         # Custom validation logic can be added here, if needed
         return data
-    
-    
+
+
 class ForgotPasswordResetSerializer(serializers.Serializer):
     user_id = serializers.UUIDField()
     new_password = serializers.CharField(required=True)
-  

@@ -18,6 +18,14 @@ class ServiceTagList(generics.ListAPIView):
     serializer_class = ServiceTagSerializer
 
 
+# Onboard status view
+
+
+class OnboardStatusList(generics.ListAPIView):
+    queryset = OnboardStatus.objects.all().order_by("order")
+    serializer_class = OnboardStatusSerializer
+
+
 # Company CRUD view
 
 

@@ -48,7 +48,7 @@ class Company(Main):
     staffs = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
     is_onboard = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
-    assigned_to = models.ForeignKey(
+    created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         blank=True,
@@ -63,8 +63,13 @@ class Company(Main):
     # status = models.CharField(
     #     choices=COMPANY_STATUS, default="New Lead", max_length=100
     # )
-    status = models.ForeignKey(OnboardStatus, on_delete=models.SET_NULL, blank=True, null=True,
-                               related_name="company_company_status")
+    status = models.ForeignKey(
+        OnboardStatus,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="company_company_status",
+    )
     third_party_ownership = models.BooleanField(default=False)
 
     class Meta:

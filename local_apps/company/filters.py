@@ -10,7 +10,6 @@ class CompanyFilter(django_filters.FilterSet):
         fields = [
             "is_onboard",
             "is_active",
-            "assigned_to",
             "service_summary",
             "status",
         ]
