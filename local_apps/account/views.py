@@ -130,7 +130,7 @@ class RequestOTPView(APIView):
                 )
                 if not created:
                     password_reset.otp = otp
-                    password_reset.expires_at = expires_at
+                    password_reset.expires_at = expires_at 
                     password_reset.save()
                 data = {
                     "name": str(user.first_name) if user.first_name else "DMS User",
