@@ -137,7 +137,7 @@ class RequestOTPView(APIView):
                     "otp": str(otp),
                 }
                 subject = "Forgot your password?"
-                email_template = "emails/password_otp.html"
+                email_template = "message_utility/password_otp.html"
                 mail_handler(
                     mail_type="single",
                     to=[email],
