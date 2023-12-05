@@ -1,6 +1,8 @@
 from django.db import models
 from local_apps.company.models import Company
 from local_apps.core.models import Main
+from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 NUMBER_CHOICES = []
 
@@ -229,3 +231,44 @@ class ServiceImage(Main):
             if self.service and self.service.name
             else "No service name"
         )
+
+
+class ServiceReview(Main):
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name="service_service_review_service",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="service_service_review_user",
+    )
+    review_title = models.CharField(max_length=500, null=True, blank=True)
+    review_summary = models.TextField(null=True, blank=True)
+    reply = models.TextField(null=True, blank=True)
+    rating = models.PositiveIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        null=True,
+        blank=True,
+    )
+    replied_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="service_service_review_replied_by",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.review_title if self.review_title else "No Title"
+
+    class Meta:
+        unique_together = (("service", "user"),)
+        ordering = ["-created_at"]
+        verbose_name = "Service Review"
+        verbose_name_plural = "Service Reviews"

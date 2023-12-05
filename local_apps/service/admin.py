@@ -45,3 +45,8 @@ class PriceAdmin(admin.ModelAdmin):
 @admin.register(ServiceImage)
 class ServiceImageAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(ServiceReview)
+class ServiceReviewAdmin(admin.ModelAdmin):
+    pass
