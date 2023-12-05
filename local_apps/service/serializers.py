@@ -112,7 +112,7 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
     service_image = ServiceImageSerializer(many=True)
     destination = serializers.CharField(source="destination.name")
     company = serializers.CharField(source="company.name")
-    # category = serializers.CharField(source="category.name")
+    category = serializers.CharField(source="category.name")
     # pricing_type = serializers.CharField(source="pricing_type.name")
     # occasions = serializers.SlugRelatedField(
     #     many=True, slug_field="name", queryset=Occasion.objects.all()
@@ -132,7 +132,9 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
             "company",
             "amenities",
             "description",
-            "duration",
+            "day",
+            "night",
+            "category",
         ]
 
         extra_kwargs = {
