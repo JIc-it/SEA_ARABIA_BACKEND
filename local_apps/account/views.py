@@ -9,7 +9,7 @@ from .models import *
 from .serializers import *
 from local_apps.company.filters import CompanyFilter
 from .filters import *
-from local_apps.company.models import Company
+from local_apps.company.models import Company, OnboardStatus
 
 #   User CRUD View
 
@@ -88,8 +88,8 @@ class VendorAdd(generics.CreateAPIView):
             profile_extra = ProfileExtra.objects.create(
                 user=user, location=location_data
             )
-        Company.objects.create(user=user, created_by=created_by, status="New Lead")
-        Company.objects.create(user=user)
+        new_lead = OnboardStatus.objects.get(order=1)
+        Company.objects.create(user=user, created_by=created_by, status=new_lead)
 
 
 # -------------------------reset Password-----------------------------------------------------------------------------------------------------------------------------#
