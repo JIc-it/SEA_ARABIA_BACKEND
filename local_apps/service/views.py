@@ -83,8 +83,8 @@ class SubCategoryList(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = SubCategory.objects.all()
     serializer_class = SubCategorySerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_class = SubCategoryFilter
+    # filter_backends = [DjangoFilterBackend, SearchFilter]
+    # filterset_class = SubCategoryFilter
 
 
 # Service Type Views
@@ -154,26 +154,32 @@ class ServiceReviewUpdate(generics.CreateAPIView):
     serializer_class = ServiceReviewSerializer
 
 
-class ServiceReviewList(generics.ListAPIView):
-    # permission_classes = [IsAuthenticated]
-    queryset = ServiceReview.objects.all()
-    serializer_class = ServiceReviewListSerializer
-    # filter_backends = [DjangoFilterBackend, SearchFilter]
-    # search_fields = [
-    #     "rating",
-    #     "service__name",
-    #     "review_title",
-    # ]
-
-
 class ServiceFilterList(generics.ListAPIView):
     """View for filtering the service in service review listing section"""
 
     serializer_class = ServiceFilterList
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ["name"]
+    filterset_class = ServiceFilter
 
     def get_queryset(self):
         user = self.request.user
         service_list = Service.objects.filter(company__user=user)
+        return service_list
+
+
+class ServiceReviewList(generics.ListAPIView):
+    """view for showing the reviews realted to the particular service"""
+
+    # permission_classes = [IsAuthenticated]
+    # queryset = ServiceReview.objects.all()
+    serializer_class = ServiceReviewListSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ServiceReviewFilter
+
+    def get_queryset(self):
+        service_id = self.kwargs.get("pk")
+        service_list = ServiceReview.objects.filter(service=service_id)
         return service_list
 
 

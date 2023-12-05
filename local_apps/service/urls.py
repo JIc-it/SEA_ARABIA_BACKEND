@@ -99,7 +99,7 @@ urlpatterns = [
         name="service-review-create",
     ),
     path(
-        "service-review-list",
+        "service-review-list/<uuid:pk>",
         ServiceReviewList.as_view(),
         name="service-review-list",
     ),

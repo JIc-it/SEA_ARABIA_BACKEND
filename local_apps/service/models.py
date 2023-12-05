@@ -140,6 +140,9 @@ class Service(Main):
         choices=SERVICE_TYPE, max_length=100, default="Service", blank=True, null=True
     )
     category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, blank=True, null=True
+    )
+    sub_category = models.ForeignKey(
         SubCategory, on_delete=models.SET_NULL, blank=True, null=True
     )
     occasions = models.ManyToManyField(Occasion, blank=True)

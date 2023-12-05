@@ -14,8 +14,9 @@ class ServiceFilter(django_filters.FilterSet):
         fields = [
             "is_verified",
             "is_active",
-            "category__name",
             "company",
+            "category",
+            "sub_category",
             "occasions",
             "pickup_point",
             "destination",
@@ -23,3 +24,7 @@ class ServiceFilter(django_filters.FilterSet):
             "amenities",
             "type",
         ]
+
+
+class ServiceReviewFilter(django_filters.FilterSet):
+    pass

@@ -56,6 +56,8 @@ class ServiceImageSerializer(serializers.ModelSerializer):
 
 
 class ServiceSerializer(serializers.ModelSerializer):
+    """serializer for creating new service"""
+
     service_price = PriceSerializer(many=True)
     service_image = ServiceImageSerializer(many=True)
     destination = serializers.CharField(source="destination.name")
@@ -147,13 +149,12 @@ class ServiceFilterList(serializers.ModelSerializer):
     """serializer for service review filter section"""
 
     service_image = ServiceImageSerializer(many=True)
+    # category = serializers.CharField(source="category.name")
+    # sub_category = serializers.CharField(source="sub_category.name")
 
     class Meta:
         model = Service
-        fields = [
-            "name",
-            "service_image",
-        ]
+        fields = ["name", "service_image", "category", "sub_category"]
 
 
 class ServiceReviewSerializer(serializers.ModelSerializer):
