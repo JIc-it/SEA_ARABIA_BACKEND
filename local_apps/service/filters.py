@@ -27,4 +27,8 @@ class ServiceFilter(django_filters.FilterSet):
 
 
 class ServiceReviewFilter(django_filters.FilterSet):
-    pass
+    class Meta:
+        model = ServiceReview
+        fields = [
+            "rating",
+        ]
