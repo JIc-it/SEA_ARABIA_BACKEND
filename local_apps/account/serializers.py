@@ -250,3 +250,4 @@ class UserSignUpSerializer(serializers.ModelSerializer):
             ProfileExtra.objects.create(user=user, **profile_extra_data)
 
         return user
+    
