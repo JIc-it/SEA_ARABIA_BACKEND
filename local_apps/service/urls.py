@@ -115,9 +115,19 @@ urlpatterns = [
         name="explore-more",
     ),
     # top suggestions
-    # path(
-    #     "top-suggestions",
-    #     ServiceTopSuggestion.as_view(),
-    #     name="top-suggestions",
-    # ),
+    path(
+        "top-suggestions",
+        ServiceTopSuggestion.as_view(),
+        name="top-suggestions",
+    ),
+    # near by activities
+    # path("near-by-activites",
+    #      NearByActivities.as_view(),
+    #     name="near-by-activites" 
+    #     ),
+    # # recommendation on activity side
+    # path("recommendation",
+    #      Recommendation.as_view(),
+    #      name="recommmendation"),
 ]
+
