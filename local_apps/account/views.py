@@ -107,6 +107,11 @@ class VendorPersonalList(generics.RetrieveAPIView):
     serializer_class = VendorAddDetails
 
 
+class UserIdTypeList(generics.ListAPIView):
+    serializer_class = UserIdentificationTypeSerializer
+    queryset = UserIdentificationType.objects.all()
+
+
 # -------------------------reset Password-----------------------------------------------------------------------------------------------------------------------------#
 
 from rest_framework.views import APIView

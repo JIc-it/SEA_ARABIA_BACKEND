@@ -65,6 +65,13 @@ urlpatterns = [
         VendorPersonalList.as_view(),
         name="vendor-list-details",
     ),
+    # vendor personal Details list  Add api
+    path(
+        "userid-type",
+        UserIdTypeList.as_view(),
+        name="userid-type",
+    ),
+    # forget password urls
     path(
         "check-first-time/", CheckFirstTimeLoginView.as_view(), name="check-first-time"
     ),
