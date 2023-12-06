@@ -130,3 +130,4 @@ urlpatterns = [
     #      Recommendation.as_view(),
     #      name="recommmendation"),
 ]
+
