@@ -186,9 +186,9 @@ class ServiceReviewList(generics.ListAPIView):
 # ?---------------------------App views----------------------------------------#
 
 
-# class ServiceTopSuggestion(generics.ListAPIView):
-#     queryset = Service.objects.filter(is_top_suggestion=True)
-#     serializer_class = ExploreMoreSerializer
+class ServiceTopSuggestion(generics.ListAPIView):
+    queryset = Service.objects.filter(is_top_suggestion=True)
+    serializer_class = ExploreMoreSerializer
 
 
 class ExploreMore(generics.ListAPIView):
@@ -197,3 +197,16 @@ class ExploreMore(generics.ListAPIView):
     serializer_class = ExploreMoreSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ServiceFilter
+
+# class NearByActivities(generics.ListAPIView):
+#     queryset = Service.objects.all()
+#     serializer_class = ExploreMoreSerializer
+#     filter_backends=[DjangoFilterBackend]
+#     filterset_class = ServiceFilter
+
+
+# class Recommendation(generics.ListAPIView):
+#     queryset = Service.objects.all()
+#     serializer_class = ExploreMoreSerializer
+#     filter_backends = [DjangoFilterBackend]
+#     flterset_class = ServiceFilter
