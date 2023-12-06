@@ -75,6 +75,11 @@ class VendorSerializerList(generics.ListAPIView):
     filterset_class = VendorFilter
 
 
+class VendorDetailsList(generics.RetrieveAPIView):
+    queryset = User.objects.filter(role="Vendor")
+    serializer_class = VendorDetailsSerializer
+
+
 class VendorAdd(generics.CreateAPIView):
     """view for creating new vendor"""
 
@@ -130,7 +135,7 @@ class RequestOTPView(APIView):
                 )
                 if not created:
                     password_reset.otp = otp
-                    password_reset.expires_at = expires_at 
+                    password_reset.expires_at = expires_at
                     password_reset.save()
                 data = {
                     "name": str(user.first_name) if user.first_name else "DMS User",

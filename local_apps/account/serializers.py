@@ -31,6 +31,38 @@ class VendorSerializer(serializers.ModelSerializer):
         ]
 
 
+class VendorDetailsSerializer(serializers.ModelSerializer):
+    """serializer for showing the vendor details"""
+
+    location = serializers.CharField(source="profileextra.location")
+    id_number = serializers.CharField(source="useridentificationdata.id_number")
+    company_id = serializers.CharField(source="company_company_user.id")
+    company_name = serializers.CharField(source="company_company_user.name")
+    registration_number = serializers.CharField(
+        source="company_company_user.registration_number"
+    )
+    company_address = serializers.CharField(source="company_company_user.address")
+    company_website = serializers.CharField(source="company_company_user.website")
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "mobile",
+            "role",
+            "first_name",
+            "last_name",
+            "location",
+            "id_number",
+            "company_id",
+            "company_name",
+            "registration_number",
+            "company_address",
+            "company_website",
+        ]
+
+
 class VendorAddSerializer(serializers.ModelSerializer):
     """serializer for adding the vendor"""
 

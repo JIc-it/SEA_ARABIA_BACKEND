@@ -41,7 +41,9 @@ class CompanyListSerializer(serializers.ModelSerializer):
 class MiscellaneousSerializer(serializers.ModelSerializer):
     class Meta:
         model = Miscellaneous
-        exclude = ["created_at", "updated_at"]
+        exclude = [
+            "updated_at",
+        ]
 
 
 class MiscellaneousTypeSerializer(serializers.ModelSerializer):

@@ -72,13 +72,13 @@ class MiscellaneousTypeList(generics.ListAPIView):
 
 
 class MiscellaneousCreate(generics.CreateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Miscellaneous.objects.all()
     serializer_class = MiscellaneousSerializer
 
 
 class MiscellaneousList(generics.ListAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Miscellaneous.objects.all()
     serializer_class = MiscellaneousSerializer
 
@@ -90,7 +90,7 @@ class MiscellaneousUpdate(generics.UpdateAPIView):
 
 
 class MiscellaneousView(generics.RetrieveAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Miscellaneous.objects.all()
     serializer_class = MiscellaneousSerializer
 
