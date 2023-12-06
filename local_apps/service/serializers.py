@@ -186,3 +186,42 @@ class ServiceReviewListSerializer(serializers.ModelSerializer):
             "review_summary",
             "rating",
         ]
+
+
+class ActivitySerializer(serializers.ModelSerializer):
+    """Serializer for Activity listing"""
+
+    service_price = PriceSerializer(many=True)
+    service_image = ServiceImageSerializer(many=True)
+    destination = serializers.CharField(source="destination.name")
+    company = serializers.CharField(source="company.name")
+    amenities = AmenitySerializer(many=True)
+    category = serializers.CharField(source="category.name")
+
+    class Meta:
+        model = Service
+        fields = [
+            "id",
+            "name",
+            "pickup_point",
+            "service_price",
+            "capacity",
+            "service_image",
+            "destination",
+            "company",
+            "amenities",
+            "description",
+            "day",
+            "night",
+            "category",
+        ]
+
+        extra_kwargs = {
+            "service_price": {"required": False},
+            "service_image": {"required": False},
+        }
+
+
+
+
+

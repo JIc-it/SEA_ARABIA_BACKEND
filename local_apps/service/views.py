@@ -8,6 +8,8 @@ from rest_framework.filters import SearchFilter
 from .models import *
 from .serializers import *
 from .filters import *
+from django.shortcuts import get_object_or_404
+
 
 
 class OccassionList(generics.ListAPIView):
@@ -187,11 +189,13 @@ class ServiceReviewList(generics.ListAPIView):
 
 
 class ServiceTopSuggestion(generics.ListAPIView):
+    """views for top suggestions"""
     queryset = Service.objects.filter(is_top_suggestion=True)
     serializer_class = ExploreMoreSerializer
 
 
 class ExploreMore(generics.ListAPIView):
+    """views for explore more"""
     # permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
     serializer_class = ExploreMoreSerializer
@@ -210,3 +214,31 @@ class ExploreMore(generics.ListAPIView):
 #     serializer_class = ExploreMoreSerializer
 #     filter_backends = [DjangoFilterBackend]
 #     flterset_class = ServiceFilter
+
+
+class AllActivities(generics.ListAPIView):
+    """views for all activity listing"""
+    queryset = Service.objects.all()
+    serializer_class = ActivitySerializer
+    filter_backends =[DjangoFilterBackend]
+    filterset_class = ServiceFilter
+
+    def get_queryset(self):
+       
+        return Service.objects.filter(type="Activity")
+
+    
+
+class CategoryBasedListing(generics.ListAPIView):
+    """views for category based listing"""
+    queryset = Service.objects.all()
+    serializer_class = ActivitySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ServiceFilter
+
+    def get_queryset(self):
+        category_name = self.kwargs.get('category_name')  
+        category = get_object_or_404(Category, name=category_name)
+        return Service.objects.filter(category=category)
+    
+

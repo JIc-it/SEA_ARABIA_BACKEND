@@ -120,7 +120,7 @@ urlpatterns = [
         ServiceTopSuggestion.as_view(),
         name="top-suggestions",
     ),
-    # near by activities
+    # # near by activities
     # path("near-by-activites",
     #      NearByActivities.as_view(),
     #     name="near-by-activites" 
@@ -129,5 +129,18 @@ urlpatterns = [
     # path("recommendation",
     #      Recommendation.as_view(),
     #      name="recommmendation"),
+
+    # all activity listing
+    path(
+        "all-activites",
+        AllActivities.as_view(),
+        name='all-activites'
+    ),
+    # category based listing 
+    path("category-based-listing/<str:category_name>/",
+        CategoryBasedListing.as_view(),
+         name="category-based-listing" 
+         ),
+
 ]
 
