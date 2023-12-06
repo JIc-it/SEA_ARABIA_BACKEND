@@ -10,6 +10,14 @@ from .serializers import *
 from local_apps.company.filters import CompanyFilter
 from .filters import *
 from local_apps.company.models import Company, OnboardStatus
+from rest_framework.views import APIView
+from django.utils import timezone
+from .models import PasswordReset
+from django.contrib.auth import get_user_model
+import random
+from local_apps.message_utility.views import mail_handler
+from django.shortcuts import render
+
 
 #   User CRUD View
 
@@ -112,15 +120,8 @@ class UserIdTypeList(generics.ListAPIView):
     queryset = UserIdentificationType.objects.all()
 
 
-# -------------------------reset Password-----------------------------------------------------------------------------------------------------------------------------#
+# -----------------------------------------------------------Authenitaction-Section/OTP/FORGOTPASSWORD-----------------------------------------------------------------------------------------------------------------------------#
 
-from rest_framework.views import APIView
-from django.utils import timezone
-from .models import PasswordReset
-from django.contrib.auth import get_user_model
-import random
-from local_apps.message_utility.views import mail_handler
-from django.shortcuts import render
 
 
 def generate_otp():
@@ -327,3 +328,23 @@ class UserProfileView(generics.RetrieveAPIView):
 
 def emilres(request):
     return render(request, "email.html")
+
+
+
+#------------------------------------------------------------------------mobilepp-----------------------------------------------------------------#
+
+
+class UserSignUp(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSignUpSerializer
+
+    def post(self, request):
+        serializer = UserSignUpSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+
+
+
+    

@@ -227,3 +227,26 @@ class VendorAddDetails(serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
 
         return instance
+
+
+#----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
+#usersignup 
+
+       
+
+class UserSignUpSerializer(serializers.ModelSerializer):
+    
+    profile_extra = ProfileExtraSerializer(required=False)
+
+    class Meta:
+        model = User
+        fields = '__all__'
+
+    def create(self, validated_data):
+        profile_extra_data = validated_data.pop('profile_extra', None)
+        user = User.objects.create(**validated_data)
+        
+        if profile_extra_data:
+            ProfileExtra.objects.create(user=user, **profile_extra_data)
+
+        return user
