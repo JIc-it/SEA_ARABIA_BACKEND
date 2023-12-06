@@ -103,7 +103,7 @@ class Miscellaneous(Main):
         upload_to="company/miscellaneous/attachment", blank=True, null=True
     )
     note = models.TextField(blank=True, null=True)
-    datetime = models.DateTimeField(blank=True, null=True)
+    datetime = models.DateTimeField(blank=True, null=True, auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -158,7 +158,8 @@ class SiteVisit(Main):
     )
     qualifications = models.ManyToManyField(Qualifications, blank=True)
     note = models.TextField(blank=True, null=True)
-    datetime = models.DateTimeField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+    time = models.TimeField(blank=True, null=True)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -196,7 +197,7 @@ class Proposal(Main):
         upload_to="company/proposal/attachment", blank=True, null=True
     )
     note = models.TextField(blank=True, null=True)
-    datetime = models.DateTimeField(blank=True, null=True)
+    datetime = models.DateTimeField(blank=True, null=True, auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -234,7 +235,7 @@ class Negotiation(Main):
         upload_to="company/negotiation/attachment", blank=True, null=True
     )
     note = models.TextField(blank=True, null=True)
-    datetime = models.DateTimeField(blank=True, null=True)
+    datetime = models.DateTimeField(blank=True, null=True, auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -272,7 +273,7 @@ class MOUorCharter(Main):
         upload_to="company/mou_or_charter/attachment", blank=True, null=True
     )
     note = models.TextField(blank=True, null=True)
-    datetime = models.DateTimeField(blank=True, null=True)
+    datetime = models.DateTimeField(blank=True, null=True, auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]

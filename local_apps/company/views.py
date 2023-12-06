@@ -107,25 +107,25 @@ class QualificationsList(generics.ListAPIView):
 
 
 class SiteVisitCreate(generics.CreateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = SiteVisit.objects.all()
     serializer_class = SiteVisitSerializer
 
 
 class SiteVisitList(generics.ListAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = SiteVisit.objects.all()
     serializer_class = SiteVisitSerializer
 
 
 class SiteVisitUpdate(generics.UpdateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = SiteVisit.objects.all()
     serializer_class = SiteVisitSerializer
 
 
 class SiteVisitView(generics.RetrieveAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = SiteVisit.objects.all()
     serializer_class = SiteVisitSerializer
 

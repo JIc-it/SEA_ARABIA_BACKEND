@@ -23,6 +23,21 @@ class CompanySerializer(serializers.ModelSerializer):
         exclude = ["created_at", "updated_at"]
 
 
+class CompanyAddSerializer(serializers.ModelSerializer):
+    """serializer for adding and updating the company details in vendor"""
+
+    class Meta:
+        model = Company
+        fields = [
+            "name",
+            "registration_number",
+            "address",
+            "website",
+            "third_party_ownership",
+            "service_summary",
+        ]
+
+
 class CompanyListSerializer(serializers.ModelSerializer):
     service_summary = serializers.SlugRelatedField(
         many=True, slug_field="name", queryset=ServiceTag.objects.all()
@@ -39,9 +54,12 @@ class CompanyListSerializer(serializers.ModelSerializer):
 
 
 class MiscellaneousSerializer(serializers.ModelSerializer):
+    attachment = serializers.FileField()
+
     class Meta:
         model = Miscellaneous
         exclude = [
+            "created_at",
             "updated_at",
         ]
 
@@ -49,19 +67,30 @@ class MiscellaneousSerializer(serializers.ModelSerializer):
 class MiscellaneousTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = MiscellaneousType
-        exclude = ["created_at", "updated_at"]
+        exclude = [
+            "created_at",
+            "updated_at",
+        ]
 
 
 class SiteVisitSerializer(serializers.ModelSerializer):
+    attachment = serializers.FileField()
+
     class Meta:
         model = SiteVisit
-        exclude = ["created_at", "updated_at"]
+        exclude = [
+            "created_at",
+            "updated_at",
+        ]
 
 
 class ProposalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Proposal
-        exclude = ["created_at", "updated_at"]
+        exclude = [
+            "created_at",
+            "updated_at",
+        ]
 
 
 class NegotiationSerializer(serializers.ModelSerializer):

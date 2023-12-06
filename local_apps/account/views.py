@@ -97,6 +97,16 @@ class VendorAdd(generics.CreateAPIView):
         Company.objects.create(user=user, created_by=created_by, status=new_lead)
 
 
+class VendorDetailsAdd(generics.UpdateAPIView):
+    serializer_class = VendorAddDetails
+    queryset = User.objects.filter(role="Vendor")
+
+
+class VendorPersonalList(generics.RetrieveAPIView):
+    queryset = User.objects.filter(role="Vendor")
+    serializer_class = VendorAddDetails
+
+
 # -------------------------reset Password-----------------------------------------------------------------------------------------------------------------------------#
 
 from rest_framework.views import APIView

@@ -53,6 +53,18 @@ urlpatterns = [
         VendorDetailsList.as_view(),
         name="vendor-details",
     ),
+    # vendor Details Add api
+    path(
+        "vendor-add-details/<uuid:pk>",
+        VendorDetailsAdd.as_view(),
+        name="vendor-add-details",
+    ),
+    # vendor personal Details list  Add api
+    path(
+        "vendor-list-details/<uuid:pk>",
+        VendorPersonalList.as_view(),
+        name="vendor-list-details",
+    ),
     path(
         "check-first-time/", CheckFirstTimeLoginView.as_view(), name="check-first-time"
     ),

@@ -1,5 +1,9 @@
 from rest_framework import serializers
 from .models import *
+from local_apps.company.serializers import CompanyAddSerializer
+from rest_framework.response import Response
+from local_apps.company.models import Company
+from rest_framework import status
 
 # user cms serializers
 
@@ -87,7 +91,7 @@ class UserIdentificationTypeSerializer(serializers.ModelSerializer):
 class UserIdentificationDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserIdentificationData
-        fields = "__all__"
+        fields = ["id_type", "id_number"]
 
 
 # Serializers for viewing in app
@@ -168,3 +172,58 @@ class OTPVerificationSerializer(serializers.Serializer):
 class ForgotPasswordResetSerializer(serializers.Serializer):
     user_id = serializers.UUIDField()
     new_password = serializers.CharField(required=True)
+
+
+class VendorAddDetails(serializers.ModelSerializer):
+    """serializer for adding and updating"""
+
+    useridentificationdata = UserIdentificationDataSerializer()
+    company_company_user = CompanyAddSerializer()
+    location = serializers.CharField(source="profileextra.location")
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "mobile",
+            "role",
+            "first_name",
+            "last_name",
+            "useridentificationdata",
+            "company_company_user",
+            "location",
+        ]
+
+    def update(self, instance, validated_data):
+        location_data = validated_data.pop("profileextra", {}).get("location", "")
+        company_data = validated_data.pop("company_company_user", {})
+        user_identification_data = validated_data.pop("useridentificationdata", {})
+
+        profile_instance, _ = ProfileExtra.objects.get_or_create(user=instance)
+
+        if location_data:
+            profile_instance.location = location_data
+            profile_instance.save()
+
+        company_instance, _ = Company.objects.get_or_create(user=instance)
+        company_serializer = CompanyAddSerializer(
+            instance=company_instance, data=company_data
+        )
+        if company_serializer.is_valid():
+            company_serializer.save()
+
+        (
+            user_identification_instance,
+            _,
+        ) = UserIdentificationData.objects.get_or_create(user=instance)
+
+        user_identification_serializer = UserIdentificationDataSerializer(
+            instance=user_identification_instance, data=user_identification_data
+        )
+        if user_identification_serializer.is_valid():
+            user_identification_serializer.save()
+
+        instance = super().update(instance, validated_data)
+
+        return instance
