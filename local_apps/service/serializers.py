@@ -193,7 +193,7 @@ class ActivitySerializer(serializers.ModelSerializer):
 
     service_price = PriceSerializer(many=True)
     service_image = ServiceImageSerializer(many=True)
-    destination = serializers.CharField(source="destination.name")
+    destination = serializers.CharField(source="destination.name", required=False, allow_null=True)
     company = serializers.CharField(source="company.name")
     amenities = AmenitySerializer(many=True)
     category = serializers.CharField(source="category.name")
