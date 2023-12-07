@@ -106,13 +106,75 @@ class VendorAdd(generics.CreateAPIView):
 
 
 class VendorDetailsAdd(generics.UpdateAPIView):
-    serializer_class = VendorAddDetails
+    serializer_class = VendorAddDetailsSerialzier
     queryset = User.objects.filter(role="Vendor")
 
+    def update(self, request, *args, **kwargs):
+        try:
+            location_data = request.data.get("location", {})
+            company_data = request.data.get("company_company_user", {})
+            user_identification_data = request.data.get("useridentificationdata", {})
+            service_category = company_data.get('service_summary',[])
+
+            #   get user instance
+            user = User.objects.get(id=kwargs["pk"])
+
+            #   user details 
+
+            email = request.data.get("email",None)
+            mobile = request.data.get("mobile",None)
+            first_name = request.data.get("first_name",None)
+            last_name = request.data.get("last_name",None)
+
+            if email:
+                user.email = email
+            
+            if mobile:
+                user.mobile = mobile
+            
+            if first_name:
+                user.first_name = first_name
+            
+            if last_name:
+                user.last_name = last_name
+
+            user.save()
+
+            profile_instance, created = ProfileExtra.objects.get_or_create(user=user)
+            if location_data:
+                profile_instance.location = location_data
+                profile_instance.save()
+
+            company_instance, _ = Company.objects.get_or_create(user=user)
+            company_serializer = CompanyAddSerializer(instance=company_instance, data=company_data)
+            if company_serializer.is_valid():
+                company_serializer.save()
+
+                if service_category:
+                    company_instance.service_summary.set(service_category)
+
+
+
+            
+            useridentification_instance,_,= UserIdentificationData.objects.get_or_create(user=user)
+            user_identification_serializer = UserIdentificationDataSerializer(
+                instance=useridentification_instance, data=user_identification_data
+            )
+
+            if user_identification_serializer.is_valid():
+                user_identification_serializer.save()
+
+            serializer = VendorAddDetailsSerialzier(user)
+            return Response(serializer.data,status = status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(f"Error: {str(e)}",status= status.HTTP_400_BAD_REQUEST)
+        
+
+        
 
 class VendorPersonalList(generics.RetrieveAPIView):
     queryset = User.objects.filter(role="Vendor")
-    serializer_class = VendorAddDetails
+    serializer_class = VendorAddDetailsSerialzier
 
 
 class UserIdTypeList(generics.ListAPIView):
@@ -121,7 +183,6 @@ class UserIdTypeList(generics.ListAPIView):
 
 
 # -----------------------------------------------------------Authenitaction-Section/OTP/FORGOTPASSWORD-----------------------------------------------------------------------------------------------------------------------------#
-
 
 
 def generate_otp():
@@ -330,8 +391,7 @@ def emilres(request):
     return render(request, "email.html")
 
 
-
-#------------------------------------------------------------------------mobilepp-----------------------------------------------------------------#
+# ------------------------------------------------------------------------mobilepp-----------------------------------------------------------------#
 
 
 class UserSignUp(generics.CreateAPIView):
@@ -343,8 +403,4 @@ class UserSignUp(generics.CreateAPIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
-
-
-
-    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -3,6 +3,7 @@ from local_apps.company.models import Company
 from local_apps.core.models import Main
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
+from local_apps.main.models import Category, SubCategory
 
 NUMBER_CHOICES = []
 
@@ -103,31 +104,31 @@ class Amenity(Main):
         verbose_name_plural = "Amenities"
 
 
-class Category(Main):
-    name = models.CharField(max_length=255)
+# class Category(Main):
+#     name = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
-    class Meta:
-        ordering = ["-created_at", "-updated_at"]
-        verbose_name = "Category"
-        verbose_name_plural = "Categories"
+#     class Meta:
+#         ordering = ["-created_at", "-updated_at"]
+#         verbose_name = "Category"
+#         verbose_name_plural = "Categories"
 
 
-class SubCategory(Main):
-    category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, blank=True, null=True
-    )
-    name = models.CharField(max_length=255)
+# class SubCategory(Main):
+#     category = models.ForeignKey(
+#         Category, on_delete=models.SET_NULL, blank=True, null=True
+#     )
+#     name = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
-    class Meta:
-        ordering = ["-created_at", "-updated_at"]
-        verbose_name = "Sub Category"
-        verbose_name_plural = "Sub Categories"
+#     class Meta:
+#         ordering = ["-created_at", "-updated_at"]
+#         verbose_name = "Sub Category"
+#         verbose_name_plural = "Sub Categories"
 
 
 class Service(Main):

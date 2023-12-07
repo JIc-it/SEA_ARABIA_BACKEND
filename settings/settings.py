@@ -40,6 +40,7 @@ LOCAL_APPS = [
     "local_apps.service.apps.ServiceConfig",
     "local_apps.message_utility.apps.MessageUtilityConfig",
     "local_apps.report.apps.ReportConfig",
+    "local_apps.main.apps.MainConfig",
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS

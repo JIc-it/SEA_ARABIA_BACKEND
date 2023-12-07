@@ -26,16 +26,16 @@ class AmenitySerializer(serializers.ModelSerializer):
         exclude = ["created_at", "updated_at"]
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        exclude = ["created_at", "updated_at"]
+# class CategorySerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Category
+#         exclude = ["created_at", "updated_at"]
 
 
-class SubCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SubCategory
-        exclude = ["created_at", "updated_at"]
+# class SubCategorySerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = SubCategory
+#         exclude = ["created_at", "updated_at"]
 
 
 class PriceSerializer(serializers.ModelSerializer):
@@ -145,7 +145,7 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
         }
 
 
-class ServiceFilterList(serializers.ModelSerializer):
+class ServiceFilterListSerializer(serializers.ModelSerializer):
     """serializer for service review filter section"""
 
     service_image = ServiceImageSerializer(many=True)
@@ -193,7 +193,9 @@ class ActivitySerializer(serializers.ModelSerializer):
 
     service_price = PriceSerializer(many=True)
     service_image = ServiceImageSerializer(many=True)
-    destination = serializers.CharField(source="destination.name", required=False, allow_null=True)
+    destination = serializers.CharField(
+        source="destination.name", required=False, allow_null=True
+    )
     company = serializers.CharField(source="company.name")
     amenities = AmenitySerializer(many=True)
     category = serializers.CharField(source="category.name")
@@ -220,8 +222,3 @@ class ActivitySerializer(serializers.ModelSerializer):
             "service_price": {"required": False},
             "service_image": {"required": False},
         }
-
-
-
-
-

@@ -22,16 +22,6 @@ class AmenityAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(SubCategory)
-class SubCategoryAdmin(admin.ModelAdmin):
-    pass
-
-
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
     pass

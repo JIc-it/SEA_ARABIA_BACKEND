@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from django.contrib.auth import get_user_model
+from local_apps.main.serializers import *
 
 User = get_user_model()
 
@@ -26,7 +27,7 @@ class CompanySerializer(serializers.ModelSerializer):
 class CompanyAddSerializer(serializers.ModelSerializer):
     """serializer for adding and updating the company details in vendor"""
 
-    service_summary = ServiceTagSerializer(many=True, read_only=True)
+    service_summary = CategorySerializer(many=True,read_only=True)
 
     class Meta:
         model = Company

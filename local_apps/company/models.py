@@ -2,6 +2,7 @@ from django.db import models
 from local_apps.core.models import Main
 from django.conf import settings
 from utils.file_handle import remove_file
+from local_apps.main.models import Category
 
 COMPANY_STATUS = (
     ("New Lead", "New Lead"),
@@ -59,7 +60,7 @@ class Company(Main):
     registration_number = models.CharField(max_length=200, blank=True, null=True)
     address = models.TextField(max_length=200, blank=True, null=True)
     website = models.CharField(max_length=200, blank=True, null=True)
-    service_summary = models.ManyToManyField(ServiceTag, blank=True)
+    service_summary = models.ManyToManyField(Category, blank=True)
     # status = models.CharField(
     #     choices=COMPANY_STATUS, default="New Lead", max_length=100
     # )

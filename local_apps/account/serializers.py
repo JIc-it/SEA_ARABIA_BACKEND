@@ -176,12 +176,12 @@ class ForgotPasswordResetSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True)
 
 
-class VendorAddDetails(serializers.ModelSerializer):
+class VendorAddDetailsSerialzier(serializers.ModelSerializer):
     """Serializer for adding and updating"""
 
-    useridentificationdata = UserIdentificationDataSerializer()
-    company_company_user = CompanyAddSerializer()
-    location = serializers.CharField(source="profileextra.location")
+    useridentificationdata = UserIdentificationDataSerializer(read_only=True)
+    company_company_user = CompanyAddSerializer(read_only=True)
+    location = serializers.CharField(source="profileextra.location", read_only=True)
 
     class Meta:
         model = User
@@ -197,58 +197,24 @@ class VendorAddDetails(serializers.ModelSerializer):
             "location",
         ]
 
-    def update(self, instance, validated_data):
-        location_data = validated_data.pop("profileextra", {}).get("location", "")
-        company_data = validated_data.pop("company_company_user", {})
-        user_identification_data = validated_data.pop("useridentificationdata", {})
-        profile_instance, created = ProfileExtra.objects.get_or_create(user=instance)
-
-        if location_data:
-            profile_instance.location = location_data
-            profile_instance.save()
-        company_instance, created = Company.objects.get_or_create(user=instance)
-        company_serializer = CompanyAddSerializer(
-            instance=company_instance, data=company_data
-        )
-        if company_serializer.is_valid():
-            company_serializer.save()
-
-        (
-            user_identification_instance,
-            created,
-        ) = UserIdentificationData.objects.get_or_create(user=instance)
-
-        user_identification_serializer = UserIdentificationDataSerializer(
-            instance=user_identification_instance, data=user_identification_data
-        )
-
-        if user_identification_serializer.is_valid():
-            user_identification_serializer.save()
-
-        instance = super().update(instance, validated_data)
-
-        return instance
 
 
-#----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
-#usersignup 
+# ----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
+# usersignup
 
-       
 
 class UserSignUpSerializer(serializers.ModelSerializer):
-    
     profile_extra = ProfileExtraSerializer(required=False)
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = "__all__"
 
     def create(self, validated_data):
-        profile_extra_data = validated_data.pop('profile_extra', None)
+        profile_extra_data = validated_data.pop("profile_extra", None)
         user = User.objects.create(**validated_data)
-        
+
         if profile_extra_data:
             ProfileExtra.objects.create(user=user, **profile_extra_data)
 
         return user
-    

@@ -9,7 +9,7 @@ from .models import *
 from .serializers import *
 from .filters import *
 from django.shortcuts import get_object_or_404
-
+from local_apps.main.serializers import CategorySerializer, SubCategorySerializer
 
 
 class OccassionList(generics.ListAPIView):
@@ -159,7 +159,7 @@ class ServiceReviewUpdate(generics.CreateAPIView):
 class ServiceFilterList(generics.ListAPIView):
     """View for filtering the service in service review listing section"""
 
-    serializer_class = ServiceFilterList
+    serializer_class = ServiceFilterListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ["name"]
     filterset_class = ServiceFilter
@@ -190,17 +190,20 @@ class ServiceReviewList(generics.ListAPIView):
 
 class ServiceTopSuggestion(generics.ListAPIView):
     """views for top suggestions"""
+
     queryset = Service.objects.filter(is_top_suggestion=True)
     serializer_class = ExploreMoreSerializer
 
 
 class ExploreMore(generics.ListAPIView):
     """views for explore more"""
+
     # permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
     serializer_class = ExploreMoreSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ServiceFilter
+
 
 # class NearByActivities(generics.ListAPIView):
 #     queryset = Service.objects.all()
@@ -218,33 +221,25 @@ class ExploreMore(generics.ListAPIView):
 
 class ServiceTypesListing(generics.ListAPIView):
     """views for all activity listing"""
-    queryset = Service.objects.all()
-    serializer_class = ActivitySerializer
-    filter_backends =[DjangoFilterBackend]
-    filterset_class = ServiceFilter
 
-    def get_queryset(self):
-        queryset = Service.objects.all()
-        
-       
-        service_type = self.request.query_params.get('type', None)
-        if service_type:
-            queryset = queryset.filter(type=service_type)
-        
-        return queryset    
-        
-
-
-class CategoryBasedListing(generics.ListAPIView):
-    """views for category based listing"""
     queryset = Service.objects.all()
     serializer_class = ActivitySerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ServiceFilter
 
     def get_queryset(self):
-        category_name = self.kwargs.get('category_name')  
+        return Service.objects.filter(type="Activity")
+
+
+class CategoryBasedListing(generics.ListAPIView):
+    """views for category based listing"""
+
+    queryset = Service.objects.all()
+    serializer_class = ActivitySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ServiceFilter
+
+    def get_queryset(self):
+        category_name = self.kwargs.get("category_name")
         category = get_object_or_404(Category, name=category_name)
         return Service.objects.filter(category=category)
-    
-
