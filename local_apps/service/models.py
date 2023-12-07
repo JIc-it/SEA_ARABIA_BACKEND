@@ -104,33 +104,6 @@ class Amenity(Main):
         verbose_name_plural = "Amenities"
 
 
-# class Category(Main):
-#     name = models.CharField(max_length=255)
-
-#     def __str__(self):
-#         return self.name
-
-#     class Meta:
-#         ordering = ["-created_at", "-updated_at"]
-#         verbose_name = "Category"
-#         verbose_name_plural = "Categories"
-
-
-# class SubCategory(Main):
-#     category = models.ForeignKey(
-#         Category, on_delete=models.SET_NULL, blank=True, null=True
-#     )
-#     name = models.CharField(max_length=255)
-
-#     def __str__(self):
-#         return self.name
-
-#     class Meta:
-#         ordering = ["-created_at", "-updated_at"]
-#         verbose_name = "Sub Category"
-#         verbose_name_plural = "Sub Categories"
-
-
 class Service(Main):
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
