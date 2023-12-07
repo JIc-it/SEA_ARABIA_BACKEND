@@ -17,7 +17,7 @@ from django.contrib.auth import get_user_model
 import random
 from local_apps.message_utility.views import mail_handler
 from django.shortcuts import render
-
+from django.shortcuts import get_object_or_404
 
 #   User CRUD View
 
@@ -111,10 +111,15 @@ class VendorDetailsAdd(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         try:
+
+            # taking the data 
             location_data = request.data.get("location", {})
             company_data = request.data.get("company_company_user", {})
             user_identification_data = request.data.get("useridentificationdata", {})
             service_category = company_data.get('service_summary',[])
+
+            user_id_type = user_identification_data.get('id_type',None)
+            user_id_number = user_identification_data.get('id_number',None)
 
             #   get user instance
             user = User.objects.get(id=kwargs["pk"])
@@ -140,10 +145,13 @@ class VendorDetailsAdd(generics.UpdateAPIView):
 
             user.save()
 
+            #   updating the user profile extra
             profile_instance, created = ProfileExtra.objects.get_or_create(user=user)
             if location_data:
                 profile_instance.location = location_data
                 profile_instance.save()
+
+            #   updating the company details 
 
             company_instance, _ = Company.objects.get_or_create(user=user)
             company_serializer = CompanyAddSerializer(instance=company_instance, data=company_data)
@@ -152,18 +160,16 @@ class VendorDetailsAdd(generics.UpdateAPIView):
 
                 if service_category:
                     company_instance.service_summary.set(service_category)
-
-
-
             
+            #   updating the user identification data
             useridentification_instance,_,= UserIdentificationData.objects.get_or_create(user=user)
-            user_identification_serializer = UserIdentificationDataSerializer(
-                instance=useridentification_instance, data=user_identification_data
-            )
-
-            if user_identification_serializer.is_valid():
-                user_identification_serializer.save()
-
+            
+            if user_id_type and user_id_number:
+                idType = get_object_or_404(UserIdentificationType, id=user_id_type)
+                useridentification_instance.id_type = idType
+                useridentification_instance.id_number = user_id_number
+                useridentification_instance.save()
+                
             serializer = VendorAddDetailsSerialzier(user)
             return Response(serializer.data,status = status.HTTP_201_CREATED)
         except Exception as e:

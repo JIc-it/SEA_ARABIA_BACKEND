@@ -89,7 +89,7 @@ class UserIdentificationTypeSerializer(serializers.ModelSerializer):
 
 
 class UserIdentificationDataSerializer(serializers.ModelSerializer):
-    id_type = UserIdentificationTypeSerializer(read_only=True)
+    id_type = UserIdentificationTypeSerializer(read_only =True)
 
     class Meta:
         model = UserIdentificationData
