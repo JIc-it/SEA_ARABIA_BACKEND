@@ -85,10 +85,12 @@ class VendorAddSerializer(serializers.ModelSerializer):
 class UserIdentificationTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserIdentificationType
-        fields = "__all__"
+        fields = ["name", "id"]
 
 
 class UserIdentificationDataSerializer(serializers.ModelSerializer):
+    id_type = UserIdentificationTypeSerializer(read_only=True)
+
     class Meta:
         model = UserIdentificationData
         fields = ["id_type", "id_number"]
@@ -175,7 +177,7 @@ class ForgotPasswordResetSerializer(serializers.Serializer):
 
 
 class VendorAddDetails(serializers.ModelSerializer):
-    """serializer for adding and updating"""
+    """Serializer for adding and updating"""
 
     useridentificationdata = UserIdentificationDataSerializer()
     company_company_user = CompanyAddSerializer()
@@ -199,14 +201,12 @@ class VendorAddDetails(serializers.ModelSerializer):
         location_data = validated_data.pop("profileextra", {}).get("location", "")
         company_data = validated_data.pop("company_company_user", {})
         user_identification_data = validated_data.pop("useridentificationdata", {})
-
-        profile_instance, _ = ProfileExtra.objects.get_or_create(user=instance)
+        profile_instance, created = ProfileExtra.objects.get_or_create(user=instance)
 
         if location_data:
             profile_instance.location = location_data
             profile_instance.save()
-
-        company_instance, _ = Company.objects.get_or_create(user=instance)
+        company_instance, created = Company.objects.get_or_create(user=instance)
         company_serializer = CompanyAddSerializer(
             instance=company_instance, data=company_data
         )
@@ -215,12 +215,13 @@ class VendorAddDetails(serializers.ModelSerializer):
 
         (
             user_identification_instance,
-            _,
+            created,
         ) = UserIdentificationData.objects.get_or_create(user=instance)
 
         user_identification_serializer = UserIdentificationDataSerializer(
             instance=user_identification_instance, data=user_identification_data
         )
+
         if user_identification_serializer.is_valid():
             user_identification_serializer.save()
 

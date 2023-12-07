@@ -26,6 +26,8 @@ class CompanySerializer(serializers.ModelSerializer):
 class CompanyAddSerializer(serializers.ModelSerializer):
     """serializer for adding and updating the company details in vendor"""
 
+    service_summary = ServiceTagSerializer(many=True, read_only=True)
+
     class Meta:
         model = Company
         fields = [
