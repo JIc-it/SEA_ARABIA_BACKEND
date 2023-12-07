@@ -199,22 +199,28 @@ class VendorAddDetailsSerialzier(serializers.ModelSerializer):
 
 
 
-# ----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
-# usersignup
+#----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
+#usersignup 
 
+       
 
 class UserSignUpSerializer(serializers.ModelSerializer):
     profile_extra = ProfileExtraSerializer(required=False)
+    location = serializers.CharField(source="profile_extra.location", required=False)
+    images = serializers.ImageField(source="profile_extra.image", required=False)
+    dob = serializers.CharField(source="profile_extra.dob", required=False)
+    gender = serializers.CharField(source="profile_extra.gender", required=False)
 
     class Meta:
         model = User
-        fields = "__all__"
+        fields = '__all__'
 
     def create(self, validated_data):
-        profile_extra_data = validated_data.pop("profile_extra", None)
+        profile_extra_data = validated_data.pop('profile_extra', None)
         user = User.objects.create(**validated_data)
-
+        
         if profile_extra_data:
             ProfileExtra.objects.create(user=user, **profile_extra_data)
 
         return user
+    
