@@ -193,6 +193,20 @@ class ServiceTopSuggestion(generics.ListAPIView):
 
     queryset = Service.objects.filter(is_top_suggestion=True)
     serializer_class = ExploreMoreSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ServiceFilter
+
+    def get_queryset(self):
+        queryset = Service.objects.all()
+        
+       
+        service_type = self.request.query_params.get('type', None)
+        if service_type:
+            queryset = queryset.filter(type=service_type)
+        
+        return queryset    
+        
+
 
 
 class ExploreMore(generics.ListAPIView):
@@ -222,6 +236,12 @@ class ExploreMore(generics.ListAPIView):
 class ServiceTypesListing(generics.ListAPIView):
     """views for all activity listing"""
 
+    queryset = Service.objects.all()
+    serializer_class = ActivitySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ServiceFilter
+
+
     def get_queryset(self):
         queryset = Service.objects.all()
         
@@ -233,16 +253,6 @@ class ServiceTypesListing(generics.ListAPIView):
         return queryset    
         
 
-
-class CategoryBasedListing(generics.ListAPIView):
-    """views for category based listing"""
-    queryset = Service.objects.all()
-    serializer_class = ActivitySerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = ServiceFilter
-
-    def get_queryset(self):
-        return Service.objects.filter(type="Activity")
 
 
 class CategoryBasedListing(generics.ListAPIView):
