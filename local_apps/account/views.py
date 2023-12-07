@@ -224,7 +224,7 @@ class RequestOTPView(APIView):
                     "name": str(user.first_name) if user.first_name else "DMS User",
                     "otp": str(otp),
                 }
-                subject = "Forgot your password?"
+                subject = "Sea Arabia Account Password Reset"
                 email_template = "message_utility/password_otp.html"
                 mail_handler(
                     mail_type="single",
@@ -404,9 +404,12 @@ class UserSignUp(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSignUpSerializer
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         serializer = UserSignUpSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            response_data = {'message': 'User registered successfully'}
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+

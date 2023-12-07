@@ -210,7 +210,7 @@ class UserSignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('first_name','last_name' ,'email', 'mobile', 'password', 'profile_extra', 'location', 'images', 'dob', 'gender')
+        fields = ('username', 'email', 'mobile', 'password','role', 'profile_extra', 'location', 'images', 'dob', 'gender')
         extra_kwargs = {'password': {'write_only': True},}
 
     def create(self, validated_data):
@@ -223,7 +223,16 @@ class UserSignUpSerializer(serializers.ModelSerializer):
         user.save()
 
         # Create associated ProfileExtra instance
-        ProfileExtra.objects.create(user=user, **profile_extra_data)
+        profile_extra = ProfileExtra.objects.create(user=user, **profile_extra_data)
 
-        return user
+        # Add related data to the response
+        response_data = self.data
+        response_data['profile_extra'] = ProfileExtraSerializer(profile_extra).data
+
+        return user, response_data
+    
+
+
+
+
     
