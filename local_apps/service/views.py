@@ -182,7 +182,67 @@ class ServiceReviewList(generics.ListAPIView):
     def get_queryset(self):
         service_id = self.kwargs.get("pk")
         service_list = ServiceReview.objects.filter(service=service_id)
+        
+        
         return service_list
+    
+class ServiceAvailabilityCreate(generics.CreateAPIView):
+    queryset = ServiceAvailability.objects.all()
+    serializer_class = ServiceAvailabilitySerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, args, *kwargs):
+        try:
+            service = request.data.get('service', None)
+            if service and Service.objects.filter(id=service).exists():
+                service = Service.objects.filter(id=service)
+                date = request.data.get('date', None)
+                time = request.data.get('time', None)
+
+                instance = ServiceAvailability.objects.create(service=service,
+                                                              date=date,
+                                                              time=time)
+            else:
+                return Response({"error": "Service not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+            serializer = ServiceAvailabilitySerializer(instance)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ServiceAvailabilityUpdate(generics.UpdateAPIView):
+    queryset = ServiceAvailability.objects.all()
+    serializer_class = ServiceAvailabilitySerializer
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, args, *kwargs):
+        try:
+            if Service.objects.filter(pk=kwargs['pk']).exists():
+                service = ServiceAvailability.objects.get(pk=kwargs['pk'])
+
+                date = request.data.get('date', None)
+                time = request.data.get('time', None)
+                if date:
+                    service.date = date
+                if time:
+                    service.time = time
+
+                service.save()
+                serializer = ServiceAvailabilitySerializer(service)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Service not found"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ServiceAvailabilityList(generics.ListAPIView):
+    serializer_class = ServiceAvailabilitySerializer
+
+    def get_queryset(self):
+        service_id = self.kwargs['service']
+        return ServiceAvailability.objects.filter(service__id=service_id)    
 
 
 # ?---------------------------App views----------------------------------------#

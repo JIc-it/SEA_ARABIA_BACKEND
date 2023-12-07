@@ -222,3 +222,18 @@ class ActivitySerializer(serializers.ModelSerializer):
             "service_price": {"required": False},
             "service_image": {"required": False},
         }
+
+
+
+class ServiceAvailabilityServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = ["id", "name"]
+
+
+class ServiceAvailabilitySerializer(serializers.ModelSerializer):
+    service = ServiceAvailabilityServiceSerializer()
+
+    class Meta:
+        model = ServiceAvailability
+        fields = ["id", "service", "date", "time", "created_at", "updated_at"]

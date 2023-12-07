@@ -37,6 +37,35 @@ VENDOR_PERIOD_TYPE = (
 )
 
 
+
+def default_timeslot():
+    return [
+        {'time': '00:00 am', 'slot': False},
+        {'time': '01:00 am', 'slot': False},
+        {'time': '02:00 am', 'slot': False},
+        {'time': '03:00 am', 'slot': False},
+        {'time': '04:00 am', 'slot': False},
+        {'time': '05:00 am', 'slot': False},
+        {'time': '06:00 am', 'slot': False},
+        {'time': '07:00 am', 'slot': False},
+        {'time': '08:00 am', 'slot': False},
+        {'time': '09:00 am', 'slot': False},
+        {'time': '10:00 am', 'slot': False},
+        {'time': '11:00 am', 'slot': False},
+        {'time': '12:00 pm', 'slot': False},
+        {'time': '01:00 pm', 'slot': False},
+        {'time': '02:00 pm', 'slot': False},
+        {'time': '03:00 pm', 'slot': False},
+        {'time': '04:00 pm', 'slot': False},
+        {'time': '05:00 pm', 'slot': False},
+        {'time': '06:00 pm', 'slot': False},
+        {'time': '07:00 pm', 'slot': False},
+        {'time': '08:00 pm', 'slot': False},
+        {'time': '09:00 pm', 'slot': False},
+        {'time': '10:00 pm', 'slot': False},
+        {'time': '11:00 pm', 'slot': False},
+    ]
+
 class Occasion(Main):
     name = models.CharField(max_length=255)
 
@@ -252,3 +281,18 @@ class ServiceReview(Main):
         ordering = ["-created_at"]
         verbose_name = "Service Review"
         verbose_name_plural = "Service Reviews"
+
+
+
+
+
+class ServiceAvailability(Main):
+    service = models.ForeignKey('Service', on_delete=models.CASCADE,
+                                related_name="service_service_availability_service")
+    date = models.DateField()
+    time = models.JSONField(default=default_timeslot)
+
+    class Meta:
+        ordering = ["-created_at", "-updated_at"]
+        verbose_name = "Service Availability"
+        verbose_name_plural = "Service Availabilities"

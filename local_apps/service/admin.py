@@ -40,3 +40,9 @@ class ServiceImageAdmin(admin.ModelAdmin):
 @admin.register(ServiceReview)
 class ServiceReviewAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(ServiceAvailability)
+class ServiceAvailabilityAdmin(admin.ModelAdmin):
+    pass
+
