@@ -216,7 +216,7 @@ class ExploreMore(generics.ListAPIView):
 #     flterset_class = ServiceFilter
 
 
-class AllActivities(generics.ListAPIView):
+class ServiceTypesListing(generics.ListAPIView):
     """views for all activity listing"""
     queryset = Service.objects.all()
     serializer_class = ActivitySerializer
@@ -224,10 +224,16 @@ class AllActivities(generics.ListAPIView):
     filterset_class = ServiceFilter
 
     def get_queryset(self):
+        queryset = Service.objects.all()
+        
        
-        return Service.objects.filter(type="Activity")
+        service_type = self.request.query_params.get('type', None)
+        if service_type:
+            queryset = queryset.filter(type=service_type)
+        
+        return queryset    
+        
 
-    
 
 class CategoryBasedListing(generics.ListAPIView):
     """views for category based listing"""
