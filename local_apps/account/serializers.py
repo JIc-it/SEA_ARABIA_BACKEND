@@ -201,9 +201,6 @@ class VendorAddDetailsSerialzier(serializers.ModelSerializer):
 
 #----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
 #usersignup 
-
-       
-
 class UserSignUpSerializer(serializers.ModelSerializer):
     profile_extra = ProfileExtraSerializer(required=False)
     location = serializers.CharField(source="profile_extra.location", required=False)
@@ -213,14 +210,20 @@ class UserSignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('first_name','last_name' ,'email', 'mobile', 'password', 'profile_extra', 'location', 'images', 'dob', 'gender')
+        extra_kwargs = {'password': {'write_only': True},}
 
     def create(self, validated_data):
-        profile_extra_data = validated_data.pop('profile_extra', None)
+        password = validated_data.pop('password')
+        profile_extra_data = validated_data.pop('profile_extra', {})
+        validated_data['role'] = 'User'
+
         user = User.objects.create(**validated_data)
-        
-        if profile_extra_data:
-            ProfileExtra.objects.create(user=user, **profile_extra_data)
+        user.set_password(password)
+        user.save()
+
+        # Create associated ProfileExtra instance
+        ProfileExtra.objects.create(user=user, **profile_extra_data)
 
         return user
     
