@@ -2,11 +2,16 @@ from django.contrib import admin
 from .models import *
 
 
+class SubcategoryAdmin(admin.StackedInline):
+    model = SubCategory
+    extra = 0
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    pass
+    inlines = [SubcategoryAdmin,]
+    list_display = ['name']
+    search_fields = ['name']
 
 
-@admin.register(SubCategory)
-class SubcategoryAdmin(admin.ModelAdmin):
-    pass
+
