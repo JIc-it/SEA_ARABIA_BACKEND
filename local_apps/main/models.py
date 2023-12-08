@@ -4,6 +4,7 @@ from local_apps.core.models import Main
 
 class Category(Main):
     name = models.CharField(max_length=255)
+    image = models.ImageField(upload_to="main/category/image",null=True,blank=True)
 
     def __str__(self):
         return self.name
