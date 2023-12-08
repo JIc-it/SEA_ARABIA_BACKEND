@@ -1,13 +1,16 @@
-from rest_framework import generics
+from rest_framework import generics,views
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from django.shortcuts import get_object_or_404
+from django.http import Http404
 
 from .models import *
 from .serializers import *
 from .filters import *
+
 
 #   service CRUD view
 
@@ -209,3 +212,22 @@ class MOUorCharterView(generics.RetrieveAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = MOUorCharter.objects.all()
     serializer_class = MOUorCharterSerializer
+
+
+#   Onboard vendor views
+
+class OnboardVendor(generics.UpdateAPIView):
+    queryset = Company.objects.filter(is_onboard = False)
+    serializer_class = CompanyOnboardSerializer
+
+    def update(self, request, *args, **kwargs):
+        try:
+            company_id = kwargs.get('pk',None)
+            onboard_status = request.data.get('status',None)
+            company_instance = get_object_or_404(Company,id=company_id)
+            company_instance.is_onboard = onboard_status
+            company_instance.save()
+            serializer_data = CompanyOnboardSerializer(self.request.data)
+            return Response(serializer_data.data,status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error: {str(e)}",status= status.HTTP_400_BAD_REQUEST)

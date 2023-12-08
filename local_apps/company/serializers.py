@@ -77,7 +77,7 @@ class MiscellaneousTypeSerializer(serializers.ModelSerializer):
 
 
 class SiteVisitSerializer(serializers.ModelSerializer):
-    attachment = serializers.FileField()
+    attachment = serializers.FileField(required=True)
 
     class Meta:
         model = SiteVisit
@@ -88,6 +88,7 @@ class SiteVisitSerializer(serializers.ModelSerializer):
 
 
 class ProposalSerializer(serializers.ModelSerializer):
+    attachment = serializers.FileField(required=True)
     class Meta:
         model = Proposal
         exclude = [
@@ -97,18 +98,24 @@ class ProposalSerializer(serializers.ModelSerializer):
 
 
 class NegotiationSerializer(serializers.ModelSerializer):
+    attachment = serializers.FileField(required=True)
     class Meta:
         model = Negotiation
         exclude = ["created_at", "updated_at"]
 
 
 class MOUorCharterSerializer(serializers.ModelSerializer):
+    attachment = serializers.FileField(required=True)
     class Meta:
         model = MOUorCharter
         exclude = ["created_at", "updated_at"]
 
 
 class OnboardStatusSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = OnboardStatus
         fields = ["name"]
+
+class CompanyOnboardSerializer(serializers.Serializer):
+    status = serializers.BooleanField()

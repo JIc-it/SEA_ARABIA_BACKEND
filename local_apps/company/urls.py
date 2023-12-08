@@ -47,4 +47,8 @@ urlpatterns = [
     path("mou-create/", MOUorCharterCreate.as_view(), name="mou-create"),
     path("mou-view/<uuid:pk>", MOUorCharterView.as_view(), name="mou-view"),
     path("mou-update/<uuid:pk>", MOUorCharterUpdate.as_view(), name="mou-update"),
+
+    #Onboard Urls
+
+    path("onboard-vendor/<uuid:pk>", OnboardVendor.as_view(), name="onboard-vendor"),
 ]
