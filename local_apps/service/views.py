@@ -254,7 +254,7 @@ class ServiceAvailabilityList(generics.ListAPIView):
 # 
 
 class ServiceAvailabeListView(generics.ListAPIView):
-    serializer_class = ServiceSerializer
+    serializer_class = ServiceAvailabilitySerializer
 
     def get_queryset(self):
         # Get the date and service ID from the URL parameters
