@@ -75,7 +75,9 @@ class UserCreate(generics.CreateAPIView):
 class UserList(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserListSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = UserFilter
 
 
 class UserUpdate(generics.UpdateAPIView):

@@ -149,6 +149,31 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
+class UserListSerializer(serializers.ModelSerializer):
+    """ Serializer for listing the user(customer,vendor, and other role types)"""
+    location  = serializers.CharField(source = "profileextra.location")
+    created_at = serializers.DateTimeField(format="%d-%m-%Y")     
+    updated_at = serializers.DateTimeField(format="%d-%m-%Y")  
+    total_booking = serializers.SerializerMethodField()
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "mobile",
+            "location",
+            "created_at",
+            "is_active",
+            "total_booking",
+            "role",
+            "updated_at"
+        ]
+
+    def get_total_booking(self,instance):
+        return 0
+    
 class PasswordResetSerializer(serializers.Serializer):
     current_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)

@@ -32,6 +32,7 @@ class UserAdmin(BaseUserAdmin):
                     "password",
                     "is_email_verified",
                     "is_mobile_verified",
+             
                 )
             },
         ),
