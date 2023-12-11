@@ -263,13 +263,13 @@ class UserSignUpSerializer(serializers.ModelSerializer):
 class BookMarkSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = BookMark
+        model = Bookmark
         fields = "__all__"
 
 class BookMarkListSerializer(serializers.ModelSerializer):
     service = ServiceSerializer()
     class Meta:
-        model = BookMark
+        model = Bookmark
         fields = "__all__"
 
 

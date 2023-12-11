@@ -109,7 +109,7 @@ class ProfileExtraAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(BookMark)
+@admin.register(Bookmark)
 class BookMarkAdmin(admin.ModelAdmin):
     list_display = ["user","service"]
     pass

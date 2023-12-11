@@ -335,6 +335,7 @@ class ServiceTypesListing(generics.ListAPIView):
     serializer_class = ActivitySerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ServiceFilter
+    permission_classes = [IsAuthenticated]
 
 
     def get_queryset(self):

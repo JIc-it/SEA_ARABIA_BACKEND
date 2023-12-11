@@ -169,11 +169,11 @@ class Service(Main):
         VendorPriceType, on_delete=models.SET_NULL, blank=True, null=True
     )
     default_price = models.PositiveIntegerField(blank=True, null=True)
-    privacy_policy = models.FileField(
-        upload_to="service/service/privacy_policy", blank=True, null=True
+    privacy_policy = models.TextField(
+        blank=True, null=True
     )
-    return_policy = models.FileField(
-        upload_to="service/service/return_policy", blank=True, null=True
+    return_policy = models.TextField(
+         blank=True, null=True
     )
 
     class Meta:

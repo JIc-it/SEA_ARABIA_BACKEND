@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import *
+from local_apps.account.models import Bookmark
 
 
 class OccassionSerializer(serializers.ModelSerializer):
@@ -67,6 +68,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     occasions = serializers.SlugRelatedField(
         slug_field="name", queryset=Occasion.objects.all()
     )
+    
 
     class Meta:
         model = Service
@@ -105,6 +107,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         instance.amenities.set(amenities)
 
         return instance
+    
 
 
 class ExploreMoreSerializer(serializers.ModelSerializer):
@@ -199,7 +202,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     company = serializers.CharField(source="company.name")
     amenities = AmenitySerializer(many=True)
     category = serializers.CharField(source="category.name")
-
+    is_bookmarked = serializers.SerializerMethodField()
     class Meta:
         model = Service
         fields = [
@@ -216,13 +219,24 @@ class ActivitySerializer(serializers.ModelSerializer):
             "day",
             "night",
             "category",
+            "is_bookmarked",
         ]
 
         extra_kwargs = {
             "service_price": {"required": False},
             "service_image": {"required": False},
         }
+    def get_is_bookmarked(self, obj):
+        request = self.context.get('request')
+        user = request.user if request and request.user.is_authenticated else None
+        if user:
+            return Bookmark.objects.filter(user=user, service=obj).exists()
+        return False
 
+    def to_representation(self, instance):
+        data = super(ActivitySerializer, self).to_representation(instance)
+        data['is_bookmarked'] = self.get_is_bookmarked(instance)
+        return data
 
 
 class ServiceAvailabilityServiceSerializer(serializers.ModelSerializer):

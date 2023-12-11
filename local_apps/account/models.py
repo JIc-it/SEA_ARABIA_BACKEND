@@ -167,7 +167,7 @@ class PasswordReset(models.Model):
 
 
 
-class BookMark(Main):
+class Bookmark(Main):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

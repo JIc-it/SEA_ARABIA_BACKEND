@@ -462,7 +462,7 @@ class UserSignUp(generics.CreateAPIView):
 
 class BookMarkCreationAPI(generics.CreateAPIView):
     """bookmark creation"""
-    queryset = BookMark.objects.all()
+    queryset = Bookmark.objects.all()
     serializer_class = BookMarkSerializer
     permission_classes = [IsAuthenticated]
 
@@ -478,12 +478,12 @@ class BookMarkListView(generics.ListAPIView):
 
     def get_queryset(self):
         
-        return BookMark.objects.filter(user=self.request.user)
+        return Bookmark.objects.filter(user=self.request.user)
     
 
 class BookMarkDeleteView(generics.RetrieveDestroyAPIView):
     """book deletion"""
-    queryset = BookMark.objects.all()
+    queryset = Bookmark.objects.all()
     serializer_class = BookMarkListSerializer
     lookup_field ='pk'
 
