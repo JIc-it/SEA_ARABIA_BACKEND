@@ -38,6 +38,7 @@ class LoginView(APIView):
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
             refresh_token = str(refresh)
+            
             user_id=user.id
             print(user_id)
 

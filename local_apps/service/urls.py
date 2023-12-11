@@ -142,5 +142,9 @@ urlpatterns = [
          name="category-based-listing" 
          ),
 
+
+
+    path('servicesavailable/<str:date>/<uuid:service_id>/', ServiceAvailabeListView.as_view(), name='service-availabe'),         
+
 ]
 

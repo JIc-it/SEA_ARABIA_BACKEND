@@ -10,7 +10,7 @@ from .serializers import *
 from .filters import *
 from django.shortcuts import get_object_or_404
 from local_apps.main.serializers import CategorySerializer, SubCategorySerializer
-
+from datetime import datetime
 
 class OccassionList(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
@@ -243,6 +243,41 @@ class ServiceAvailabilityList(generics.ListAPIView):
     def get_queryset(self):
         service_id = self.kwargs['service']
         return ServiceAvailability.objects.filter(service__id=service_id)    
+    
+
+
+
+
+#vendor App 
+# 
+# 
+# 
+
+class ServiceAvailabeListView(generics.ListAPIView):
+    serializer_class = ServiceSerializer
+
+    def get_queryset(self):
+        # Get the date and service ID from the URL parameters
+        date_param = self.kwargs.get('date', None)
+        service_id = self.kwargs.get('service_id', None)
+
+        try:
+            date_object = datetime.strptime(date_param, "%Y-%m-%d").date()
+            services = ServiceAvailability.objects.filter(date=date_object, service=service_id)
+            return services
+
+        except ValueError:
+            # Invalid date format
+            return None
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        if queryset is not None:
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Invalid date format or service ID"}, status=status.HTTP_400_BAD_REQUEST)    
 
 
 # ?---------------------------App views----------------------------------------#
