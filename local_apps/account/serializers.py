@@ -4,6 +4,7 @@ from local_apps.company.serializers import CompanyAddSerializer
 from rest_framework.response import Response
 from local_apps.company.models import Company
 from rest_framework import status
+from local_apps.service.serializers import ServiceSerializer
 
 # user cms serializers
 
@@ -231,6 +232,21 @@ class UserSignUpSerializer(serializers.ModelSerializer):
 
         return user, response_data
     
+
+# bookmark
+
+class BookMarkSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BookMark
+        fields = "__all__"
+
+class BookMarkListSerializer(serializers.ModelSerializer):
+    service = ServiceSerializer()
+    class Meta:
+        model = BookMark
+        fields = "__all__"
+
 
 
 

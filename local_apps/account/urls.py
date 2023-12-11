@@ -94,5 +94,13 @@ urlpatterns = [
     path('users-signup/', UserSignUp.as_view(), name='user-create'),
     path('users-profile/', UserProfileView.as_view(), name='user-profile'),
 
+    #bookmark urls
+
+    path('bookmark-create/',BookMarkCreationAPI.as_view(),name="bookmark-create"),
+    path('bookmark-list/',BookMarkListView.as_view(),name="bookmark-list"),
+    path('bookmark-delete/<uuid:pk>/',BookMarkDeleteView.as_view(),name="bookmark-delete"),
+
+
+
     
 ]

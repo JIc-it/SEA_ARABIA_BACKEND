@@ -5,6 +5,9 @@ from local_apps.account.managers import CustomUserManager
 from local_apps.core.models import Main
 from utils.file_handle import remove_file
 from django.utils import timezone
+from local_apps.service.models import Service
+from django.conf import settings
+
 
 USER_ROLE = (
     ('Admin', "Admin"),
@@ -160,3 +163,15 @@ class PasswordReset(models.Model):
     @property
     def is_expired(self):
         return timezone.now() > self.expires_at
+    
+
+
+
+class BookMark(Main):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="account_bookmark_user",
+    )
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, blank=True, null=True, related_name='account_bookmark_service')

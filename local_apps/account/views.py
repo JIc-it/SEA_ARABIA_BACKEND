@@ -456,8 +456,36 @@ class UserSignUp(generics.CreateAPIView):
             return Response(response_data, status=status.HTTP_201_CREATED)
         return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
- 
 
+class BookMarkCreationAPI(generics.CreateAPIView):
+    """bookmark creation"""
+    queryset = BookMark.objects.all()
+    serializer_class = BookMarkSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+       
+        serializer.save(user=self.request.user)
+
+
+class BookMarkListView(generics.ListAPIView):
+    """bookmark listing"""
+    serializer_class = BookMarkListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        
+        return BookMark.objects.filter(user=self.request.user)
+    
+
+class BookMarkDeleteView(generics.RetrieveDestroyAPIView):
+    """book deletion"""
+    queryset = BookMark.objects.all()
+    serializer_class = BookMarkListSerializer
+    lookup_field ='pk'
+
+ 
+    
 
 class UserProfileView(generics.RetrieveAPIView):
     serializer_class = UserSignUpSerializer

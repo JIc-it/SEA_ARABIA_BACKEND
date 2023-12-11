@@ -106,3 +106,9 @@ class UserIdentificationDataAdmin(admin.ModelAdmin):
 @admin.register(ProfileExtra)
 class ProfileExtraAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(BookMark)
+class BookMarkAdmin(admin.ModelAdmin):
+    list_display = ["user","service"]
+    pass
