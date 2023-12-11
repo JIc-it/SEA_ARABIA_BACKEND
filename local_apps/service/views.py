@@ -249,7 +249,7 @@ class ServiceAvailabilityList(generics.ListAPIView):
 
 
 class ServiceTopSuggestion(generics.ListAPIView):
-    """views for top suggestions"""
+    """views for top suggestions & top activites"""
 
     queryset = Service.objects.filter(is_top_suggestion=True)
     serializer_class = ExploreMoreSerializer
@@ -294,7 +294,7 @@ class ExploreMore(generics.ListAPIView):
 
 
 class ServiceTypesListing(generics.ListAPIView):
-    """views for all activity listing"""
+    """views for all activity & service listing"""
 
     queryset = Service.objects.all()
     serializer_class = ActivitySerializer
@@ -327,3 +327,4 @@ class CategoryBasedListing(generics.ListAPIView):
         category_name = self.kwargs.get("category_name")
         category = get_object_or_404(Category, name=category_name)
         return Service.objects.filter(category=category)
+
