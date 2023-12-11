@@ -114,6 +114,15 @@ class SiteVisitCreate(generics.CreateAPIView):
     queryset = SiteVisit.objects.all()
     serializer_class = SiteVisitSerializer
 
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        qualifications = self.request.data.getlist("qualifications",[])
+        if qualifications:
+            instance.qualifications.set(qualifications)
+        return super().perform_create(serializer)
+    
+
+
 
 class SiteVisitList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
@@ -218,7 +227,7 @@ class MOUorCharterView(generics.RetrieveAPIView):
 
 class OnboardVendor(generics.UpdateAPIView):
     ''' view for onboarding and offloading the vendor based on the status '''
-    
+
     queryset = Company.objects.filter(is_onboard = False)
     serializer_class = CompanyOnboardSerializer
 

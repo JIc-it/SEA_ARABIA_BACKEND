@@ -79,7 +79,7 @@ class MiscellaneousTypeSerializer(serializers.ModelSerializer):
 
 class SiteVisitSerializer(serializers.ModelSerializer):
     attachment = serializers.FileField(required=True)
-
+    
     class Meta:
         model = SiteVisit
         exclude = [
