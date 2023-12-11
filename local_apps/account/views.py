@@ -412,4 +412,19 @@ class UserSignUp(generics.CreateAPIView):
             return Response(response_data, status=status.HTTP_201_CREATED)
         return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+ 
 
+
+class UserProfileView(generics.RetrieveAPIView):
+    serializer_class = UserSignUpSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        user = self.request.user
+        try:
+            profile_extra = ProfileExtra.objects.get(user=user)
+        except ProfileExtra.DoesNotExist:
+            profile_extra = None
+
+        user.profile_extra = profile_extra
+        return user
