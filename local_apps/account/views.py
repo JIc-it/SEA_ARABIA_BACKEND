@@ -19,6 +19,50 @@ from local_apps.message_utility.views import mail_handler
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 
+from django.contrib.auth import authenticate, login
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import RefreshToken
+
+#custom Auth
+
+
+class LoginView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        user = authenticate(request, username=email, password=password)
+
+        if user is not None:
+            login(request, user)
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
+            user_id=user.id
+            print(user_id)
+
+            return Response({
+                'detail': 'Login successful!',
+                'access_token': access_token,
+                'refresh_token': refresh_token,
+                # 'user_id':user_id
+                
+            }, status=status.HTTP_200_OK)
+        else:
+            raise AuthenticationFailed('Invalid email or password. Please try again.')
+        
+
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------        
+
+
+
+
+
+
+
 #   User CRUD View
 
 
