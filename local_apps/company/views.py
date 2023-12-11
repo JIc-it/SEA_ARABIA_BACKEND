@@ -217,6 +217,8 @@ class MOUorCharterView(generics.RetrieveAPIView):
 #   Onboard vendor views
 
 class OnboardVendor(generics.UpdateAPIView):
+    ''' view for onboarding and offloading the vendor based on the status '''
+    
     queryset = Company.objects.filter(is_onboard = False)
     serializer_class = CompanyOnboardSerializer
 
