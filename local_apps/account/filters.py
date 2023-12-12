@@ -20,7 +20,7 @@ class UserFilter(django_filters.FilterSet):
 
     role = django_filters.CharFilter(lookup_expr="icontains")
     location = django_filters.CharFilter(method = "get_location")
-    updated_at = django_filters.DateFilter(method="get_updated_at")
+    updated_at = django_filters.CharFilter(method="get_updated_at")
 
     def get_location(self,queryset,name,value):
         """ function returns the result with multiple location selected """
@@ -31,8 +31,9 @@ class UserFilter(django_filters.FilterSet):
             return queryset.none()
         
     def get_updated_at(self,queryset,name,value):
-        print(value,name,'<<<<<')
-        return queryset
+        start_date,end_date = value.split(',')
+
+        return queryset.filter(updated_at__date__gte = start_date,updated_at__date__lte=end_date)
         
     class Meta:
         model = User

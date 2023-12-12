@@ -119,7 +119,6 @@ class SiteVisitCreate(generics.CreateAPIView):
             instance = serializer.save()
             qualifications = serializer.validated_data.get('qualifications')
             if qualifications:
-
                 for qualification in qualifications:
                     instance.qualifications.add(qualification)
             serialized_instance = SiteVisitSerializer(instance)
@@ -127,8 +126,6 @@ class SiteVisitCreate(generics.CreateAPIView):
         except Exception as e:
             return Response(f"Error: {str(e)}",status=status.HTTP_400_BAD_REQUEST)
     
-
-
 
 class SiteVisitList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]

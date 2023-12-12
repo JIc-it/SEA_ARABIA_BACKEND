@@ -73,7 +73,7 @@ class UserCreate(generics.CreateAPIView):
 
 
 class UserList(generics.ListAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserListSerializer
     filter_backends = [DjangoFilterBackend]
@@ -491,7 +491,7 @@ class BookMarkDeleteView(generics.RetrieveDestroyAPIView):
     
 
 class UserProfileView(generics.RetrieveAPIView):
-    serializer_class = UserSignUpSerializer
+    serializer_class = UserSerializerApp
     permission_classes = [IsAuthenticated]
 
     def get_object(self):

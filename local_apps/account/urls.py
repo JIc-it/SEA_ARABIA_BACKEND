@@ -84,7 +84,6 @@ urlpatterns = [
 
 
     path("user-list/", UserListView.as_view(), name="user-list"),
-    path("profile/", UserProfileView.as_view(), name="user-profile"),
     path("emilres/", emilres, name="emilres"),
     path("request-otp/", RequestOTPView.as_view(), name="request-otp"),
     path("verify-otp/", VerifyOTPView.as_view(), name="verify-otp"),
