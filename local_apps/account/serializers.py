@@ -153,7 +153,6 @@ class UserListSerializer(serializers.ModelSerializer):
     """ Serializer for listing the user(customer,vendor, and other role types)"""
     location  = serializers.CharField(source = "profileextra.location")
     created_at = serializers.DateTimeField(format="%d-%m-%Y")     
-    updated_at = serializers.DateTimeField(format="%Y-%m-%d")  
     total_booking = serializers.SerializerMethodField()
     class Meta:
         model = User
@@ -168,7 +167,6 @@ class UserListSerializer(serializers.ModelSerializer):
             "is_active",
             "total_booking",
             "role",
-            "updated_at"
         ]
 
     def get_total_booking(self,instance):
@@ -223,8 +221,25 @@ class VendorAddDetailsSerialzier(serializers.ModelSerializer):
             "location",
         ]
 
+class AllUserDetailsSerializer(serializers.ModelSerializer):
+    """ serializer for viewing the details of all the user """
 
-
+    useridentificationdata = UserIdentificationDataSerializer(read_only=True)
+    company_company_user = CompanyAddSerializer(read_only=True)
+    profileextra = ProfileExtraSerializer(read_only=True)
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "mobile",
+            "role",
+            "first_name",
+            "last_name",
+            "useridentificationdata",
+            "company_company_user",
+            "profileextra",
+        ]
 #----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
 #usersignup 
 class UserSignUpSerializer(serializers.ModelSerializer):

@@ -198,7 +198,7 @@ class VendorDetailsAdd(generics.UpdateAPIView):
                 profile_instance.location = location_data
                 profile_instance.save()
 
-            #   updating the company details 
+            #   updating the company details VendorAddDetailsSerialzier
 
             company_instance, _ = Company.objects.get_or_create(user=user)
             company_serializer = CompanyAddSerializer(instance=company_instance, data=company_data)
@@ -227,7 +227,7 @@ class VendorDetailsAdd(generics.UpdateAPIView):
 
 class VendorPersonalList(generics.RetrieveAPIView):
     queryset = User.objects.filter(role="Vendor")
-    serializer_class = VendorAddDetailsSerialzier
+    serializer_class = AllUserDetailsSerializer
 
 
 class UserIdTypeList(generics.ListAPIView):
