@@ -226,7 +226,7 @@ class VendorDetailsAdd(generics.UpdateAPIView):
         
 
 class VendorPersonalList(generics.RetrieveAPIView):
-    queryset = User.objects.filter(role="Vendor")
+    queryset = User.objects.all()
     serializer_class = AllUserDetailsSerializer
 
 
