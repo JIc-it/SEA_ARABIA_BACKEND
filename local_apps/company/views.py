@@ -115,11 +115,17 @@ class SiteVisitCreate(generics.CreateAPIView):
     serializer_class = SiteVisitSerializer
 
     def perform_create(self, serializer):
-        instance = serializer.save()
-        qualifications = self.request.data.getlist("qualifications",[])
-        if qualifications:
-            instance.qualifications.set(qualifications)
-        return super().perform_create(serializer)
+        try:
+            instance = serializer.save()
+            qualifications = serializer.validated_data.get('qualifications')
+            if qualifications:
+
+                for qualification in qualifications:
+                    instance.qualifications.add(qualification)
+            serialized_instance = SiteVisitSerializer(instance)
+            return super().perform_create(serializer)
+        except Exception as e:
+            return Response(f"Error: {str(e)}",status=status.HTTP_400_BAD_REQUEST)
     
 
 
