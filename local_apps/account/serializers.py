@@ -289,6 +289,34 @@ class BookMarkListSerializer(serializers.ModelSerializer):
 
 
 
+class UserUpdatedSerializer(serializers.ModelSerializer):
+    profile_extra = ProfileExtraSerializer(required=False)
+
+    class Meta:
+        model = User
+        fields = ['email', 'mobile', 'role', 'profile_extra']
+
+    def update(self, instance, validated_data):
+        # Update User fields
+        instance.email = validated_data.get('email', instance.email)
+        instance.mobile = validated_data.get('mobile', instance.mobile)
+        instance.role = validated_data.get('role', instance.role)
+        instance.save()
+
+        # Update or create ProfileExtra
+        profile_extra_data = validated_data.pop('profile_extra', {})
+        if instance.profile_extra:
+            profile_extra_serializer = ProfileExtraSerializer(instance.profile_extra, data=profile_extra_data)
+        else:
+            profile_extra_serializer = ProfileExtraSerializer(data=profile_extra_data)
+
+        if profile_extra_serializer.is_valid():
+            profile_extra_serializer.save(user=instance)
+        else:
+            raise serializers.ValidationError(profile_extra_serializer.errors)
+
+        return instance
+
 
 
     

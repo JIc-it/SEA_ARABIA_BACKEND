@@ -92,12 +92,15 @@ urlpatterns = [
     #mobileapp
     path('users-signup/', UserSignUp.as_view(), name='user-create'),
     path('users-profile/', UserProfileView.as_view(), name='user-profile'),
+    path('users-update/', UserProfileUpdateView.as_view(), name='user-update'),
 
     #bookmark urls
 
     path('bookmark-create/',BookMarkCreationAPI.as_view(),name="bookmark-create"),
     path('bookmark-list/',BookMarkListView.as_view(),name="bookmark-list"),
     path('bookmark-delete/<uuid:pk>/',BookMarkDeleteView.as_view(),name="bookmark-delete"),
+
+
 
 
 

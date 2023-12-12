@@ -511,3 +511,19 @@ class UserProfileView(generics.RetrieveAPIView):
 
         user.profile_extra = profile_extra
         return user
+    
+
+
+class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
+    serializer_class = UserUpdatedSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response({"message": "User updated successfully"}, status=status.HTTP_200_OK)
