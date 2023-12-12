@@ -90,6 +90,7 @@ urlpatterns = [
     path("reset-passwordnew/",ForgotResetPasswordViewsnew.as_view(),name="reset-password-new",),
 
     #mobileapp
+    
     path('users-signup/', UserSignUp.as_view(), name='user-create'),
     path('users-profile/', UserProfileView.as_view(), name='user-profile'),
     path('users-update/', UserProfileUpdateView.as_view(), name='user-update'),

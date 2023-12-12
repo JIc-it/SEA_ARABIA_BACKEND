@@ -479,21 +479,41 @@ class BookMarkCreationAPI(generics.CreateAPIView):
         serializer.save(user=self.request.user)
 
 
+# class BookMarkListView(generics.ListAPIView):
+#     """bookmark listing"""
+#     serializer_class = BookMarkListSerializer
+#     permission_classes = [IsAuthenticated]
+
+#     def get_queryset(self):
+        
+#         return Bookmark.objects.filter(user=self.request.user)
+
 class BookMarkListView(generics.ListAPIView):
     """bookmark listing"""
     serializer_class = BookMarkListSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        
-        return Bookmark.objects.filter(user=self.request.user)
+        user_bookmarks = Bookmark.objects.filter(user=self.request.user)
+        return user_bookmarks
+
+   
+
     
 
-class BookMarkDeleteView(generics.RetrieveDestroyAPIView):
-    """book deletion"""
+class BookMarkDeleteView(generics.DestroyAPIView):
+    """bookmark deletion"""
     queryset = Bookmark.objects.all()
     serializer_class = BookMarkListSerializer
     lookup_field ='pk'
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(data={'message': 'Bookmark deleted successfully'}, status=status.HTTP_200_OK)
+
+    def perform_destroy(self, instance):
+        instance.delete()
 
  
     
