@@ -9,7 +9,7 @@ class SubCategoryFilter(django_filters.FilterSet):
 
 
 class ServiceFilter(django_filters.FilterSet):
-    category = django_filters.CharFilter(field_name='category__name', lookup_expr='iexact')
+    category = django_filters.CharFilter(field_name='category__name', lookup_expr='iexact') 
     class Meta:
         model = Service
         fields = [

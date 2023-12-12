@@ -96,7 +96,6 @@ class UserIdentificationDataSerializer(serializers.ModelSerializer):
         model = UserIdentificationData
         fields = ["id_type", "id_number"]
 
-
 # Serializers for viewing in app
 class ProfileExtraSerializer(serializers.ModelSerializer):
     class Meta:

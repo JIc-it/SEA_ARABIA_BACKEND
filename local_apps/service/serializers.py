@@ -152,12 +152,9 @@ class ServiceFilterListSerializer(serializers.ModelSerializer):
     """serializer for service review filter section"""
 
     service_image = ServiceImageSerializer(many=True)
-    # category = serializers.CharField(source="category.name")
-    # sub_category = serializers.CharField(source="sub_category.name")
-
     class Meta:
         model = Service
-        fields = ["id", "name", "service_image", "category", "sub_category"]
+        fields = ["id", "name", "service_image", "category", "sub_category","company"]
 
 
 class ServiceReviewSerializer(serializers.ModelSerializer):

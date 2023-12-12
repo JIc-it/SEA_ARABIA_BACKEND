@@ -157,8 +157,8 @@ class ServiceReviewUpdate(generics.CreateAPIView):
 
 
 class ServiceFilterList(generics.ListAPIView):
-    """View for filtering the service in service review listing section"""
-
+    """View for filtering the service in service review listing section (VMS)   """
+    permission_classes =[IsAuthenticated]
     serializer_class = ServiceFilterListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ["name"]
@@ -168,12 +168,21 @@ class ServiceFilterList(generics.ListAPIView):
         user = self.request.user
         service_list = Service.objects.filter(company__user=user)
         return service_list
-
+    
+class ServiceFilterAdminList(generics.ListAPIView):
+    """ View for filtering the service based on the company for Admin CMS   """
+    permission_classes =[IsAuthenticated]
+    queryset = Service.objects.all()
+    serializer_class = ServiceFilterListSerializer
+    filter_backends = [DjangoFilterBackend,SearchFilter]
+    search_field = ["name"]
+    filterset_class =ServiceFilter
+        
 
 class ServiceReviewList(generics.ListAPIView):
     """view for showing the reviews realted to the particular service"""
 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     # queryset = ServiceReview.objects.all()
     serializer_class = ServiceReviewListSerializer
     filter_backends = [DjangoFilterBackend]
@@ -301,7 +310,7 @@ class ServiceTopSuggestion(generics.ListAPIView):
         
         return queryset    
         
-
+permission_classes =[IsAuthenticated]
 
 
 class ExploreMore(generics.ListAPIView):
