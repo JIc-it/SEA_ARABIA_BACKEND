@@ -76,7 +76,13 @@ class UserList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserListSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend,SearchFilter]
+    search_fields = [
+        "first_name",
+        "last_name",
+        "profileextra__location"
+    ]
+    
     filterset_class = UserFilter
 
 
