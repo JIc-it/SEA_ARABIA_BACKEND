@@ -51,4 +51,7 @@ urlpatterns = [
     #Onboard Urls
 
     path("onboard-vendor/<uuid:pk>", OnboardVendor.as_view(), name="onboard-vendor"),
+
+
+    path("companycms-list", CompanyListCms.as_view(), name="companycms-list"),
 ]

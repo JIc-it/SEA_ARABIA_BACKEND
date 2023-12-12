@@ -41,7 +41,16 @@ class CompanyAddSerializer(serializers.ModelSerializer):
             "service_summary",
         ]
 
-
+class CompanyCmsSerializer(serializers.ModelSerializer):
+    """ serializer for lisiting the company in the admin review cms """
+    class Meta:
+        model = Company
+        fields = [
+            "id",
+            "name"
+        ]
+        
+        
 class CompanyListSerializer(serializers.ModelSerializer):
     service_summary = serializers.SlugRelatedField(
         many=True, slug_field="name", queryset=ServiceTag.objects.all()

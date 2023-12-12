@@ -44,6 +44,11 @@ class CompanyList(generics.ListAPIView):
     ]
     filterset_class = CompanyFilter
 
+class CompanyListCms(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Company.objects.all()
+    serializer_class = CompanyCmsSerializer
+
 
 class CompanyCreate(generics.CreateAPIView):
     # permission_classes = [IsAuthenticated]
