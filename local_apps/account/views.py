@@ -516,6 +516,7 @@ class UserProfileView(generics.RetrieveAPIView):
 
 class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = UserUpdatedSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return self.request.user
@@ -523,7 +524,10 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
+        
+        print(request.data)  
+
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
-        return Response({"message": "User updated successfully"}, status=status.HTTP_200_OK)
+        return Response({"detail": "User profile updated successfully"}, status=status.HTTP_200_OK)
