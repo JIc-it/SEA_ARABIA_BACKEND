@@ -80,7 +80,9 @@ class UserList(generics.ListAPIView):
     search_fields = [
         "first_name",
         "last_name",
-        "profileextra__location"
+        "profileextra__location",
+        "email",
+        "mobile"
     ]
     
     filterset_class = UserFilter
