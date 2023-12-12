@@ -193,16 +193,17 @@ class ServiceReviewListSerializer(serializers.ModelSerializer):
 
 class ActivitySerializer(serializers.ModelSerializer):
     """Serializer for Activity listing"""
+   
+
 
     service_price = PriceSerializer(many=True)
     service_image = ServiceImageSerializer(many=True)
-    destination = serializers.CharField(
-        source="destination.name", required=False, allow_null=True
-    )
+    destination = serializers.CharField(source="destination.name", required=False, allow_null=True)
     company = serializers.CharField(source="company.name")
     amenities = AmenitySerializer(many=True)
     category = serializers.CharField(source="category.name")
     is_bookmarked = serializers.SerializerMethodField()
+
     class Meta:
         model = Service
         fields = [
@@ -227,16 +228,25 @@ class ActivitySerializer(serializers.ModelSerializer):
             "service_image": {"required": False},
         }
     def get_is_bookmarked(self, obj):
-        request = self.context.get('request')
-        user = request.user if request and request.user.is_authenticated else None
-        if user:
-            return Bookmark.objects.filter(user=user, service=obj).exists()
-        return False
+        try:
+            request = self.context.get('request')
+            if request and request.user.is_authenticated:
+                return Bookmark.objects.filter(user=request.user, service=obj).exists()
+            return False
+        except:
+            return False
 
-    def to_representation(self, instance):
-        data = super(ActivitySerializer, self).to_representation(instance)
-        data['is_bookmarked'] = self.get_is_bookmarked(instance)
-        return data
+    # def get_is_bookmarked(self, obj):
+    #     request = self.context.get('request')
+    #     user = request.user if request and request.user.is_authenticated else None
+    #     if user:
+    #         return Bookmark.objects.filter(user=user, service=obj).exists()
+    #     return False
+
+    # def to_representation(self, instance):
+    #     data = super(ActivitySerializer, self).to_representation(instance)
+    #     data['is_bookmarked'] = self.get_is_bookmarked(instance)
+    #     return data
 
 
 class ServiceAvailabilityServiceSerializer(serializers.ModelSerializer):

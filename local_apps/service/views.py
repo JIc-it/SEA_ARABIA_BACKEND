@@ -328,26 +328,27 @@ class ExploreMore(generics.ListAPIView):
 #     flterset_class = ServiceFilter
 
 
-class ServiceTypesListing(generics.ListAPIView):
-    """views for all activity & service listing"""
+class ServiceListing(generics.ListAPIView):
+    """Views for all activity & service listing"""
 
     queryset = Service.objects.all()
     serializer_class = ActivitySerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ServiceFilter
-    permission_classes = [IsAuthenticated]
+   
 
+    # def get_queryset(self):
+    #     try:
+    #         user = self.request.user
+    #         if user.is_authenticated:
+    #             # Filter services based on bookmarks
+    #             bookmarked_service_ids = Bookmark.objects.filter(user=user).values_list('service__id', flat=True)
+    #             return Service.objects.filter(id__in=bookmarked_service_ids)
+    #         else:
+    #             return Service.objects.none()
+    #     except:
+    #         pass
 
-    def get_queryset(self):
-        queryset = Service.objects.all()
-        
-       
-        service_type = self.request.query_params.get('type', None)
-        if service_type:
-            queryset = queryset.filter(type=service_type)
-        
-        return queryset    
-        
 
 
 

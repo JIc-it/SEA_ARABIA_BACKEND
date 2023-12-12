@@ -132,9 +132,9 @@ urlpatterns = [
 
     # all activity listing
     path(
-        "service-types",
-        ServiceTypesListing.as_view(),
-        name='service-types'
+        "service-listing",
+        ServiceListing.as_view(),
+        name='service-listing'
     ),
     # category based listing 
     path("category-based-listing/<str:category_name>/",
