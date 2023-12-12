@@ -12,11 +12,11 @@ from local_apps.service.serializers import ServiceSerializer
 class VendorSerializer(serializers.ModelSerializer):
     """vendor listing serializer"""
 
-    location = serializers.CharField(source="profileextra.location")
-    status = serializers.CharField(source="company_company_user.status")
-    company_id = serializers.CharField(source="company_company_user.id")
+    location = serializers.CharField(source="profileextra.location",default=None)
+    status = serializers.CharField(source="company_company_user.status",default=None)
+    company_id = serializers.CharField(source="company_company_user.id",default=None)
     created_by = serializers.CharField(
-        source="company_company_user.created_by.first_name"
+        source="company_company_user.created_by.first_name",default=None
     )
 
     class Meta:
