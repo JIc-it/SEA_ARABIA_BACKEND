@@ -391,3 +391,19 @@ class CategoryBasedListing(generics.ListAPIView):
         category_name = self.kwargs.get("category_name")
         category = get_object_or_404(Category, name=category_name)
         return Service.objects.filter(category=category)
+
+
+class ComboPackageListing(generics.ListAPIView):
+     """for combo package listing"""
+     queryset = Package.objects.filter(is_active=True)
+     serializer_class = PackageSerializer
+     filter_backends = [DjangoFilterBackend]
+    #  filterset_class = ServiceFilter
+
+
+    
+
+
+
+
+

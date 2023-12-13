@@ -40,18 +40,18 @@ class Booking(Main):
     payment = models.OneToOneField(Payment, blank=True, null=True, on_delete=models.SET_NULL,
                                    related_name='booking_service')
     user_type = models.CharField(choices=USER_TYPE, default='Registered', max_length=255)
-    starting_point = models.CharField(max_length=255)
-    destination = models.CharField(max_length=255)
+    starting_point = models.CharField(max_length=255,blank=True,null=True)
+    destination = models.CharField(max_length=255,blank=True,null=True)
     start_date = models.DateField()
     end_date = models.DateField()
-    slot = models.CharField(max_length=255)
+    slot = models.CharField(max_length=255,blank=True,null=True)
     additional_hours = models.PositiveIntegerField(default=0)
     additional_hours_amount = models.PositiveIntegerField(default=0)
     adults = models.PositiveIntegerField(default=0)
     children = models.PositiveIntegerField(default=0)
     is_insured = models.BooleanField(default=False)
-    insurance_id = models.CharField(max_length=255, unique=True)
-    status = models.CharField(choices=BOOKING_STATUS, default='Opened', max_length=255)
+    insurance_id = models.CharField(max_length=255, unique=True,blank=True,null=True)
+    status = models.CharField(choices=BOOKING_STATUS, default='Opened', max_length=255,blank=True,null=True)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]

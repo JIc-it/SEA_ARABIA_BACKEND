@@ -55,3 +55,8 @@ class ServiceReviewAdmin(admin.ModelAdmin):
 @admin.register(ServiceAvailability)
 class ServiceAvailabilityAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(Package)
+class PackageAdmin(admin.ModelAdmin):
+    pass

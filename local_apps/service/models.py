@@ -244,7 +244,7 @@ class ServiceAvailability(Main):
 class Package(Main):
     is_active = models.BooleanField(default=False)
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="service_package_service")
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255,blank=True,null=True)
     short_description = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     day = models.CharField(choices=DAY_CHOICES, max_length=100, blank=True, null=True)
@@ -252,3 +252,7 @@ class Package(Main):
     capacity = models.PositiveIntegerField(default=0)
     image = models.FileField(upload_to="service/package/image")
     price = models.PositiveIntegerField(blank=True, null=True)
+
+
+    def __str__(self):
+        return self.name if self.name else "No Packages"

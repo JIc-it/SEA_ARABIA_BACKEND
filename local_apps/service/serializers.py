@@ -147,7 +147,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 class ExploreMoreSerializer(serializers.ModelSerializer):
     """serializer for showing the data in explore more section"""
 
-    service_price = PriceSerializer(many=True)
+    price = PriceSerializer(required=False, allow_null=True)
     service_image = ServiceImageSerializer(many=True)
     destination = serializers.CharField(source="destination.name", required=False, allow_null=True)
     company = serializers.CharField(source="company.name")
@@ -164,15 +164,13 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "pickup_point",
-            "service_price",
+            "price",
             "capacity",
             "service_image",
             "destination",
             "company",
             "amenities",
             "description",
-            "day",
-            "night",
             "category",
         ]
 
@@ -245,3 +243,11 @@ class ServiceAvailabilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceAvailability
         fields = ["id", "service", "date", "time", "created_at", "updated_at"]
+
+
+
+class PackageSerializer(serializers.ModelSerializer):
+    """for combopackeges"""
+    class Meta:
+        model = Package
+        fields = ['id','service','name','short_description','capacity','image','price']
