@@ -1,21 +1,34 @@
-# serializers.py
-
 from rest_framework import serializers
-from .models import Offers, Booking, PassengerDetails
+from .models import Booking, Payment
 
-class OffersSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Offers
-        fields = '__all__'
 
-class PassengerDetailsSerializer(serializers.ModelSerializer):
+class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PassengerDetails
-        fields = '__all__'
+        model = Payment
+        fields = ['payment_id',
+                  'status']
+
 
 class BookingSerializer(serializers.ModelSerializer):
-    passenger_details = PassengerDetailsSerializer(many=True, read_only=True)
+    payment = PaymentSerializer(allow_null=True, required=False)
 
     class Meta:
         model = Booking
-        fields = '__all__'
+        fields = ['booking_id',
+                  'user',
+                  'offer',
+                  'service',
+                  'payment',
+                  'user_type',
+                  'starting_point',
+                  'destination',
+                  'start_date',
+                  'end_date',
+                  'slot',
+                  'additional_hours',
+                  'additional_hours_amount',
+                  'adults',
+                  'children',
+                  'is_insured',
+                  'insurance_id',
+                  'status']

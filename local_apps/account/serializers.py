@@ -296,30 +296,19 @@ class UserUpdatedSerializer(serializers.ModelSerializer):
         fields = ['email', 'mobile', 'role', 'profile_extra']
 
     def update(self, instance, validated_data):
-
-        
-
         instance.email = validated_data.get('email', instance.email)
         instance.mobile = validated_data.get('mobile', instance.mobile)
         instance.role = validated_data.get('role', instance.role)
-        
         instance.save()
-        
-
-      
         profile_extra_data = validated_data.pop('profile_extra', {})
-
         profile_extra_instance, created = ProfileExtra.objects.get_or_create(
             user=instance,
             defaults=profile_extra_data
         )
-
-    
         if not created:
             for key, value in profile_extra_data.items():
                 setattr(profile_extra_instance, key, value)
             profile_extra_instance.save()
-
         return instance
 
 
