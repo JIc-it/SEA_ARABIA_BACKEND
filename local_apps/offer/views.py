@@ -95,7 +95,7 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
         try:
             offer = Offer.objects.get(pk=kwargs['pk'])
 
-            is_enable = request.data.get('is_enable', False)
+            is_enable = request.data.get('is_enable', 'false')
             name = request.data.get('name', None)
             coupon_code = request.data.get('coupon_code', None)
             image = request.data.get('image', None)
@@ -123,7 +123,7 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
                 companies = None
 
             if is_enable:
-                offer.is_enable = is_enable
+                offer.is_enable = True if is_enable and is_enable == 'true' else False
             if name:
                 offer.name = name
             if coupon_code:
