@@ -18,12 +18,14 @@ import random
 from local_apps.message_utility.views import mail_handler
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from django.db.models import Count, Q
+import datetime
 
 from django.contrib.auth import authenticate, login
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 
-#custom Auth
+# custom Auth
 
 
 class LoginView(APIView):
@@ -38,8 +40,8 @@ class LoginView(APIView):
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
             refresh_token = str(refresh)
-            
-            user_id=user.id
+
+            user_id = user.id
             print(user_id)
 
             return Response({
@@ -47,22 +49,14 @@ class LoginView(APIView):
                 'access_token': access_token,
                 'refresh_token': refresh_token,
                 # 'user_id':user_id
-                
+
             }, status=status.HTTP_200_OK)
         else:
-            raise AuthenticationFailed('Invalid email or password. Please try again.')
-        
+            raise AuthenticationFailed(
+                'Invalid email or password. Please try again.')
 
 
-
-
-#-------------------------------------------------------------------------------------------------------------------------------------------------------------------        
-
-
-
-
-
-
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #   User CRUD View
 
@@ -73,10 +67,12 @@ class UserCreate(generics.CreateAPIView):
 
 
 class UserList(generics.ListAPIView):
+    """ list all users """
+
     permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserListSerializer
-    filter_backends = [DjangoFilterBackend,SearchFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = [
         "first_name",
         "last_name",
@@ -84,7 +80,7 @@ class UserList(generics.ListAPIView):
         "email",
         "mobile"
     ]
-    
+
     filterset_class = UserFilter
 
 
@@ -92,18 +88,6 @@ class UserUpdate(generics.UpdateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
-
-class UserDelete(generics.DestroyAPIView):
-    # permission_classes = [IsAuthenticated]
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-
-class UserSerializerView(generics.RetrieveAPIView):
-    # permission_classes = [IsAuthenticated]
-    queryset = User.objects.all()
-    serializer_class = UserSerializerApp
 
 
 #   Profile extra views
@@ -116,7 +100,6 @@ class ProfileExtraCreate(generics.CreateAPIView):
 
 
 class VendorSerializerList(generics.ListAPIView):
-
     """view for listing the vendor in cms"""
 
     queryset = User.objects.filter(role="Vendor")
@@ -157,7 +140,8 @@ class VendorAdd(generics.CreateAPIView):
                 user=user, location=location_data
             )
         new_lead = OnboardStatus.objects.get(order=1)
-        Company.objects.create(user=user, created_by=created_by, status=new_lead)
+        Company.objects.create(
+            user=user, created_by=created_by, status=new_lead)
 
 
 class VendorDetailsAdd(generics.UpdateAPIView):
@@ -167,41 +151,43 @@ class VendorDetailsAdd(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         try:
 
-            # taking the data 
+            # taking the data
             location_data = request.data.get("location", {})
             company_data = request.data.get("company_company_user", {})
-            user_identification_data = request.data.get("useridentificationdata", {})
-            service_category = company_data.get('service_summary',[])
+            user_identification_data = request.data.get(
+                "useridentificationdata", {})
+            service_category = company_data.get('service_summary', [])
 
-            user_id_type = user_identification_data.get('id_type',None)
-            user_id_number = user_identification_data.get('id_number',None)
+            user_id_type = user_identification_data.get('id_type', None)
+            user_id_number = user_identification_data.get('id_number', None)
 
             #   get user instance
             user = User.objects.get(id=kwargs["pk"])
 
-            #   user details 
+            #   user details
 
-            email = request.data.get("email",None)
-            mobile = request.data.get("mobile",None)
-            first_name = request.data.get("first_name",None)
-            last_name = request.data.get("last_name",None)
+            email = request.data.get("email", None)
+            mobile = request.data.get("mobile", None)
+            first_name = request.data.get("first_name", None)
+            last_name = request.data.get("last_name", None)
 
             if email:
                 user.email = email
-            
+
             if mobile:
                 user.mobile = mobile
-            
+
             if first_name:
                 user.first_name = first_name
-            
+
             if last_name:
                 user.last_name = last_name
 
             user.save()
 
             #   updating the user profile extra
-            profile_instance, created = ProfileExtra.objects.get_or_create(user=user)
+            profile_instance, created = ProfileExtra.objects.get_or_create(
+                user=user)
             if location_data:
                 profile_instance.location = location_data
                 profile_instance.save()
@@ -209,36 +195,71 @@ class VendorDetailsAdd(generics.UpdateAPIView):
             #   updating the company details VendorAddDetailsSerialzier
 
             company_instance, _ = Company.objects.get_or_create(user=user)
-            company_serializer = CompanyAddSerializer(instance=company_instance, data=company_data)
+            company_serializer = CompanyAddSerializer(
+                instance=company_instance, data=company_data)
             if company_serializer.is_valid():
                 company_serializer.save()
 
                 if service_category:
                     company_instance.service_summary.set(service_category)
-            
+
             #   updating the user identification data
-            useridentification_instance,_,= UserIdentificationData.objects.get_or_create(user=user)
-            
+            useridentification_instance, _, = UserIdentificationData.objects.get_or_create(
+                user=user)
+
             if user_id_type and user_id_number:
-                idType = get_object_or_404(UserIdentificationType, id=user_id_type)
+                idType = get_object_or_404(
+                    UserIdentificationType, id=user_id_type)
                 useridentification_instance.id_type = idType
                 useridentification_instance.id_number = user_id_number
                 useridentification_instance.save()
-                
+
             serializer = VendorAddDetailsSerialzier(user)
-            return Response(serializer.data,status = status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response(f"Error: {str(e)}",status= status.HTTP_400_BAD_REQUEST)
-        
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
-        
 
-class VendorPersonalList(generics.RetrieveAPIView):
+# ? Lead management card APIs
+
+class VendorLeadCount(APIView):
+    """ vendor related counts """
+
+    def get(self, request):
+        try:
+
+            total_lead_count = User.objects.filter(role="Vendor").count()
+            total_active_vendors = Company.objects.filter(
+                is_onboard=True).count()
+            seven_days = datetime.date.today() - datetime.timedelta(7)
+            # ? takes the count of the leads that are generated in the last 7 days
+            new_leads = User.objects.filter(
+                created_at__date__gte=seven_days).count()
+            active_vendors = Company.objects.filter(is_onboard=True).annotate(
+                service_count=Count(
+                    "service", filter=Q(service__is_active=True))
+            ).filter(service_count__gt=0)
+            total_count = {
+                "total_lead": total_lead_count,
+                "onboarded_vendors": total_active_vendors,
+                "new_leads": new_leads,
+                "active_vedors": active_vendors.count()
+            }
+            return Response(total_count, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
+
+class AllUserDetails(generics.RetrieveAPIView):
+    """ List all the user(different roles) details """
+
     queryset = User.objects.all()
     serializer_class = AllUserDetailsSerializer
 
 
 class UserIdTypeList(generics.ListAPIView):
+    """ list the id types """
+
     serializer_class = UserIdentificationTypeSerializer
     queryset = UserIdentificationType.objects.all()
 
@@ -289,7 +310,8 @@ class RequestOTPView(APIView):
                     template=email_template,
                 )
                 return Response(
-                    {"detail": "OTP sent successfully.", "user_id": str(user.id)},
+                    {"detail": "OTP sent successfully.",
+                        "user_id": str(user.id)},
                     status=status.HTTP_200_OK,
                 )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -475,7 +497,7 @@ class BookMarkCreationAPI(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-       
+
         serializer.save(user=self.request.user)
 
 
@@ -485,7 +507,7 @@ class BookMarkCreationAPI(generics.CreateAPIView):
 #     permission_classes = [IsAuthenticated]
 
 #     def get_queryset(self):
-        
+
 #         return Bookmark.objects.filter(user=self.request.user)
 
 class BookMarkListView(generics.ListAPIView):
@@ -494,18 +516,15 @@ class BookMarkListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user_bookmarks = Bookmark.objects.filter(user=self.request.user)
-        return user_bookmarks
 
-   
+        return Bookmark.objects.filter(user=self.request.user)
 
-    
 
 class BookMarkDeleteView(generics.DestroyAPIView):
     """bookmark deletion"""
     queryset = Bookmark.objects.all()
     serializer_class = BookMarkListSerializer
-    lookup_field ='pk'
+    lookup_field = 'pk'
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -515,8 +534,6 @@ class BookMarkDeleteView(generics.DestroyAPIView):
     def perform_destroy(self, instance):
         instance.delete()
 
- 
-    
 
 class UserProfileView(generics.RetrieveAPIView):
     serializer_class = UserSerializerApp
@@ -531,23 +548,55 @@ class UserProfileView(generics.RetrieveAPIView):
 
         user.profile_extra = profile_extra
         return user
-    
 
 
 class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
     serializer_class = UserUpdatedSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_object(self):
-        return self.request.user
+    # def get_object(self):
+    #     return self.request.user
+    # FIXME::    get object code commented so that user can be taken from the user id passed
 
     def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        
-        print(request.data)  
+        try:
+            user_id = kwargs.get('pk', None)
+            email = request.data.get('email', None)
+            mobile = request.data.get('mobile', None)
+            first_name = request.data.get('first_name', None)
+            last_name = request.data.get('last_name', None)
+            # dob = request.data.get('last_name', None)
+            # gender = request.data.get('last_name', None)
+            profile_extra = request.data.get('profile_extra', {})
+            location = profile_extra.get('location', None)
+            dob = profile_extra.get('dob', None)
+            gender = profile_extra.get('gender', None)
+            user_instance = get_object_or_404(User, id=user_id)
+            profile_instance = get_object_or_404(
+                ProfileExtra, user=user_instance)
+            print(profile_instance, '<>>>>>>')
+            if email:
+                user_instance.email = email
+            if mobile:
+                user_instance.mobile = mobile
+            if first_name:
+                user_instance.first_name = first_name
+            if last_name:
+                user_instance.last_name = last_name
 
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+            if location:
+                profile_instance.location = location
 
-        return Response({"detail": "User profile updated successfully"}, status=status.HTTP_200_OK)
+            if dob:
+                profile_instance.dob = dob
+
+            if gender:
+                profile_instance.gender = gender.title()
+
+            user_instance.save()
+            profile_instance.save()
+
+            return Response({"detail": "User profile updated successfully"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)

@@ -12,11 +12,14 @@ from local_apps.service.serializers import ServiceSerializer
 class VendorSerializer(serializers.ModelSerializer):
     """vendor listing serializer"""
 
-    location = serializers.CharField(source="profileextra.location",default=None)
-    status = serializers.CharField(source="company_company_user.status",default=None)
-    company_id = serializers.CharField(source="company_company_user.id",default=None)
+    location = serializers.CharField(
+        source="profileextra.location", default=None)
+    status = serializers.CharField(
+        source="company_company_user.status", default=None)
+    company_id = serializers.CharField(
+        source="company_company_user.id", default=None)
     created_by = serializers.CharField(
-        source="company_company_user.created_by.first_name",default=None
+        source="company_company_user.created_by.first_name", default=None
     )
 
     class Meta:
@@ -40,14 +43,17 @@ class VendorDetailsSerializer(serializers.ModelSerializer):
     """serializer for showing the vendor details"""
 
     location = serializers.CharField(source="profileextra.location")
-    id_number = serializers.CharField(source="useridentificationdata.id_number")
+    id_number = serializers.CharField(
+        source="useridentificationdata.id_number")
     company_id = serializers.CharField(source="company_company_user.id")
     company_name = serializers.CharField(source="company_company_user.name")
     registration_number = serializers.CharField(
         source="company_company_user.registration_number"
     )
-    company_address = serializers.CharField(source="company_company_user.address")
-    company_website = serializers.CharField(source="company_company_user.website")
+    company_address = serializers.CharField(
+        source="company_company_user.address")
+    company_website = serializers.CharField(
+        source="company_company_user.website")
 
     class Meta:
         model = User
@@ -90,13 +96,39 @@ class UserIdentificationTypeSerializer(serializers.ModelSerializer):
 
 
 class UserIdentificationDataSerializer(serializers.ModelSerializer):
-    id_type = UserIdentificationTypeSerializer(read_only =True)
+    id_type = UserIdentificationTypeSerializer(read_only=True)
 
     class Meta:
         model = UserIdentificationData
         fields = ["id_type", "id_number"]
 
+
+class VendorAddDetailsSerialzier(serializers.ModelSerializer):
+    """Serializer for adding and updating"""
+
+    useridentificationdata = UserIdentificationDataSerializer(read_only=True)
+    company_company_user = CompanyAddSerializer(read_only=True)
+    location = serializers.CharField(
+        source="profileextra.location", read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "mobile",
+            "role",
+            "first_name",
+            "last_name",
+            "useridentificationdata",
+            "company_company_user",
+            "location",
+        ]
+
+
 # Serializers for viewing in app
+
+
 class ProfileExtraSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfileExtra
@@ -150,9 +182,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserListSerializer(serializers.ModelSerializer):
     """ Serializer for listing the user(customer,vendor, and other role types)"""
-    location  = serializers.CharField(source = "profileextra.location")
-    created_at = serializers.DateTimeField(format="%d-%m-%Y")     
+    location = serializers.CharField(source="profileextra.location")
+    created_at = serializers.DateTimeField(format="%d-%m-%Y")
     total_booking = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = [
@@ -168,9 +201,10 @@ class UserListSerializer(serializers.ModelSerializer):
             "role",
         ]
 
-    def get_total_booking(self,instance):
+    def get_total_booking(self, instance):
         return 0
-    
+
+
 class PasswordResetSerializer(serializers.Serializer):
     current_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
@@ -199,33 +233,13 @@ class ForgotPasswordResetSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True)
 
 
-class VendorAddDetailsSerialzier(serializers.ModelSerializer):
-    """Serializer for adding and updating"""
-
-    useridentificationdata = UserIdentificationDataSerializer(read_only=True)
-    company_company_user = CompanyAddSerializer(read_only=True)
-    location = serializers.CharField(source="profileextra.location", read_only=True)
-
-    class Meta:
-        model = User
-        fields = [
-            "id",
-            "email",
-            "mobile",
-            "role",
-            "first_name",
-            "last_name",
-            "useridentificationdata",
-            "company_company_user",
-            "location",
-        ]
-
 class AllUserDetailsSerializer(serializers.ModelSerializer):
     """ serializer for viewing the details of all the user """
 
     useridentificationdata = UserIdentificationDataSerializer(read_only=True)
     company_company_user = CompanyAddSerializer(read_only=True)
     profileextra = ProfileExtraSerializer(read_only=True)
+
     class Meta:
         model = User
         fields = [
@@ -239,19 +253,25 @@ class AllUserDetailsSerializer(serializers.ModelSerializer):
             "company_company_user",
             "profileextra",
         ]
-#----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
-#usersignup 
+# ----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
+# usersignup
+
+
 class UserSignUpSerializer(serializers.ModelSerializer):
     profile_extra = ProfileExtraSerializer(required=False)
-    location = serializers.CharField(source="profile_extra.location", required=False)
-    images = serializers.ImageField(source="profile_extra.image", required=False)
+    location = serializers.CharField(
+        source="profile_extra.location", required=False)
+    images = serializers.ImageField(
+        source="profile_extra.image", required=False)
     dob = serializers.CharField(source="profile_extra.dob", required=False)
-    gender = serializers.CharField(source="profile_extra.gender", required=False)
+    gender = serializers.CharField(
+        source="profile_extra.gender", required=False)
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'mobile', 'password','role', 'profile_extra', 'location', 'images', 'dob', 'gender')
-        extra_kwargs = {'password': {'write_only': True},}
+        fields = ('username', 'email', 'mobile', 'password', 'role',
+                  'profile_extra', 'location', 'images', 'dob', 'gender')
+        extra_kwargs = {'password': {'write_only': True}, }
 
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -263,14 +283,16 @@ class UserSignUpSerializer(serializers.ModelSerializer):
         user.save()
 
         # Create associated ProfileExtra instance
-        profile_extra = ProfileExtra.objects.create(user=user, **profile_extra_data)
+        profile_extra = ProfileExtra.objects.create(
+            user=user, **profile_extra_data)
 
         # Add related data to the response
         response_data = self.data
-        response_data['profile_extra'] = ProfileExtraSerializer(profile_extra).data
+        response_data['profile_extra'] = ProfileExtraSerializer(
+            profile_extra).data
 
         return user, response_data
-    
+
 
 # bookmark
 
@@ -280,12 +302,13 @@ class BookMarkSerializer(serializers.ModelSerializer):
         model = Bookmark
         fields = "__all__"
 
+
 class BookMarkListSerializer(serializers.ModelSerializer):
     service = ServiceSerializer()
+
     class Meta:
         model = Bookmark
         fields = "__all__"
-
 
 
 class UserUpdatedSerializer(serializers.ModelSerializer):
@@ -295,21 +318,23 @@ class UserUpdatedSerializer(serializers.ModelSerializer):
         model = User
         fields = ['email', 'mobile', 'role', 'profile_extra']
 
-    def update(self, instance, validated_data):
-        instance.email = validated_data.get('email', instance.email)
-        instance.mobile = validated_data.get('mobile', instance.mobile)
-        instance.role = validated_data.get('role', instance.role)
-        instance.save()
-        profile_extra_data = validated_data.pop('profile_extra', {})
-        profile_extra_instance, created = ProfileExtra.objects.get_or_create(
-            user=instance,
-            defaults=profile_extra_data
-        )
-        if not created:
-            for key, value in profile_extra_data.items():
-                setattr(profile_extra_instance, key, value)
-            profile_extra_instance.save()
-        return instance
+    # def update(self, instance, validated_data):
+    #     instance.email = validated_data.get('email', instance.email)
+    #     instance.mobile = validated_data.get('mobile', instance.mobile)
+    #     instance.role = validated_data.get('role', instance.role)
 
+    #     instance.save()
 
-    
+    #     profile_extra_data = validated_data.pop('profile_extra', {})
+
+    #     profile_extra_instance, created = ProfileExtra.objects.get_or_create(
+    #         user=instance,
+    #         defaults=profile_extra_data
+    #     )
+
+    #     if not created:
+    #         for key, value in profile_extra_data.items():
+    #             setattr(profile_extra_instance, key, value)
+    #         profile_extra_instance.save()
+
+    #     return instance

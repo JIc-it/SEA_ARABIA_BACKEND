@@ -1,4 +1,4 @@
-from rest_framework import generics,views
+from rest_framework import generics, views
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
@@ -43,6 +43,7 @@ class CompanyList(generics.ListAPIView):
         "service_summary__name",
     ]
     filterset_class = CompanyFilter
+
 
 class CompanyListCms(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
@@ -90,6 +91,10 @@ class MiscellaneousList(generics.ListAPIView):
     queryset = Miscellaneous.objects.all()
     serializer_class = MiscellaneousSerializer
 
+    def get_queryset(self):
+        company_id = self.request.query_params.get("id")
+        return SiteVisit.objects.filter(company=company_id)
+
 
 class MiscellaneousUpdate(generics.UpdateAPIView):
     # permission_classes = [IsAuthenticated]
@@ -129,13 +134,17 @@ class SiteVisitCreate(generics.CreateAPIView):
             serialized_instance = SiteVisitSerializer(instance)
             return super().perform_create(serializer)
         except Exception as e:
-            return Response(f"Error: {str(e)}",status=status.HTTP_400_BAD_REQUEST)
-    
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
 
 class SiteVisitList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = SiteVisit.objects.all()
     serializer_class = SiteVisitSerializer
+
+    def get_queryset(self):
+        company_id = self.request.query_params.get("id")
+        return SiteVisit.objects.filter(company=company_id)
 
 
 class SiteVisitUpdate(generics.UpdateAPIView):
@@ -164,6 +173,10 @@ class ProposalList(generics.ListAPIView):
     queryset = Proposal.objects.all()
     serializer_class = ProposalSerializer
 
+    def get_queryset(self):
+        company_id = self.request.query_params.get("id")
+        return SiteVisit.objects.filter(company=company_id)
+
 
 class ProposalUpdate(generics.UpdateAPIView):
     # permission_classes = [IsAuthenticated]
@@ -190,6 +203,10 @@ class NegotiationList(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = Negotiation.objects.all()
     serializer_class = NegotiationSerializer
+
+    def get_queryset(self):
+        company_id = self.request.query_params.get("id")
+        return SiteVisit.objects.filter(company=company_id)
 
 
 class NegotiationUpdate(generics.UpdateAPIView):
@@ -218,6 +235,10 @@ class MOUorCharterList(generics.ListAPIView):
     queryset = MOUorCharter.objects.all()
     serializer_class = MOUorCharterSerializer
 
+    def get_queryset(self):
+        company_id = self.request.query_params.get("id")
+        return SiteVisit.objects.filter(company=company_id)
+
 
 class MOUorCharterUpdate(generics.UpdateAPIView):
     # permission_classes = [IsAuthenticated]
@@ -236,17 +257,17 @@ class MOUorCharterView(generics.RetrieveAPIView):
 class OnboardVendor(generics.UpdateAPIView):
     ''' view for onboarding and offloading the vendor based on the status '''
 
-    queryset = Company.objects.filter(is_onboard = False)
+    queryset = Company.objects.filter(is_onboard=False)
     serializer_class = CompanyOnboardSerializer
 
     def update(self, request, *args, **kwargs):
         try:
-            company_id = kwargs.get('pk',None)
-            onboard_status = request.data.get('status',None)
-            company_instance = get_object_or_404(Company,id=company_id)
+            company_id = kwargs.get('pk', None)
+            onboard_status = request.data.get('status', None)
+            company_instance = get_object_or_404(Company, id=company_id)
             company_instance.is_onboard = onboard_status
             company_instance.save()
             serializer_data = CompanyOnboardSerializer(self.request.data)
-            return Response(serializer_data.data,status=status.HTTP_200_OK)
+            return Response(serializer_data.data, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response(f"Error: {str(e)}",status= status.HTTP_400_BAD_REQUEST)
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
