@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from .models import Booking, Payment
+from local_apps.service.serializers import ServiceSerializer
+from local_apps.offer.serializers import OfferSerializer
+from local_apps.account.serializers import UserSerializer
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -11,6 +14,9 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 class BookingSerializer(serializers.ModelSerializer):
     payment = PaymentSerializer(allow_null=True, required=False)
+    service = ServiceSerializer(allow_null=True, required=False)
+    offer = OfferSerializer(allow_null=True, required=False)
+    user = UserSerializer(allow_null=True, required=False)
 
     class Meta:
         model = Booking
