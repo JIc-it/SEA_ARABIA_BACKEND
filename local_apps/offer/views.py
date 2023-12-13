@@ -113,12 +113,12 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
             companies = request.data.get('companies', None)
 
             try:
-                services = Service.objects.filter(id__in=services)
+                services = Service.objects.filter(id__in=services) if Service.objects.filter(id__in=services).exists() else None
             except Service.DoesNotExist:
                 services = None
 
             try:
-                companies = Company.objects.filter(id__in=companies)
+                companies = Company.objects.filter(id__in=companies) if Company.objects.filter(id__in=companies).exists() else None
             except Company.DoesNotExist:
                 companies = None
 
