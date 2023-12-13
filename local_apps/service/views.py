@@ -339,14 +339,6 @@ class ExploreMore(generics.ListAPIView):
 #     flterset_class = ServiceFilter
 
 
-class ServiceListing(generics.ListAPIView):
-    """Views for all activity & service listing"""
-
-    queryset = Service.objects.all()
-    serializer_class = ActivitySerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = ServiceFilter
-   
 
     # def get_queryset(self):
     #     try:
