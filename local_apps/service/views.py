@@ -13,31 +13,26 @@ from local_apps.main.serializers import CategorySerializer, SubCategorySerialize
 from datetime import datetime
 
 
-class OccassionList(generics.ListAPIView):
-    # permission_classes = [IsAuthenticated]
-    queryset = Occasion.objects.all()
-    serializer_class = OccassionSerializer
-
 
 # vendorPrice Type Views
 
 
-class VendorPriceTypeList(generics.ListAPIView):
-    # permission_classes = [IsAuthenticated]
-    queryset = VendorPriceType.objects.all()
-    serializer_class = VendorPriceTypeSerializer
+# class VendorPriceTypeList(generics.ListAPIView):
+#     # permission_classes = [IsAuthenticated]
+#     queryset = VendorPriceType.objects.all()
+#     serializer_class = VendorPriceTypeSerializer
 
 
-class VendorPriceTypeCreate(generics.CreateAPIView):
-    # permission_classes = [IsAuthenticated]
-    queryset = VendorPriceType.objects.all()
-    serializer_class = VendorPriceTypeSerializer
+# class VendorPriceTypeCreate(generics.CreateAPIView):
+#     # permission_classes = [IsAuthenticated]
+#     queryset = VendorPriceType.objects.all()
+#     serializer_class = VendorPriceTypeSerializer
 
 
-class VendorPriceTypeUpdate(generics.UpdateAPIView):
-    # permission_classes = [IsAuthenticated]
-    queryset = VendorPriceType.objects.all()
-    serializer_class = VendorPriceTypeSerializer
+# class VendorPriceTypeUpdate(generics.UpdateAPIView):
+#     # permission_classes = [IsAuthenticated]
+#     queryset = VendorPriceType.objects.all()
+#     serializer_class = VendorPriceTypeSerializer
 
 
 # Destination Type Views
@@ -96,11 +91,10 @@ class SubCategoryList(generics.ListAPIView):
 class ServiceList(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
-    serializer_class = ExploreMoreSerializer
+    serializer_class = ServiceSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = [
         "name",
-        "occasions__name",
         "amenities__name",
         "destination__name",
     ]
@@ -158,37 +152,40 @@ class ServiceReviewUpdate(generics.CreateAPIView):
 
 
 class ServiceFilterList(generics.ListAPIView):
+    """View for filtering the service in service review listing section"""
+
     """View for filtering the service in service review listing section (VMS)   """
     permission_classes = [IsAuthenticated]
     serializer_class = ServiceFilterListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ["name"]
-    filterset_class = ServiceFilter
+
+    # filterset_class = ServiceFilter
 
     def get_queryset(self):
         user = self.request.user
         service_list = Service.objects.filter(company__user=user)
         return service_list
-
-
+    
 class ServiceFilterAdminList(generics.ListAPIView):
     """ View for filtering the service based on the company for Admin CMS   """
-    permission_classes = [IsAuthenticated]
+    permission_classes =[IsAuthenticated]
     queryset = Service.objects.all()
     serializer_class = ServiceFilterListSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]
-    search_fields = ["name"]
-    filterset_class = ServiceFilter
-
+    filter_backends = [DjangoFilterBackend,SearchFilter]
+    search_field = ["name"]
+    filterset_class =ServiceFilter
+        
 
 class ServiceReviewList(generics.ListAPIView):
     """view for showing the reviews realted to the particular service"""
 
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     # queryset = ServiceReview.objects.all()
     serializer_class = ServiceReviewListSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_class = ServiceReviewFilter
+
+    # filterset_class = ServiceReviewFilter
 
     def get_queryset(self):
         service_id = self.kwargs.get("pk")
@@ -255,7 +252,13 @@ class ServiceAvailabilityList(generics.ListAPIView):
         service_id = self.kwargs['service']
         return ServiceAvailability.objects.filter(service__id=service_id)
 
+        return ServiceAvailability.objects.filter(service__id=service_id)
 
+
+# vendor App
+#
+#
+#
 # vendor App
 #
 #
@@ -287,6 +290,7 @@ class ServiceAvailabeListView(generics.ListAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid date format or service ID"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid date format or service ID"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # ?---------------------------App views----------------------------------------#
@@ -303,14 +307,12 @@ class ServiceTopSuggestion(generics.ListAPIView):
     def get_queryset(self):
         queryset = Service.objects.all()
 
+
         service_type = self.request.query_params.get('type', None)
         if service_type:
             queryset = queryset.filter(type=service_type)
 
         return queryset
-
-
-permission_classes = [IsAuthenticated]
 
 
 class ExploreMore(generics.ListAPIView):
@@ -344,6 +346,7 @@ class ServiceListing(generics.ListAPIView):
     serializer_class = ActivitySerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ServiceFilter
+   
 
     # def get_queryset(self):
     #     try:
@@ -358,11 +361,13 @@ class ServiceListing(generics.ListAPIView):
     #         pass
 
 
+
+
 class CategoryBasedListing(generics.ListAPIView):
     """views for category based listing"""
 
     queryset = Service.objects.all()
-    serializer_class = ActivitySerializer
+    serializer_class = ServiceSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ServiceFilter
 

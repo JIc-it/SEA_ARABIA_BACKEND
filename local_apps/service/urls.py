@@ -1,30 +1,23 @@
 from django.urls import path
 from .views import *
 
-
 urlpatterns = [
-    # ocassion urls
-    path(
-        "occassion-list",
-        OccassionList.as_view(),
-        name="ocassion_list",
-    ),
     # vendor price type urls
-    path(
-        "vendorprice-type-list",
-        VendorPriceTypeList.as_view(),
-        name="vendorprice_type_list",
-    ),
-    path(
-        "vendorprice-type-create",
-        VendorPriceTypeCreate.as_view(),
-        name="vendorprice_type_create",
-    ),
-    path(
-        "vendorprice-type-update/<uuid:pk>",
-        VendorPriceTypeUpdate.as_view(),
-        name="vendorprice_type_update",
-    ),
+    # path(
+    #     "vendorprice-type-list",
+    #     VendorPriceTypeList.as_view(),
+    #     name="vendorprice_type_list",
+    # ),
+    # path(
+    #     "vendorprice-type-create",
+    #     VendorPriceTypeCreate.as_view(),
+    #     name="vendorprice_type_create",
+    # ),
+    # path(
+    #     "vendorprice-type-update/<uuid:pk>",
+    #     VendorPriceTypeUpdate.as_view(),
+    #     name="vendorprice_type_update",
+    # ),
     # Destination  urls
     path(
         "destination-list",
@@ -108,12 +101,6 @@ urlpatterns = [
         ServiceFilterList.as_view(),
         name="service-filter-list",
     ),
-    path(
-        "service-filter-list-cms",
-        ServiceFilterAdminList.as_view(),
-        name="service-filter-list-cms",
-    ),
-    
     #  App Urls
     path(
         "explore-more",
@@ -129,28 +116,20 @@ urlpatterns = [
     # # near by activities
     # path("near-by-activites",
     #      NearByActivities.as_view(),
-    #     name="near-by-activites" 
+    #     name="near-by-activites"
     #     ),
     # # recommendation on activity side
     # path("recommendation",
     #      Recommendation.as_view(),
     #      name="recommmendation"),
 
-    # all activity listing
-    path(
-        "service-listing",
-        ServiceListing.as_view(),
-        name='service-listing'
-    ),
-    # category based listing 
+    # category based listing
     path("category-based-listing/<str:category_name>/",
-        CategoryBasedListing.as_view(),
-         name="category-based-listing" 
+         CategoryBasedListing.as_view(),
+         name="category-based-listing"
          ),
 
-
-
-    path('servicesavailable/<str:date>/<uuid:service_id>/', ServiceAvailabeListView.as_view(), name='service-availabe'),         
+    path('servicesavailable/<str:date>/<uuid:service_id>/', ServiceAvailabeListView.as_view(), name='service-availabe'),
 
 ]
 

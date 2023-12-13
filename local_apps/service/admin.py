@@ -2,13 +2,23 @@ from django.contrib import admin
 from .models import *
 
 
-@admin.register(Occasion)
-class OcassionAdmin(admin.ModelAdmin):
+@admin.register(PriceList)
+class PriceListAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(VendorPriceType)
-class VendorPriceTypeAdmin(admin.ModelAdmin):
+@admin.register(Duration)
+class DurationAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(PriceCriterion)
+class PriceCriterionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ProfitMethod)
+class ProfitMethodAdmin(admin.ModelAdmin):
     pass
 
 
@@ -45,4 +55,3 @@ class ServiceReviewAdmin(admin.ModelAdmin):
 @admin.register(ServiceAvailability)
 class ServiceAvailabilityAdmin(admin.ModelAdmin):
     pass
-

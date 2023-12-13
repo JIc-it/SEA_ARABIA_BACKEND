@@ -1,113 +1,147 @@
 from rest_framework import serializers
 from .models import *
 from local_apps.account.models import Bookmark
-
-
-class OccassionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Occasion
-        exclude = ["created_at", "updated_at"]
-
-
-class VendorPriceTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VendorPriceType
-        exclude = ["created_at", "updated_at"]
+from local_apps.main.serializers import *
 
 
 class DestinationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Destination
-        exclude = ["created_at", "updated_at"]
+        fields = ["id", "name"]
 
 
 class AmenitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Amenity
-        exclude = ["created_at", "updated_at"]
+        fields = ["id", "name", "image"]
 
 
-# class CategorySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Category
-#         exclude = ["created_at", "updated_at"]
+class ProfitMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfitMethod
+        fields = ["id", "name"]
 
 
-# class SubCategorySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = SubCategory
-#         exclude = ["created_at", "updated_at"]
+class PriceCriterionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PriceCriterion
+        fields = ["id", "name"]
+
+
+class DurationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Duration
+        fields = ["id", "time"]
+
+
+class PriceListForPriceSerializer(serializers.ModelSerializer):
+    destination = DestinationSerializer(required=False, allow_null=True)
+    duration = DurationSerializer(required=False, allow_null=True)
+
+    class Meta:
+        model = PriceList
+        fields = ['id',
+                  'operation_type',
+                  'destination',
+                  'duration',
+                  'price']
 
 
 class PriceSerializer(serializers.ModelSerializer):
+    profile_method = ProfitMethodSerializer(required=False, allow_null=True)
+    price_criterion = PriceCriterionSerializer(required=False, allow_null=True)
+    duration = DurationSerializer(required=False, allow_null=True)
+    price_list = PriceListForPriceSerializer(required=False, allow_null=True)
+
     class Meta:
         model = Price
-        exclude = ["created_at", "updated_at"]
-        extra_kwargs = {"service": {"required": False}}
+        fields = ['id',
+                  'profile_method',
+                  'price_criterion',
+                  'price_per',
+                  'price',
+                  'sea_arabia_percentage',
+                  'vendor_percentage',
+                  'markup_fee',
+                  'price_list',
+                  'duration']
+
+
+class PriceListSerializer(serializers.ModelSerializer):
+    price_map = PriceSerializer(required=False, allow_null=True)
+    destination = DestinationSerializer(required=False, allow_null=True)
+    duration = DurationSerializer(required=False, allow_null=True)
+
+    class Meta:
+        model = PriceList
+        fields = ['id',
+                  'price_map',
+                  'operation_type',
+                  'destination',
+                  'duration',
+                  'price']
 
 
 class ServiceImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceImage
-        fields = [
-            "thumbnail",
-            "is_thumbnail",
-        ]
-        extra_kwargs = {"service": {"required": False}}
+        fields = ['id',
+                  "thumbnail",
+                  "is_thumbnail",
+                  ]
+
+
+class ServiceCompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = ['id',
+                  "name",
+                  ]
 
 
 class ServiceSerializer(serializers.ModelSerializer):
-    """serializer for creating new service"""
-
-    service_price = PriceSerializer(many=True)
-    service_image = ServiceImageSerializer(many=True)
-    destination = serializers.CharField(source="destination.name")
-    company = serializers.CharField(source="company.name")
-    category = serializers.CharField(source="category.name")
-    pricing_type = serializers.CharField(source="pricing_type.name")
-    occasions = serializers.SlugRelatedField(
-        slug_field="name", queryset=Occasion.objects.all()
-    )
-    
+    price = PriceSerializer(required=False, allow_null=True)
+    service_image = ServiceImageSerializer(many=True, required=False, allow_null=True)
+    # company = ServiceCompanySerializer(required=False, allow_null=True)
+    category = CategorySerializer(many=True, required=False, allow_null=True)
+    sub_category = SubCategorySerializer(many=True, required=False, allow_null=True)
+    is_bookmarked = serializers.SerializerMethodField()
 
     class Meta:
         model = Service
-        exclude = ["created_at", "updated_at"]
+        fields = ['id',
+                  'is_verified',
+                  'is_active',
+                  'is_top_suggestion',
+                  'is_bookmarked',
+                  'type',
+                  'category',
+                  'sub_category',
+                  'name',
+                  'machine_id',
+                  'description',
+                  'lounge',
+                  'bedroom',
+                  'toilet',
+                  'capacity',
+                  'amenities',
+                  'pickup_point',
+                  'cancellation_policy',
+                  'refund_policy',
+                  'price',
+                  'service_image',
+                  'company',
+                  'service_image',
+                  ]
 
-        extra_kwargs = {
-            "service_price": {"required": False},
-            "service_image": {"required": False},
-        }
-
-    def create(self, validated_data):
-        service_prices = validated_data.pop("service_price", [])
-        service_images = validated_data.pop("service_image", [])
-        ocassions = validated_data.pop("occasions", [])
-        amenities = validated_data.pop("amenities", [])
-        service_instance = Service.objects.create(**validated_data)
-        service_instance.occasions.set(ocassions)
-        service_instance.amenities.set(amenities)
-        for price in service_prices:
-            Price.objects.create(service=service_instance, **price)
-
-        for service_image in service_images:
-            ServiceImage.objects.create(service=service_instance, **service_image)
-        return service_instance
-
-    def update(self, instance, validated_data):
-        service_prices = validated_data.pop("service_price", [])
-        service_images = validated_data.pop("service_image", [])
-        ocassions = validated_data.pop("occasions", [])
-        amenities = validated_data.pop("amenities", [])
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
-        instance.save()
-
-        instance.occasions.set(ocassions)
-        instance.amenities.set(amenities)
-
-        return instance
-    
+    def get_is_bookmarked(self, obj):
+        try:
+            request = self.context.get('request')
+            if request and request.user.is_authenticated:
+                return Bookmark.objects.filter(user=request.user, service=obj).exists()
+            return False
+        except:
+            return False
 
 
 class ExploreMoreSerializer(serializers.ModelSerializer):
@@ -115,7 +149,7 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
 
     service_price = PriceSerializer(many=True)
     service_image = ServiceImageSerializer(many=True)
-    destination = serializers.CharField(source="destination.name",required=False, allow_null=True)
+    destination = serializers.CharField(source="destination.name", required=False, allow_null=True)
     company = serializers.CharField(source="company.name")
     category = serializers.CharField(source="category.name")
     # pricing_type = serializers.CharField(source="pricing_type.name")
@@ -149,12 +183,11 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
 
 
 class ServiceFilterListSerializer(serializers.ModelSerializer):
-    """serializer for service review filter section"""
+    service_image = ServiceImageSerializer(many=True, required=False, allow_null=True)
 
-    service_image = ServiceImageSerializer(many=True)
     class Meta:
         model = Service
-        fields = ["id", "name", "service_image", "category", "sub_category","company"]
+        fields = ["id", "name", "service_image", "category", "sub_category"]
 
 
 class ServiceReviewSerializer(serializers.ModelSerializer):
@@ -186,52 +219,6 @@ class ServiceReviewListSerializer(serializers.ModelSerializer):
             "review_summary",
             "rating",
         ]
-
-
-class ActivitySerializer(serializers.ModelSerializer):
-    """Serializer for Activity listing"""
-   
-
-
-    service_price = PriceSerializer(many=True)
-    service_image = ServiceImageSerializer(many=True)
-    destination = serializers.CharField(source="destination.name", required=False, allow_null=True)
-    company = serializers.CharField(source="company.name")
-    amenities = AmenitySerializer(many=True)
-    category = serializers.CharField(source="category.name")
-    is_bookmarked = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Service
-        fields = [
-            "id",
-            "name",
-            "pickup_point",
-            "service_price",
-            "capacity",
-            "service_image",
-            "destination",
-            "company",
-            "amenities",
-            "description",
-            "day",
-            "night",
-            "category",
-            "is_bookmarked",
-        ]
-
-        extra_kwargs = {
-            "service_price": {"required": False},
-            "service_image": {"required": False},
-        }
-    def get_is_bookmarked(self, obj):
-        try:
-            request = self.context.get('request')
-            if request and request.user.is_authenticated:
-                return Bookmark.objects.filter(user=request.user, service=obj).exists()
-            return False
-        except:
-            return False
 
     # def get_is_bookmarked(self, obj):
     #     request = self.context.get('request')
