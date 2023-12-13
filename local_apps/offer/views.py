@@ -164,6 +164,4 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
             offer.save()
             serializer = OfferSerializer(offer)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+           
