@@ -11,6 +11,7 @@ from .filters import *
 from django.shortcuts import get_object_or_404
 from local_apps.main.serializers import CategorySerializer, SubCategorySerializer
 from datetime import datetime
+from local_apps.booking.models import Booking
 
 
 
@@ -290,7 +291,33 @@ class ServiceAvailabeListView(generics.ListAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid date format or service ID"}, status=status.HTTP_400_BAD_REQUEST)
-            return Response({"error": "Invalid date format or service ID"}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+
+
+
+class AdminServiceBookingAvailabilityList(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ServiceSerializer
+
+    def get_queryset(self):
+        try:
+            service_id = self.kwargs.get("service")
+            service = get_object_or_404(Service, id=service_id)
+
+            date = self.kwargs.get("date")
+            if not date:
+                raise ValueError("Date parameter is missing.")
+
+            return Booking.objects.filter(service=service, start_date=date)
+        except Service.DoesNotExist:
+            return Response({"error": "Service not found"}, status=status.HTTP_404_NOT_FOUND)
+        except ValueError as ve:
+            return Response({"error": str(ve)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)        
+            
 
 
 # ?---------------------------App views----------------------------------------#

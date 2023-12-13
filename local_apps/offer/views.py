@@ -92,10 +92,10 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = OfferSerializer
 
     def update(self, request, *args, **kwargs):
-        try:
+ 
             offer = Offer.objects.get(pk=kwargs['pk'])
 
-            is_enable = request.data.get('is_enable', 'false')
+            is_enable = request.data.get('is_enable', False)
             name = request.data.get('name', None)
             coupon_code = request.data.get('coupon_code', None)
             image = request.data.get('image', None)
@@ -113,17 +113,24 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
             companies = request.data.get('companies', None)
 
             try:
-                services = Service.objects.filter(id__in=services) if Service.objects.filter(id__in=services).exists() else None
+                if services:
+                    services = Service.objects.filter(id__in=services) if Service.objects.filter(id__in=services).exists() else None
+                else:
+                    services = None
+                
             except Service.DoesNotExist:
                 services = None
 
             try:
-                companies = Company.objects.filter(id__in=companies) if Company.objects.filter(id__in=companies).exists() else None
+                if companies:
+                    companies = Company.objects.filter(id__in=companies) if Company.objects.filter(id__in=companies).exists() else None
+                else:
+                    companies = None
             except Company.DoesNotExist:
                 companies = None
 
             if is_enable:
-                offer.is_enable = True if is_enable and is_enable == 'true' else False
+                offer.is_enable = is_enable
             if name:
                 offer.name = name
             if coupon_code:
@@ -157,5 +164,4 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
             offer.save()
             serializer = OfferSerializer(offer)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+   
