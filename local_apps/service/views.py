@@ -15,7 +15,6 @@ from local_apps.booking.models import Booking
 from local_apps.booking.serializers import BookingSerializer
 
 
-
 # vendorPrice Type Views
 
 
@@ -168,26 +167,27 @@ class ServiceFilterList(generics.ListAPIView):
         user = self.request.user
         service_list = Service.objects.filter(company__user=user)
         return service_list
-    
+
+
 class ServiceFilterAdminList(generics.ListAPIView):
     """ View for filtering the service based on the company for Admin CMS   """
-    permission_classes =[IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
     serializer_class = ServiceFilterListSerializer
-    filter_backends = [DjangoFilterBackend,SearchFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     search_field = ["name"]
-    filterset_class =ServiceFilter
-        
+    filterset_class = ServiceFilter
+
 
 class ServiceReviewList(generics.ListAPIView):
     """view for showing the reviews realted to the particular service"""
 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     # queryset = ServiceReview.objects.all()
     serializer_class = ServiceReviewListSerializer
     filter_backends = [DjangoFilterBackend]
 
-    # filterset_class = ServiceReviewFilter
+    filterset_class = ServiceReviewFilter
 
     def get_queryset(self):
         service_id = self.kwargs.get("pk")
@@ -289,10 +289,6 @@ class ServiceAvailabeListView(generics.ListAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid date format or service ID"}, status=status.HTTP_400_BAD_REQUEST)
-        
-
-
-
 
 
 class AdminServiceBookingAvailabilityList(generics.ListAPIView):
@@ -314,8 +310,7 @@ class AdminServiceBookingAvailabilityList(generics.ListAPIView):
         except ValueError as ve:
             return Response({"error": str(ve)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)        
-            
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # ?---------------------------App views----------------------------------------#
@@ -331,7 +326,6 @@ class ServiceTopSuggestion(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = Service.objects.all()
-
 
         service_type = self.request.query_params.get('type', None)
         if service_type:
@@ -363,8 +357,6 @@ class ExploreMore(generics.ListAPIView):
 #     filter_backends = [DjangoFilterBackend]
 #     flterset_class = ServiceFilter
 
-
-
     # def get_queryset(self):
     #     try:
     #         user = self.request.user
@@ -376,8 +368,6 @@ class ExploreMore(generics.ListAPIView):
     #             return Service.objects.none()
     #     except:
     #         pass
-
-
 
 
 class CategoryBasedListing(generics.ListAPIView):
