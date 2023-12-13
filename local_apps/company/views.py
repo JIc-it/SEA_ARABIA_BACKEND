@@ -93,7 +93,7 @@ class MiscellaneousList(generics.ListAPIView):
 
     def get_queryset(self):
         company_id = self.request.query_params.get("id")
-        return SiteVisit.objects.filter(company=company_id)
+        return Miscellaneous.objects.filter(company=company_id)
 
 
 class MiscellaneousUpdate(generics.UpdateAPIView):

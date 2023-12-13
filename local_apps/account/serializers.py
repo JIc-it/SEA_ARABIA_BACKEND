@@ -312,11 +312,11 @@ class BookMarkListSerializer(serializers.ModelSerializer):
 
 
 class UserUpdatedSerializer(serializers.ModelSerializer):
-    profile_extra = ProfileExtraSerializer(required=False, allow_null=True)
+    profileextra = ProfileExtraSerializer(required=False, allow_null=True)
 
     class Meta:
         model = User
-        fields = ['email', 'mobile', 'role', 'profile_extra']
+        fields = ['email', 'mobile', 'role', 'profileextra']
 
     # def update(self, instance, validated_data):
     #     instance.email = validated_data.get('email', instance.email)
@@ -336,5 +336,4 @@ class UserUpdatedSerializer(serializers.ModelSerializer):
     #         for key, value in profile_extra_data.items():
     #             setattr(profile_extra_instance, key, value)
     #         profile_extra_instance.save()
-
     #     return instance

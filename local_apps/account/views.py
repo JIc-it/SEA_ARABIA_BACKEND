@@ -566,16 +566,14 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
             mobile = request.data.get('mobile', None)
             first_name = request.data.get('first_name', None)
             last_name = request.data.get('last_name', None)
-            # dob = request.data.get('last_name', None)
-            # gender = request.data.get('last_name', None)
             profile_extra = request.data.get('profile_extra', {})
             location = profile_extra.get('location', None)
             dob = profile_extra.get('dob', None)
             gender = profile_extra.get('gender', None)
             user_instance = get_object_or_404(User, id=user_id)
-            profile_instance = get_object_or_404(
+            profile_instance, _ = ProfileExtra.objects.get_or_create(
                 ProfileExtra, user=user_instance)
-            print(profile_instance, '<>>>>>>')
+
             if email:
                 user_instance.email = email
             if mobile:
@@ -596,8 +594,9 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
 
             user_instance.save()
             profile_instance.save()
+            serializer = UserUpdatedSerializer(user_instance)
 
-            return Response({"detail": "User profile updated successfully"}, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 

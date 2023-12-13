@@ -261,9 +261,6 @@ class ServiceAvailabilityList(generics.ListAPIView):
 #
 #
 # vendor App
-#
-#
-#
 
 class ServiceAvailabeListView(generics.ListAPIView):
     serializer_class = ServiceAvailabilitySerializer
