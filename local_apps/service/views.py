@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from local_apps.main.serializers import CategorySerializer, SubCategorySerializer
 from datetime import datetime
 from local_apps.booking.models import Booking
+from local_apps.booking.serializers import BookingSerializer
 
 
 
@@ -296,7 +297,7 @@ class ServiceAvailabeListView(generics.ListAPIView):
 
 class AdminServiceBookingAvailabilityList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = ServiceSerializer
+    serializer_class = BookingSerializer
 
     def get_queryset(self):
         try:
