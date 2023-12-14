@@ -300,7 +300,7 @@ class AdminServiceBookingAvailabilityList(generics.ListAPIView):
             if not date:
                 raise ValueError("Date parameter is missing.")
 
-            return Booking.objects.filter(service=service, start_date=date)
+            return Booking.objects.filter(service=service, start_date__date=date)
         except Service.DoesNotExist:
             return Response({"error": "Service not found"}, status=status.HTTP_404_NOT_FOUND)
         except ValueError as ve:
