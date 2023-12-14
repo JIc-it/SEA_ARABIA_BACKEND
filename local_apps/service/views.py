@@ -78,6 +78,7 @@ class CategoryList(generics.ListAPIView):
 # SubCategory Type Views
 
 
+# vendor App
 class SubCategoryList(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = SubCategory.objects.all()
@@ -180,7 +181,7 @@ class ServiceFilterAdminList(generics.ListAPIView):
 
 
 class ServiceReviewList(generics.ListAPIView):
-    """view for showing the reviews realted to the particular service"""
+    """ view for showing the reviews realted to the particular service  """
 
     permission_classes = [IsAuthenticated]
     # queryset = ServiceReview.objects.all()
@@ -254,14 +255,9 @@ class ServiceAvailabilityList(generics.ListAPIView):
         service_id = self.kwargs['service']
         return ServiceAvailability.objects.filter(service__id=service_id)
 
-        return ServiceAvailability.objects.filter(service__id=service_id)
-
 
 # vendor App
-#
-#
-#
-# vendor App
+
 
 class ServiceAvailabeListView(generics.ListAPIView):
     serializer_class = ServiceAvailabilitySerializer
@@ -317,7 +313,7 @@ class AdminServiceBookingAvailabilityList(generics.ListAPIView):
 
 
 class ServiceTopSuggestion(generics.ListAPIView):
-    """views for top suggestions & top activites"""
+    """ views for top suggestions & top activites   """
 
     queryset = Service.objects.filter(is_top_suggestion=True)
     serializer_class = ExploreMoreSerializer
@@ -335,7 +331,7 @@ class ServiceTopSuggestion(generics.ListAPIView):
 
 
 class ExploreMore(generics.ListAPIView):
-    """views for explore more"""
+    """ views for explore more  """
 
     # permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
@@ -385,14 +381,8 @@ class CategoryBasedListing(generics.ListAPIView):
 
 
 class ComboPackageListing(generics.ListAPIView):
-     """for combo package listing"""
-     queryset = Package.objects.filter(is_active=True)
-     serializer_class = PackageSerializer
-     filter_backends = [DjangoFilterBackend]
+    """for combo package listing"""
+    queryset = Package.objects.filter(is_active=True)
+    serializer_class = PackageSerializer
+    filter_backends = [DjangoFilterBackend]
     #  filterset_class = ServiceFilter
-
-
-
-
-
-

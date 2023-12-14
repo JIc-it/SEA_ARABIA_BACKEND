@@ -100,7 +100,7 @@ class ProfileExtraCreate(generics.CreateAPIView):
 
 
 class VendorSerializerList(generics.ListAPIView):
-    """view for listing the vendor in cms"""
+    """ view for listing the vendor in cms """
 
     queryset = User.objects.filter(role="Vendor")
     serializer_class = VendorSerializer
@@ -599,4 +599,3 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
-

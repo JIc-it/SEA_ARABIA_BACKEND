@@ -5,12 +5,17 @@ from rest_framework.response import Response
 from local_apps.service.models import Service
 from local_apps.offer.models import Offer
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+from .filters import *
 
 
 class BookingListView(generics.ListAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_class = BookingFilter
 
 
 class BookingCreateView(generics.CreateAPIView):
@@ -30,7 +35,8 @@ class BookingCreateView(generics.CreateAPIView):
             end_date = request.data.get('end_date', False)
             slot = request.data.get('slot', False)
             additional_hours = request.data.get('additional_hours', False)
-            additional_hours_amount = request.data.get('additional_hours_amount', False)
+            additional_hours_amount = request.data.get(
+                'additional_hours_amount', False)
             adults = request.data.get('adults', False)
             children = request.data.get('children', False)
             is_insured = request.data.get('is_insured', False)
@@ -81,6 +87,3 @@ class BookingView(generics.RetrieveAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
-
-
-
