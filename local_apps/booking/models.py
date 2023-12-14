@@ -3,7 +3,7 @@ from django.conf import settings
 from local_apps.core.models import Main
 from local_apps.service.models import Service
 from local_apps.offer.models import Offer
-
+from local_apps.account.models import Guest
 BOOKING_STATUS = (
     ('Opened', 'Opened'),
     ('Successful', 'Successful'),
@@ -35,6 +35,8 @@ class Booking(Main):
     booking_id = models.CharField(max_length=255, unique=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.SET_NULL, null=True, blank=True)
+    guest = models.ForeignKey(Guest,
+                              on_delete=models.SET_NULL, null=True, blank=True,)
     offer = models.ForeignKey(Offer, blank=True, null=True,
                               on_delete=models.SET_NULL, related_name='booking_offer')
     service = models.ForeignKey(Service, blank=True, null=True, on_delete=models.SET_NULL,

@@ -1,6 +1,6 @@
 from rest_framework import generics, status
 from .models import Booking, Payment
-from .serializers import BookingSerializer
+from .serializers import *
 from rest_framework.response import Response
 from local_apps.service.models import Service
 from local_apps.offer.models import Offer
@@ -10,7 +10,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.views import APIView
 from rest_framework import status
 from django.db.models import Case, Count, Q, Sum, IntegerField, When
-
+from django.shortcuts import get_object_or_404
 import datetime
 from .filters import *
 
@@ -119,3 +119,22 @@ class BookingCardCount(APIView):
             return Response(booking_count, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error:{str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
+
+class BookingStatusUpdate(generics.UpdateAPIView):
+    serializer_class = BookingStatusSerializer
+    queryset = Booking.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        try:
+            booking_status = request.data.get('status')
+            booking_id = kwargs.get('pk', None)
+
+            booking_instance = get_object_or_404(Booking, id=booking_id)
+            if booking_status:
+                booking_instance.status = booking_status.title()
+                booking_instance.save()
+
+            return Response({"Booking Status": booking_instance.status}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error : {str(e)}", status=status.HTTP_400_BAD_REQUEST)

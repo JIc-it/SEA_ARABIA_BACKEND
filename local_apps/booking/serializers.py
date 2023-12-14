@@ -38,3 +38,7 @@ class BookingSerializer(serializers.ModelSerializer):
                   'is_insured',
                   'insurance_id',
                   'status']
+
+
+class BookingStatusSerializer(serializers.Serializer):
+    status = serializers.CharField()
