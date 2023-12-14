@@ -44,6 +44,7 @@ class CompanyList(generics.ListAPIView):
     ]
     filterset_class = CompanyFilter
 
+ 
 
 class CompanyListCms(generics.ListAPIView):
     permission_classes = [IsAuthenticated]

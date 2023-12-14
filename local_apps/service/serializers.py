@@ -186,7 +186,7 @@ class ServiceFilterListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Service
-        fields = ["id", "name", "service_image", "category", "sub_category"]
+        fields = ["id", "name", "service_image", "category", "sub_category","company"]
 
 
 class ServiceReviewSerializer(serializers.ModelSerializer):
