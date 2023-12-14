@@ -130,6 +130,7 @@ urlpatterns = [
          ),
 
     path('servicesavailable/<str:date>/<uuid:service_id>/', ServiceAvailabeListView.as_view(), name='service-availabe'),
+   # Combopackages listing
     path('combopackages', ComboPackageListing.as_view(), name='combopackages'),
 
     path('service-booking-availability/<uuid:service>/<str:date>/', AdminServiceBookingAvailabilityList.as_view(), name='service-booking-availability'),
