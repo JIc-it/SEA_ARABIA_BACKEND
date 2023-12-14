@@ -130,7 +130,7 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
                 companies = None
 
             if is_enable:
-                offer.is_enable = is_enable
+                offer.is_enable = True if is_enable == 'true' or is_enable == 'True' or is_enable == True else False    
             if name:
                 offer.name = name
             if coupon_code:
