@@ -113,6 +113,7 @@ class ServiceSerializer(serializers.ModelSerializer):
                   'is_verified',
                   'is_active',
                   'is_top_suggestion',
+                  'is_premium',
                   'is_bookmarked',
                   'type',
                   'category',

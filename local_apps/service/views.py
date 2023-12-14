@@ -392,8 +392,6 @@ class ComboPackageListing(generics.ListAPIView):
     #  filterset_class = ServiceFilter
 
 
-    
-
 
 
 
