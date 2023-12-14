@@ -18,7 +18,7 @@ import random
 from local_apps.message_utility.views import mail_handler
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Case, When, IntegerField, Sum
 import datetime
 
 from django.contrib.auth import authenticate, login
@@ -246,6 +246,37 @@ class VendorLeadCount(APIView):
                 "active_vedors": active_vendors.count()
             }
             return Response(total_count, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
+
+# ? user count cards
+
+class UserCountList(APIView):
+    """ count of the users """
+
+    def get(self, request):
+        try:
+            user_count = User.objects.filter(role="User").count()
+            return Response({"user_count": user_count}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
+
+class VendorCountList(APIView):
+    """ vendor coutn cards """
+
+    def get(self, request):
+        try:
+            total_vendor = User.objects.all().aggregate(
+                total_count=Count("pk"),
+                active_vendor=Sum(
+                    Case(When(is_active=True, then=1), default=0, output_field=IntegerField())),
+                inactive_vendor=Sum(
+                    Case(When(is_active=False, then=1), default=0, output_field=IntegerField())),
+            )
+
+            return Response(total_vendor, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 

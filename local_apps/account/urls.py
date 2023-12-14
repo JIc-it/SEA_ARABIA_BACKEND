@@ -60,4 +60,11 @@ urlpatterns = [
     path('vendor-leads-count', VendorLeadCount.as_view(),
          name='vendor-leads-count'),
 
+    # count of total users in cms
+    path('user-count-admin', UserCountList.as_view(),
+         name='user-count-admin'),
+    # count of total users in cms
+    path('vendor-count-admin', VendorCountList.as_view(),
+         name='vendor-count-admin'),
+
 ]
