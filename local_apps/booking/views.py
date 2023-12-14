@@ -15,6 +15,12 @@ class BookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = [
+        "booking_id",
+        "service__name",
+        "user__first_name",
+        "user__last_name"
+    ]
     filterset_class = BookingFilter
 
 

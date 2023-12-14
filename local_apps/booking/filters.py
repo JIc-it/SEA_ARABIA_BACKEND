@@ -3,9 +3,11 @@ from .models import *
 
 
 class BookingFilter(django_filters.FilterSet):
+    vendor = django_filters.UUIDFilter(field_name="service__company__user")
+
     class Meta:
-        models = Booking
+        model = Booking
         fields = [
-            "service"
-            "service__company__user"
+            "service",
+            "vendor"
         ]
