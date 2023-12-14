@@ -102,6 +102,14 @@ class MiscellaneousUpdate(generics.UpdateAPIView):
     queryset = Miscellaneous.objects.all()
     serializer_class = MiscellaneousSerializer
 
+    def update(self, request, args, *kwargs):
+        instance = self.get_object()
+        instance.attachment = request.data.get('attachment', instance.attachment) and instance.attachment or None
+        instance.save()
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
 
 class MiscellaneousView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
@@ -272,3 +280,47 @@ class OnboardVendor(generics.UpdateAPIView):
             return Response(serializer_data.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
+
+#vendor onboarding status
+
+class ChangeStatusAPIView(generics.UpdateAPIView):
+    queryset = Company.objects.all()
+    serializer_class = CompanySerializer
+
+    def update(self, request, args, *kwargs):
+        instance = self.get_object()
+
+        # Get the status to change from the request parameters
+        updated_status = request.query_params.get('new_status')
+
+        if not updated_status:
+            return Response({'detail': 'Invalid request. Please provide the new_status parameter.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the provided status is valid
+        try:
+            new_status = OnboardStatus.objects.get(name=updated_status)
+        except OnboardStatus.DoesNotExist:
+            return Response({'detail': f'Invalid status: {updated_status}'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update the status based on the provided parameter
+        if updated_status == ("Site ls"
+                              "Visit") and not User.objects.filter(company=instance).exists():
+            return Response({'detail': 'Invalid operation. Initial Contact does not exist.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        elif updated_status == "Proposal" and not SiteVisit.objects.filter(company=instance).exists():
+            return Response({'detail': 'Invalid operation. Site Visit does not exist.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        elif updated_status == "Negotiation" and not Proposal.objects.filter(company=instance).exists():
+            return Response({'detail': 'Invalid operation. Proposal does not exist.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        elif updated_status == "MOUorCharter" and not Negotiation.objects.filter(company=instance).exists():
+            return Response({'detail': 'Invalid operation. Negotiation does not exist.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        instance.status = new_status
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+        

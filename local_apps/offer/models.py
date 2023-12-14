@@ -8,6 +8,13 @@ DISCOUNT_TYPE = (
     ('Percentage', 'Percentage'),
 )
 
+MULTIPLE_REDEEM_TYPE=(('One_Time','One-Time'),
+                      ('Multiple-time','Multiple-Time'))
+
+REDEMPTION_TYPE=(('One-Time','One-Time'),
+                ('Unlimited','Unlimited'),
+                ('Limited-Number','Limited-Number'))
+
 
 class Offer(Main):
     is_enable = models.BooleanField(default=False)
@@ -16,14 +23,18 @@ class Offer(Main):
     image = models.ImageField(upload_to='offer/offer/image', blank=True, null=True)
     discount_type = models.CharField(choices=DISCOUNT_TYPE, max_length=25)
     discount_value = models.PositiveIntegerField(default=0, blank=True, null=True)
-    max_redeem_amount = models.PositiveIntegerField(default=0, blank=True, null=True)
-    max_redeem_count = models.PositiveIntegerField(default=0, blank=True, null=True)
-    min_grand_total = models.PositiveIntegerField(default=0, blank=True, null=True)
-    allow_multiple_redeem = models.BooleanField(default=False)
-    allow_global_redeem = models.BooleanField(default=False)
+    upto_amount = models.PositiveIntegerField(default=0, blank=True, null=True)
+    redemtion_type = models.CharField(choices=MULTIPLE_REDEEM_TYPE, max_length=25)
+    specify_no = models.PositiveIntegerField(default=0, blank=True, null=True)
+    purchase_requirement = models.BooleanField(default=0, blank=True, null=True)
+    min_purchase_amount = models.PositiveIntegerField(default=0, blank=True, null=True)
+    allow_multiple_redeem = models.CharField(choices=MULTIPLE_REDEEM_TYPE, max_length=25)
+    multiple_redeem_specify_no = models.BooleanField(default=False)
+    on_home_screen = models.BooleanField(default=False)
     display_global = models.BooleanField(default=False)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
+    is_lifetime = models.BooleanField(default=False)
     services = models.ManyToManyField(Service, blank=True)
     companies = models.ManyToManyField(Company, blank=True)
 

@@ -65,4 +65,6 @@ urlpatterns = [
 
 
     path("companycms-list", CompanyListCms.as_view(), name="companycms-list"),
+
+    path("change-status/<uuid:pk>", ChangeStatusAPIView.as_view(), name="change-status"),
 ]
