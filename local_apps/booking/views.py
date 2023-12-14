@@ -114,7 +114,6 @@ class BookingCardCount(APIView):
                     Case(When(status="Successful", then=1), default=0, output_field=IntegerField())),
                 total_cancelled_booking=Sum(
                     Case(When(status="Cancelled", then=1), default=0, output_field=IntegerField())),
-
             )
 
             return Response(booking_count, status=status.HTTP_200_OK)
