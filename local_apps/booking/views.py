@@ -7,7 +7,15 @@ from local_apps.offer.models import Offer
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.views import APIView
+from rest_framework import status
+from django.db.models import Case, Count, Q, Sum, IntegerField, When
+
+import datetime
 from .filters import *
+
+
+today = datetime.date.today()
 
 
 class BookingListView(generics.ListAPIView):
@@ -93,3 +101,22 @@ class BookingView(generics.RetrieveAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
+
+
+class BookingCardCount(APIView):
+    def get(self, request):
+        try:
+            booking_count = Booking.objects.all().aggregate(
+                total_booking=Count("pk"),
+                today_booking=Sum(
+                    Case(When(created_at=today, then=1), default=0, output_field=IntegerField())),
+                total_confirmed_booking=Sum(
+                    Case(When(status="Successful", then=1), default=0, output_field=IntegerField())),
+                total_cancelled_booking=Sum(
+                    Case(When(status="Cancelled", then=1), default=0, output_field=IntegerField())),
+
+            )
+
+            return Response(booking_count, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error:{str(e)}", status=status.HTTP_400_BAD_REQUEST)
