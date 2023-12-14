@@ -9,5 +9,5 @@ class BookingFilter(django_filters.FilterSet):
         model = Booking
         fields = [
             "service",
-            "vendor"
+            "vendor",
         ]
