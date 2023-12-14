@@ -185,8 +185,7 @@ class Guest(Main):
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
     location = models.CharField(max_length=255, null=True, blank=True)
-    mobile = models.PositiveBigIntegerField(
-        max_length=255, null=True, blank=True)
+    mobile = models.PositiveBigIntegerField(null=True, blank=True)
     email = models.EmailField(max_length=255, null=True, blank=True)
 
     def __str__(self):
