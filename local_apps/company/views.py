@@ -102,7 +102,7 @@ class MiscellaneousUpdate(generics.UpdateAPIView):
     queryset = Miscellaneous.objects.all()
     serializer_class = MiscellaneousSerializer
 
-    def update(self, request, args, *kwargs):
+    def update(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.attachment = request.data.get('attachment', instance.attachment) and instance.attachment or None
         instance.save()

@@ -25,7 +25,8 @@ urlpatterns = [
          name="miscellaneous-create",),
     path("miscellaneous-view/<uuid:pk>",
          MiscellaneousView.as_view(), name="miscellaneous-view",),
-    path("miscellaneous-update/<uuid:pk>", MiscellaneousUpdate.as_view(), name="miscellaneous-update",), \
+    path("miscellaneous-update/<uuid:pk>",
+         MiscellaneousUpdate.as_view(), name="miscellaneous-update",),
 
     # qualifications list
     path("qualification-list", QualificationsList.as_view(),
