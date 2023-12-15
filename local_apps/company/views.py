@@ -332,17 +332,17 @@ class ChangeStatusAPIView(generics.UpdateAPIView):
         instance = self.get_object()
 
         # Get the status id to change from the request parameters
-        updated_status = request.query_params.get('new_status')
+        updated_status = request.data.get('new_status')
 
         if not updated_status:
-            return Response({'detail': 'Invalid request. Please provide the new_status_id parameter.'},
+            return Response({'detail': 'Invalid request. Please provide the new_status parameter.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
         # Check if the provided status id is valid
         try:
             new_status = OnboardStatus.objects.get(name=updated_status)
         except OnboardStatus.DoesNotExist:
-            return Response({'detail': f'Invalid status id: {updated_status}'},
+            return Response({'detail': f'Invalid status: {updated_status}'},
                             status=status.HTTP_400_BAD_REQUEST)
 
         # Update the status based on the provided parameter
