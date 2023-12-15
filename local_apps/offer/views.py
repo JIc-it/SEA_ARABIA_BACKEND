@@ -101,15 +101,21 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
             image = request.data.get('image', None)
             discount_type = request.data.get('discount_type', None)
             discount_value = request.data.get('discount_value', None)
-            max_redeem_amount = request.data.get('max_redeem_amount', None)
-            max_redeem_count = request.data.get('max_redeem_count', None)
-            min_grand_total = request.data.get('min_grand_total', None)
+            up_to_amount = request.data.get('up_to_amount', None)
+            redemption_type = request.data.get('redemption_type', None)
+            specify_no = request.data.get('specify_no', None)
+            purchase_requirement = request.data.get('purchase_requirement', None)
+            min_purchase_amount = request.data.get('min_purchase_amount', None)
             allow_multiple_redeem = request.data.get('allow_multiple_redeem', None)
             allow_global_redeem = request.data.get('allow_global_redeem', None)
-            display_global = request.data.get('display_global', None)
+            on_home_screen = request.data.get('on_home_screen', None)
+            is_lifetime = request.data.get('is_lifetime', None)
+            multiple_redeem_specify_no = request.data.get('multiple_redeem_specify_no', None)
+            on_checkout = request.data.get('on_checkout', None)
             start_date = request.data.get('start_date', None)
             end_date = request.data.get('end_date', None)
-            services = request.data.get('services', [])
+            apply_global = request.data.get('apply_global', None)
+            services = request.data.get('services', None)
             companies = request.data.get('companies', None)
 
             try:
@@ -141,18 +147,28 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
                 offer.discount_type = discount_type
             if discount_value:
                 offer.discount_value = discount_value
-            if max_redeem_amount:
-                offer.max_redeem_amount = max_redeem_amount
-            if max_redeem_count:
-                offer.max_redeem_count = max_redeem_count
-            if min_grand_total:
-                offer.min_grand_total = min_grand_total
+            if up_to_amount:
+                offer.up_to_amount = up_to_amount
+            if redemption_type:
+                offer.redemption_type = redemption_type                
+            if specify_no:
+                offer.specify_no = specify_no
+            if purchase_requirement:
+                offer.purchase_requirement = purchase_requirement                
+            if min_purchase_amount:
+                offer.min_purchase_amount = min_purchase_amount
             if allow_multiple_redeem:
                 offer.allow_multiple_redeem = allow_multiple_redeem
             if allow_global_redeem:
-                offer.allow_global_redeem = allow_global_redeem
-            if display_global:
-                offer.display_global = display_global
+                offer.apply_global = apply_global
+            if on_home_screen:
+                offer.on_home_screen = on_home_screen
+            if is_lifetime:
+                offer.is_lifetime = is_lifetime
+            if multiple_redeem_specify_no:
+                offer.multiple_redeem_specify_no = multiple_redeem_specify_no                
+            if on_checkout:
+                offer.on_checkout = on_checkout
             if start_date:
                 offer.start_date = start_date
             if end_date:
