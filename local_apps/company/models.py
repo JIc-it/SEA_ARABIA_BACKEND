@@ -11,7 +11,7 @@ COMPANY_STATUS = (
     ("Proposal", "Proposal"),
     ("Negotations", "Negotations"),
     ("MOU/Charter", "MOU/Charter"),
-    ("Onboard", "Onboard"),
+    ("Ready to Onboard", "Ready to Onboard"),
 )
 
 
