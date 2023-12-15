@@ -29,7 +29,7 @@ class Offer(Main):
     purchase_requirement = models.BooleanField(default=0, blank=True, null=True)
     min_purchase_amount = models.PositiveIntegerField(default=0, blank=True, null=True)
     allow_multiple_redeem = models.CharField(choices=MULTIPLE_REDEEM_TYPE, max_length=25,blank=True, null=True)
-    multiple_redeem_specify_no = models.BooleanField(default=False)
+    multiple_redeem_specify_no = models.PositiveIntegerField(default=False)
     on_home_screen = models.BooleanField(default=False)
     on_checkout = models.BooleanField(default=True)
     start_date = models.DateTimeField()
