@@ -302,15 +302,7 @@ class BookMarkSerializer(serializers.ModelSerializer):
         model = Bookmark
         fields = "__all__"
         
-    def validate_service(self, value):
-        """
-        Check if the provided service is valid.
-        """
-       
-        if not Service.objects.filter(pk=value.pk).exists():
-            raise serializers.ValidationError("Service not found.")
-
-        return value
+    
 
 class BookMarkListSerializer(serializers.ModelSerializer):
     service = ServiceSerializer()
