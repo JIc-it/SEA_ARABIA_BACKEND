@@ -294,7 +294,7 @@ class AdminServiceBookingAvailabilityList(generics.ListAPIView):
     def get_queryset(self):
         try:
             service_id = self.kwargs.get("service")
-            service = get_object_or_404(Service, id=service_id)
+            service = Service.objects.get(id=service_id)
 
             date = self.kwargs.get("date")
             if not date:
@@ -302,7 +302,7 @@ class AdminServiceBookingAvailabilityList(generics.ListAPIView):
 
             return Booking.objects.filter(service=service, start_date__date=date)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # ?---------------------------App views----------------------------------------#
