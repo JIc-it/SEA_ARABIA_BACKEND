@@ -528,6 +528,10 @@ class BookMarkCreationAPI(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            return Response({"not found": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save(user=self.request.user)
 
