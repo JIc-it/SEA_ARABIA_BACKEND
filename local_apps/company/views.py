@@ -346,7 +346,7 @@ class ChangeStatusAPIView(generics.UpdateAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
         # Update the status based on the provided parameter
-        if updated_status == "Site Visit" and not User.objects.filter(company=instance).exists():
+        if updated_status == "Site Visit" and not Company.objects.filter(status__name="Initial Contact"):
             return Response({'detail': 'Invalid operation. Initial Contact does not exist.'},
                             status=status.HTTP_400_BAD_REQUEST)
         elif updated_status == "Proposal" and not SiteVisit.objects.filter(company=instance).exists():
