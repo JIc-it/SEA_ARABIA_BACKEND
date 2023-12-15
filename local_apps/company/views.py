@@ -305,8 +305,7 @@ class ChangeStatusAPIView(generics.UpdateAPIView):
             return Response({'detail': f'Invalid status: {updated_status}'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Update the status based on the provided parameter
-        if updated_status == ("Site ls"
-                              "Visit") and not User.objects.filter(company=instance).exists():
+        if updated_status == "Site Visit" and not User.objects.filter(company=instance).exists():
             return Response({'detail': 'Invalid operation. Initial Contact does not exist.'},
                             status=status.HTTP_400_BAD_REQUEST)
         elif updated_status == "Proposal" and not SiteVisit.objects.filter(company=instance).exists():
@@ -315,7 +314,7 @@ class ChangeStatusAPIView(generics.UpdateAPIView):
         elif updated_status == "Negotiation" and not Proposal.objects.filter(company=instance).exists():
             return Response({'detail': 'Invalid operation. Proposal does not exist.'},
                             status=status.HTTP_400_BAD_REQUEST)
-        elif updated_status == "MOUorCharter" and not Negotiation.objects.filter(company=instance).exists():
+        elif updated_status == "MOU / Charter" and not Negotiation.objects.filter(company=instance).exists():
             return Response({'detail': 'Invalid operation. Negotiation does not exist.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
