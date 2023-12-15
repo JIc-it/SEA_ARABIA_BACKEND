@@ -120,7 +120,12 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
 
             try:
                 if services:
-                    services = Service.objects.filter(id__in=services) if Service.objects.filter(id__in=services).exists() else None
+                    try:
+                        services=list(services)
+                    except:
+                        services=None
+                    if services:
+                        services = Service.objects.filter(id__in=services) if Service.objects.filter(id__in=services).exists() else None
                 else:
                     services = None
                 
@@ -129,6 +134,10 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
 
             try:
                 if companies:
+                    try:
+                        companies=list(companies)
+                    except:
+                        companies=None
                     companies = Company.objects.filter(id__in=companies) if Company.objects.filter(id__in=companies).exists() else None
                 else:
                     companies = None
