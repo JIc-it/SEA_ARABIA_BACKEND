@@ -19,6 +19,7 @@ urlpatterns = [
     path("booking/", include("local_apps.booking.urls")),
     path("offer/", include("local_apps.offer.urls")),
     path("main/", include("local_apps.main.urls")),
+    path("advertisement/", include("local_apps.advertisement.urls")),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
