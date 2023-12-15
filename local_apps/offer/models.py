@@ -8,7 +8,7 @@ DISCOUNT_TYPE = (
     ('Percentage', 'Percentage'),
 )
 
-MULTIPLE_REDEEM_TYPE=(('One_Time','One-Time'),
+MULTIPLE_REDEEM_TYPE=(('One-Time','One-Time'),
                       ('Multiple-time','Multiple-Time'))
 
 REDEMPTION_TYPE=(('One-Time','One-Time'),

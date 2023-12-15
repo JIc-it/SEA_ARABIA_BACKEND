@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework import generics, status
 from .models import Offer
-from .serializers import OfferSerializer
+from .serializers import OfferSerializer,OfferServiceInfoSerializer
 from rest_framework.response import Response
 from local_apps.service.models import Service
 from local_apps.company.models import Company
@@ -164,4 +164,33 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
             offer.save()
             serializer = OfferSerializer(offer)
             return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class OfferServiceInfoView(generics.RetrieveAPIView):
+    queryset = Offer.objects.all()
+    serializer_class = OfferServiceInfoSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        company_id = self.request.query_params.get('company_id', None)
+
+        if company_id:
+            try:
+                company_id = int(company_id)
+                instance = instance.filter(companies__id=company_id)
+            except ValueError:
+                return Response({'error': 'Invalid company_id'}, status=400)
+
+        selected_services_count = instance.services.count()
+        selected_services_ids = list(instance.services.values_list('id', flat=True))
+
+        serializer = self.get_serializer({
+            'selected_services_count': selected_services_count,
+            'selected_services_ids': selected_services_ids
+        })
+
+        return Response(serializer.data)
+    
+
+
            
