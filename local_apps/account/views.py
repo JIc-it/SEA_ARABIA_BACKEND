@@ -102,7 +102,7 @@ class ProfileExtraCreate(generics.CreateAPIView):
 class VendorSerializerList(generics.ListAPIView):
     """ view for listing the vendor in cms """
 
-    queryset = User.objects.filter(role="Vendor")
+    queryset = User.objects.filter(role="Vendor", company_company_user__is_onboard=True)
     serializer_class = VendorSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = [
