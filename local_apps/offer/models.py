@@ -24,7 +24,7 @@ class Offer(Main):
     discount_type = models.CharField(choices=DISCOUNT_TYPE, max_length=25,blank=True, null=True)
     discount_value = models.PositiveIntegerField(default=0, blank=True, null=True)
     upto_amount = models.PositiveIntegerField(default=0, blank=True, null=True)
-    redemtion_type = models.CharField(choices=MULTIPLE_REDEEM_TYPE, max_length=25,blank=True,null=True)
+    redemtion_type = models.CharField(choices=REDEMPTION_TYPE, max_length=25,blank=True,null=True)
     specify_no = models.PositiveIntegerField(default=0, blank=True, null=True)
     purchase_requirement = models.BooleanField(default=0, blank=True, null=True)
     min_purchase_amount = models.PositiveIntegerField(default=0, blank=True, null=True)
