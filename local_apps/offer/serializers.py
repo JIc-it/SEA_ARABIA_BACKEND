@@ -15,3 +15,7 @@ class OfferSerializer(serializers.ModelSerializer):
 class OfferServiceInfoSerializer(serializers.Serializer):
     selected_services_count = serializers.IntegerField()
     selected_services_ids = serializers.ListField(child=serializers.UUIDField())
+
+    class Meta:
+        model = Offer
+        fields = '__all__'

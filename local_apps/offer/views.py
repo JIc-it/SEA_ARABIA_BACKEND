@@ -167,30 +167,34 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
     
 
 class OfferServiceInfoView(generics.RetrieveAPIView):
-    queryset = Offer.objects.all()
     serializer_class = OfferServiceInfoSerializer
+
+    def get_queryset(self):
+        company_id = self.request.query_params.get('company_id', None)
+        
+        if company_id:
+            return Offer.objects.filter(services__companies__id=company_id)
+        else:
+            return Offer.objects.all()
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        company_id = self.request.query_params.get('company_id', None)
 
-        if company_id:
-            try:
-                company_id = int(company_id)
-                instance = instance.filter(companies__id=company_id)
-            except ValueError:
-                return Response({'error': 'Invalid company_id'}, status=400)
 
-        selected_services_count = instance.services.count()
-        selected_services_ids = list(instance.services.values_list('id', flat=True))
+        services = instance.services.all()
+        service_count = services.count()
 
-        serializer = self.get_serializer({
-            'selected_services_count': selected_services_count,
-            'selected_services_ids': selected_services_ids
-        })
+        serializer = self.get_serializer(instance)
+        data = serializer.data
 
-        return Response(serializer.data)
+
+        data['company_services'] = OfferServiceInfoSerializer(services, many=True).data
+        data['company_service_count'] = service_count
+
+        return Response(data)
     
+
+
 
 
            
