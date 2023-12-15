@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework import generics, status
 from .models import Offer
-from .serializers import OfferSerializer,OfferServiceInfoSerializer
+from .serializers import OfferSerializer, OfferServiceInfoSerializer
 from rest_framework.response import Response
 from local_apps.service.models import Service
 from local_apps.company.models import Company
@@ -109,7 +109,7 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
             display_global = request.data.get('display_global', None)
             start_date = request.data.get('start_date', None)
             end_date = request.data.get('end_date', None)
-            services = request.data.get('services', None)
+            services = request.data.get('services', [])
             companies = request.data.get('companies', None)
 
             try:
@@ -166,35 +166,32 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
     
 
-class OfferServiceInfoView(generics.RetrieveAPIView):
+# class OfferServiceInfoView(generics.ListAPIView):
+#     queryset = Offer.objects.all()
+#     serializer_class = OfferServiceInfoSerializer
+
+#     def retrieve(self, request, *args, **kwargs):
+
+#         instance = self.get_object()
+#         selected_services_count = instance.services.count()
+#         selected_services_ids = list(instance.services.values_list('id', flat=True))
+
+#         serializer = self.get_serializer({
+#             'selected_services_count': selected_services_count,
+#             'selected_services_ids': selected_services_ids
+#         })
+
+#         return Response(serializer.data)
+    
+class OfferServiceInfoView(generics.ListAPIView):
     serializer_class = OfferServiceInfoSerializer
 
     def get_queryset(self):
-        company_id = self.request.query_params.get('company_id', None)
-        
-        if company_id:
-            return Offer.objects.filter(services__companies__id=company_id)
-        else:
-            return Offer.objects.all()
+        offer_id = self.kwargs['pk']  # assuming you pass offer_id in the URL
+        return Offer.objects.filter(id=offer_id)
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-
-
-        services = instance.services.all()
-        service_count = services.count()
-
-        serializer = self.get_serializer(instance)
-        data = serializer.data
-
-
-        data['company_services'] = OfferServiceInfoSerializer(services, many=True).data
-        data['company_service_count'] = service_count
-
-        return Response(data)
-    
-
-
-
+    # def get_queryset(self):
+    #     # Filter services based on the offer ID
+    #     return Service.objects.filter(offer__offer_companies__isnull=False).distinct()
 
            

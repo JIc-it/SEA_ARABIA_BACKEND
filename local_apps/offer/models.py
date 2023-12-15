@@ -35,8 +35,8 @@ class Offer(Main):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     is_lifetime = models.BooleanField(default=False)
-    services = models.ManyToManyField(Service, blank=True)
-    companies = models.ManyToManyField(Company, blank=True)
+    services = models.ManyToManyField(Service, blank=True,related_name='offer_offer_services')
+    companies = models.ManyToManyField(Company, blank=True,related_name='offer_offer_companies')
     apply_global = models.BooleanField(default=True)
 
     def __str__(self):
