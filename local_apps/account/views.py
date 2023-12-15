@@ -233,8 +233,8 @@ class VendorLeadCount(APIView):
                 is_onboard=True).count()
             seven_days = datetime.date.today() - datetime.timedelta(7)
             # ? takes the count of the leads that are generated in the last 7 days
-            new_leads = User.objects.filter(
-                created_at__date__gte=seven_days).count()
+            new_leads = User.objects.filter(role="Vendor",
+                                            created_at__date__gte=seven_days).count()
             active_vendors = Company.objects.filter(is_onboard=True).annotate(
                 service_count=Count(
                     "service", filter=Q(service__is_active=True))
