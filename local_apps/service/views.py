@@ -382,3 +382,48 @@ class ComboPackageListing(generics.ListAPIView):
     serializer_class = PackageSerializer
     filter_backends = [DjangoFilterBackend]
     #  filterset_class = ServiceFilter
+
+
+class ServiceAvailablityTime(generics.RetrieveAPIView):
+    queryset = ServiceAvailability.objects.all()
+    serializer_class = ServiceAvailabilitySerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            service_id = self.kwargs.get('pk')
+            date = self.kwargs.get('date')
+            service_instance = Service.objects.get(id=service_id)
+            if not date:
+                raise ValueError("Date Parameter is missing")
+            value, _ = ServiceAvailability.objects.get_or_create(
+                service=service_instance, date=date)
+            serializer = self.get_serializer(value)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
+
+class ServiceAvailablityTimeUpdate(generics.UpdateAPIView):
+    queryset = ServiceAvailability.objects.all()
+    serializer_class = ServiceAvailabilitySerializer
+
+    def update(self, request, *args, **kwargs):
+        try:
+            service_id = kwargs.get('pk')
+            # date = request.data.get('date')
+            time = request.data.get('time')
+            print(service_id, "<<<<<<")
+            print(ServiceAvailability.objects.all())
+
+            if not time:
+                raise ValueError("Time Parameter is missing ")
+
+            service_avilability = ServiceAvailability.objects.get(
+                id=service_id,)
+            service_avilability.time = time
+            service_avilability.save()
+            print(service_avilability.date, '>>>>>>')
+            serializer = ServiceAvailabilitySerializer(service_avilability)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)

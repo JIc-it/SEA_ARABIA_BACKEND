@@ -101,10 +101,12 @@ class ServiceCompanySerializer(serializers.ModelSerializer):
 
 class ServiceSerializer(serializers.ModelSerializer):
     price = PriceSerializer(required=False, allow_null=True)
-    service_image = ServiceImageSerializer(many=True, required=False, allow_null=True)
+    service_image = ServiceImageSerializer(
+        many=True, required=False, allow_null=True)
     # company = ServiceCompanySerializer(required=False, allow_null=True)
     category = CategorySerializer(many=True, required=False, allow_null=True)
-    sub_category = SubCategorySerializer(many=True, required=False, allow_null=True)
+    sub_category = SubCategorySerializer(
+        many=True, required=False, allow_null=True)
     is_bookmarked = serializers.SerializerMethodField()
 
     class Meta:
@@ -150,7 +152,8 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
 
     price = PriceSerializer(required=False, allow_null=True)
     service_image = ServiceImageSerializer(many=True)
-    destination = serializers.CharField(source="destination.name", required=False, allow_null=True)
+    destination = serializers.CharField(
+        source="destination.name", required=False, allow_null=True)
     company = serializers.CharField(source="company.name")
     category = serializers.CharField(source="category.name")
     # pricing_type = serializers.CharField(source="pricing_type.name")
@@ -182,11 +185,13 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
 
 
 class ServiceFilterListSerializer(serializers.ModelSerializer):
-    service_image = ServiceImageSerializer(many=True, required=False, allow_null=True)
+    service_image = ServiceImageSerializer(
+        many=True, required=False, allow_null=True)
 
     class Meta:
         model = Service
-        fields = ["id", "name", "service_image", "category", "sub_category","company"]
+        fields = ["id", "name", "service_image",
+                  "category", "sub_category", "company"]
 
 
 class ServiceReviewSerializer(serializers.ModelSerializer):
@@ -246,9 +251,9 @@ class ServiceAvailabilitySerializer(serializers.ModelSerializer):
         fields = ["id", "service", "date", "time", "created_at", "updated_at"]
 
 
-
 class PackageSerializer(serializers.ModelSerializer):
     """for combopackeges"""
     class Meta:
         model = Package
-        fields = ['id','service','name','short_description','capacity','image','price']
+        fields = ['id', 'service', 'name',
+                  'short_description', 'capacity', 'image', 'price']
