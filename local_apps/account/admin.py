@@ -32,13 +32,14 @@ class UserAdmin(BaseUserAdmin):
                     "password",
                     "is_email_verified",
                     "is_mobile_verified",
-             
+
                 )
             },
         ),
         (
             "Personal info",
-            {"fields": ("account_id", "first_name", "last_name", "mobile", "role")},
+            {"fields": ("account_id", "first_name",
+                        "last_name", "mobile", "role")},
         ),
         (
             "Permissions",
@@ -70,7 +71,8 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
-    search_fields = ("account_id", "first_name", "last_name", "email", "mobile")
+    search_fields = ("account_id", "first_name",
+                     "last_name", "email", "mobile")
     ordering = ("first_name", "email")
     filter_horizontal = (
         "groups",
@@ -111,5 +113,10 @@ class ProfileExtraAdmin(admin.ModelAdmin):
 
 @admin.register(Bookmark)
 class BookMarkAdmin(admin.ModelAdmin):
-    list_display = ["user","service"]
+    list_display = ["user", "service"]
     pass
+
+
+@admin.register(Guest)
+class GuestAdmin(admin.ModelAdmin):
+    list_display = []

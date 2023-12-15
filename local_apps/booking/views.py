@@ -134,7 +134,6 @@ class BookingStatusUpdate(generics.UpdateAPIView):
             if booking_status:
                 booking_instance.status = booking_status.title()
                 booking_instance.save()
-
             return Response({"Booking Status": booking_instance.status}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error : {str(e)}", status=status.HTTP_400_BAD_REQUEST)

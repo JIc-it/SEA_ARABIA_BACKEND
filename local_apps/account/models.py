@@ -182,11 +182,17 @@ class Bookmark(Main):
 
 
 class Guest(Main):
-    first_name = models.CharField(max_length=255, null=True, blank=True)
-    last_name = models.CharField(max_length=255, null=True, blank=True)
-    location = models.CharField(max_length=255, null=True, blank=True)
-    mobile = models.PositiveBigIntegerField(null=True, blank=True)
-    email = models.EmailField(max_length=255, null=True, blank=True)
+    """ Guest User Model """
+    first_name = models.CharField(
+        max_length=255, null=True, blank=True, default="-")
+    last_name = models.CharField(
+        max_length=255, null=True, blank=True, default="-")
+    location = models.CharField(
+        max_length=255, null=True, blank=True, default="-")
+    mobile = models.CharField(
+        max_length=20, null=True, blank=True, default='-')
+    email = models.EmailField(
+        max_length=255, null=True, blank=True, default="-")
 
     def __str__(self):
         return self.first_name if self.first_name else "No Name"
