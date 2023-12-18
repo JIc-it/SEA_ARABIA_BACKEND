@@ -37,16 +37,21 @@ class OfferCreateView(generics.CreateAPIView):
             image = request.FILES.get('image', None)
             discount_type = request.data.get('discount_type', None)
             discount_value = request.data.get('discount_value', None)
-            max_redeem_amount = request.data.get('max_redeem_amount', None)
-            max_redeem_count = request.data.get('max_redeem_count', None)
-            min_grand_total = request.data.get('min_grand_total', None)
+            up_to_amount = request.data.get('up_to_amount', None)
+            redemption_type = request.data.get('redemption_type', None)
+            specify_no = request.data.get('specify_no', None)
+            purchase_requirement = request.data.get('purchase_requirement', False)
+            min_purchase_amount = request.data.get('min_purchase_amount', None)
             allow_multiple_redeem = request.data.get('allow_multiple_redeem', None)
-            allow_global_redeem = request.data.get('allow_global_redeem', None)
-            display_global = request.data.get('display_global', None)
+            multiple_redeem_specify_no = request.data.get('multiple_redeem_specify_no', None)
+            on_home_screen = request.data.get('on_home_screen', False)
+            on_checkout = request.data.get('on_checkout', False)
             start_date = request.data.get('start_date', None)
             end_date = request.data.get('end_date', None)
+            is_lifetime = request.data.get('is_lifetime', False)
             services = request.data.get('services', None)
             companies = request.data.get('companies', None)
+            apply_global = request.data.get('apply_global', False)
 
             try:
                 services = Service.objects.filter(id__in=services)
@@ -65,14 +70,19 @@ class OfferCreateView(generics.CreateAPIView):
                 image=image,
                 discount_type=discount_type,
                 discount_value=discount_value,
-                max_redeem_amount=max_redeem_amount,
-                max_redeem_count=max_redeem_count,
-                min_grand_total=min_grand_total,
+                up_to_amount=up_to_amount,
+                redemption_type=redemption_type,
+                specify_no=specify_no,
+                purchase_requirement=purchase_requirement,
+                min_purchase_amount=min_purchase_amount,
                 allow_multiple_redeem=allow_multiple_redeem,
-                allow_global_redeem=allow_global_redeem,
-                display_global=display_global,
+                multiple_redeem_specify_no=multiple_redeem_specify_no,
+                on_home_screen=on_home_screen,
+                on_checkout=on_checkout,
                 start_date=start_date,
-                end_date=end_date, )
+                end_date=end_date,
+                is_lifetime=is_lifetime,
+                apply_global=apply_global)
             offer.services.set(services)
             offer.companies.set(companies)
             offer.save()
@@ -92,104 +102,106 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = OfferSerializer
 
     def update(self, request, *args, **kwargs):
- 
-            offer = Offer.objects.get(pk=kwargs['pk'])
 
-            is_enable = request.data.get('is_enable', False)
-            name = request.data.get('name', None)
-            coupon_code = request.data.get('coupon_code', None)
-            image = request.data.get('image', None)
-            discount_type = request.data.get('discount_type', None)
-            discount_value = request.data.get('discount_value', None)
-            up_to_amount = request.data.get('up_to_amount', None)
-            redemption_type = request.data.get('redemption_type', None)
-            specify_no = request.data.get('specify_no', None)
-            purchase_requirement = request.data.get('purchase_requirement', None)
-            min_purchase_amount = request.data.get('min_purchase_amount', None)
-            allow_multiple_redeem = request.data.get('allow_multiple_redeem', None)
-            allow_global_redeem = request.data.get('allow_global_redeem', None)
-            on_home_screen = request.data.get('on_home_screen', None)
-            is_lifetime = request.data.get('is_lifetime', None)
-            multiple_redeem_specify_no = request.data.get('multiple_redeem_specify_no', None)
-            on_checkout = request.data.get('on_checkout', None)
-            start_date = request.data.get('start_date', None)
-            end_date = request.data.get('end_date', None)
-            apply_global = request.data.get('apply_global', None)
-            services = request.data.get('services', None)
-            companies = request.data.get('companies', None)
+        offer = Offer.objects.get(pk=kwargs['pk'])
 
-            try:
-                if services:
-                    try:
-                        services=list(services)
-                    except:
-                        services=None
-                    if services:
-                        services = Service.objects.filter(id__in=services) if Service.objects.filter(id__in=services).exists() else None
-                else:
+        is_enable = request.data.get('is_enable', False)
+        name = request.data.get('name', None)
+        coupon_code = request.data.get('coupon_code', None)
+        image = request.FILES.get('image', None)
+        discount_type = request.data.get('discount_type', None)
+        discount_value = request.data.get('discount_value', None)
+        up_to_amount = request.data.get('up_to_amount', None)
+        redemption_type = request.data.get('redemption_type', None)
+        specify_no = request.data.get('specify_no', None)
+        purchase_requirement = request.data.get('purchase_requirement', False)
+        min_purchase_amount = request.data.get('min_purchase_amount', None)
+        allow_multiple_redeem = request.data.get('allow_multiple_redeem', None)
+        multiple_redeem_specify_no = request.data.get('multiple_redeem_specify_no', None)
+        on_home_screen = request.data.get('on_home_screen', False)
+        on_checkout = request.data.get('on_checkout', False)
+        start_date = request.data.get('start_date', None)
+        end_date = request.data.get('end_date', None)
+        is_lifetime = request.data.get('is_lifetime', False)
+        services = request.data.get('services', None)
+        companies = request.data.get('companies', None)
+        apply_global = request.data.get('apply_global', False)
+
+        try:
+            if services:
+                try:
+                    services = list(services)
+                except:
                     services = None
-                
-            except Service.DoesNotExist:
+                if services:
+                    services = Service.objects.filter(id__in=services) if Service.objects.filter(
+                        id__in=services).exists() else None
+            else:
                 services = None
 
-            try:
-                if companies:
-                    try:
-                        companies=list(companies)
-                    except:
-                        companies=None
-                    companies = Company.objects.filter(id__in=companies) if Company.objects.filter(id__in=companies).exists() else None
-                else:
-                    companies = None
-            except Company.DoesNotExist:
-                companies = None
+        except Service.DoesNotExist:
+            services = None
 
-            if is_enable:
-                offer.is_enable = True if is_enable == 'true' or is_enable == 'True' or is_enable == True else False    
-            if name:
-                offer.name = name
-            if coupon_code:
-                offer.coupon_code = coupon_code
-            if image:
-                offer.image = image
-            if discount_type:
-                offer.discount_type = discount_type
-            if discount_value:
-                offer.discount_value = discount_value
-            if up_to_amount:
-                offer.up_to_amount = up_to_amount
-            if redemption_type:
-                offer.redemption_type = redemption_type                
-            if specify_no:
-                offer.specify_no = specify_no
-            if purchase_requirement:
-                offer.purchase_requirement = purchase_requirement                
-            if min_purchase_amount:
-                offer.min_purchase_amount = min_purchase_amount
-            if allow_multiple_redeem:
-                offer.allow_multiple_redeem = allow_multiple_redeem
-            if allow_global_redeem:
-                offer.apply_global = apply_global
-            if on_home_screen:
-                offer.on_home_screen = on_home_screen
-            if is_lifetime:
-                offer.is_lifetime = is_lifetime
-            if multiple_redeem_specify_no:
-                offer.multiple_redeem_specify_no = multiple_redeem_specify_no                
-            if on_checkout:
-                offer.on_checkout = on_checkout
-            if start_date:
-                offer.start_date = start_date
-            if end_date:
-                offer.end_date = end_date
-            if services:
-                offer.services.set(services)
+        try:
             if companies:
-                offer.companies.set(companies)
-            offer.save()
-            serializer = OfferSerializer(offer)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-    
+                try:
+                    companies = list(companies)
+                except:
+                    companies = None
+                companies = Company.objects.filter(id__in=companies) if Company.objects.filter(
+                    id__in=companies).exists() else None
+            else:
+                companies = None
+        except Company.DoesNotExist:
+            companies = None
+
+        if is_enable:
+            offer.is_enable = True if is_enable == 'true' or is_enable == 'True' or is_enable == True else False
+        if name:
+            offer.name = name
+        if coupon_code:
+            offer.coupon_code = coupon_code
+        if image:
+            offer.image = image
+        if discount_type:
+            offer.discount_type = discount_type
+        if discount_value:
+            offer.discount_value = discount_value
+        if up_to_amount:
+            offer.up_to_amount = up_to_amount
+        if redemption_type:
+            offer.redemption_type = redemption_type
+        if specify_no:
+            offer.specify_no = specify_no
+        if purchase_requirement:
+            offer.purchase_requirement = True if purchase_requirement == 'true' or purchase_requirement == 'True' or purchase_requirement == True else False
+        if min_purchase_amount:
+            offer.min_purchase_amount = min_purchase_amount
+        if allow_multiple_redeem:
+            offer.allow_multiple_redeem = allow_multiple_redeem
+        if multiple_redeem_specify_no:
+            offer.multiple_redeem_specify_no = multiple_redeem_specify_no
+        if on_home_screen:
+            offer.on_home_screen = True if on_home_screen == 'true' or on_home_screen == 'True' or on_home_screen == True else False
+        if on_checkout:
+            offer.on_checkout = True if on_checkout == 'true' or on_checkout == 'True' or on_checkout == True else False
+        if start_date:
+            offer.start_date = start_date
+        if end_date:
+            offer.end_date = end_date
+        if is_lifetime:
+            offer.is_lifetime = is_lifetime
+        if apply_global:
+            offer.apply_global = True if apply_global == 'true' or apply_global == 'True' or apply_global == True else False
+
+        if services:
+            offer.services.set(services)
+        if companies:
+            offer.companies.set(companies)
+        offer.save()
+        serializer = OfferSerializer(offer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 # class OfferServiceInfoView(generics.ListAPIView):
 #     queryset = Offer.objects.all()
@@ -207,7 +219,7 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
 #         })
 
 #         return Response(serializer.data)
-    
+
 class OfferServiceInfoView(generics.ListAPIView):
     serializer_class = OfferServiceInfoSerializer
 
@@ -218,5 +230,3 @@ class OfferServiceInfoView(generics.ListAPIView):
     # def get_queryset(self):
     #     # Filter services based on the offer ID
     #     return Service.objects.filter(offer__offer_companies__isnull=False).distinct()
-
-           
