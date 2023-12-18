@@ -55,10 +55,8 @@ class OfferCreateView(generics.CreateAPIView):
 
             try:
                 if services:
-                    try:
-                        services = list(services)
-                    except:
-                        services = None
+                    services = services.replace(" ", "")
+                    services = services.split(',')
                     if services:
                         services = Service.objects.filter(id__in=services) if Service.objects.filter(
                             id__in=services).exists() else None
@@ -70,10 +68,8 @@ class OfferCreateView(generics.CreateAPIView):
 
             try:
                 if companies:
-                    try:
-                        companies = list(companies)
-                    except:
-                        companies = None
+                    companies = companies.replace(" ", "")
+                    companies = companies.split(',')
                     companies = Company.objects.filter(id__in=companies) if Company.objects.filter(
                         id__in=companies).exists() else None
                 else:
@@ -149,10 +145,8 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
 
         try:
             if services:
-                try:
-                    services = list(services)
-                except:
-                    services = None
+                services = services.replace(" ", "")
+                services = services.split(',')
                 if services:
                     services = Service.objects.filter(id__in=services) if Service.objects.filter(
                         id__in=services).exists() else None
@@ -164,10 +158,8 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
 
         try:
             if companies:
-                try:
-                    companies = list(companies)
-                except:
-                    companies = None
+                companies = companies.replace(" ", "")
+                companies = companies.split(',')
                 companies = Company.objects.filter(id__in=companies) if Company.objects.filter(
                     id__in=companies).exists() else None
             else:
