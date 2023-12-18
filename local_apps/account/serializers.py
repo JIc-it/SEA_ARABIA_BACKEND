@@ -253,6 +253,8 @@ class AllUserDetailsSerializer(serializers.ModelSerializer):
     useridentificationdata = UserIdentificationDataSerializer(read_only=True)
     company_company_user = CompanyAddSerializer(read_only=True)
     profileextra = ProfileExtraSerializer(read_only=True)
+    status = serializers.CharField(
+        source="company_company_user.status", default=None)
 
     class Meta:
         model = User
@@ -266,6 +268,7 @@ class AllUserDetailsSerializer(serializers.ModelSerializer):
             "useridentificationdata",
             "company_company_user",
             "profileextra",
+            "status",
         ]
 # ----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
 # usersignup
