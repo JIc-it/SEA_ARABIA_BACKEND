@@ -47,9 +47,12 @@ class BookingStatusSerializer(serializers.Serializer):
 
 class BookingListExport(resources.ModelResource):
     service = resources.Field(column_name='service', attribute='service__name')
-    category = resources.Field(column_name='category', attribute='service__category__name')
+    category = resources.Field(column_name='category', attribute='service__categories')
     vendor = resources.Field(column_name='vendor', attribute='service__company__name')
     user = resources.Field(column_name='user', attribute='user__first_name')
+
+    def dehydrate_category(self, booking):
+        return ', '.join(category.name for category in booking.service.category.all())
 
     class Meta:
         model = Booking
@@ -61,10 +64,10 @@ class BookingListExport(resources.ModelResource):
                   'user_type',
                   'end_date',
                   'created_at',
-                  # 'start_date',
                   'status']
 
         export_order = fields
+
 
     
 
