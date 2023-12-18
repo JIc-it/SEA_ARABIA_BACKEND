@@ -122,7 +122,69 @@ class ServiceUpdate(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         try:
-            pass
+            is_verified = request.data.get('is_verified', None)
+            is_active = request.data.get('is_active', None)
+            is_top_suggestion = request.data.get('is_top_suggestion', None)
+            is_premium = request.data.get('is_premium', None)
+            is_bookmarked = request.data.get('is_bookmarked', None)
+            type = request.data.get('type', None)
+            name = request.data.get('name', None)
+            machine_id = request.data.get('machine_id', None)
+            description = request.data.get('description', None)
+            lounge = request.data.get('lounge', None)
+            bedroom = request.data.get('bedroom', None)
+            toilet = request.data.get('toilet', None)
+            capacity = request.data.get('capacity', None)
+            pickup_point = request.data.get('pickup_point', None)
+            cancellation_policy = request.data.get('cancellation_policy', None)
+            refund_policy = request.data.get('refund_policy', None)
+            service_image = request.data.get('service_image', None)
+
+            amenities = request.data.get('amenities', None)
+            category = request.data.get('category', [])
+            sub_category = request.data.get('sub_category', [])
+            service_id = kwargs.get('pk')
+            service_instance = Service.objects.get(id=service_id)
+
+            if is_verified:
+                service_instance.is_verified = is_verified
+            if is_active:
+                service_instance.is_active = is_active
+            if is_top_suggestion:
+                service_instance.is_top_suggestion = is_top_suggestion
+            if is_premium:
+                service_instance.is_premium = is_premium
+            if is_bookmarked:
+                service_instance.is_bookmarked = is_bookmarked
+            if type:
+                service_instance.type = type.title()
+            if name:
+                service_instance.name = name
+            if machine_id:
+                service_instance.machine_id = machine_id
+            if description:
+                service_instance.description = description
+            if lounge:
+                service_instance.lounge = lounge
+            if lounge:
+                service_instance.lounge = lounge
+            if bedroom:
+                service_instance.bedroom = bedroom
+            if toilet:
+                service_instance.toilet = toilet
+            if capacity:
+                service_instance.capacity = capacity
+            if pickup_point:
+                service_instance.pickup_point = pickup_point
+            if cancellation_policy:
+                service_instance.cancellation_policy = cancellation_policy
+            if refund_policy:
+                service_instance.refund_policy = refund_policy
+
+            service_instance.save()
+
+            return Response("success")
+
         except Exception as e:
             return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
@@ -206,7 +268,7 @@ class ServiceReviewList(generics.ListAPIView):
 class ServiceAvailabilityCreate(generics.CreateAPIView):
     queryset = ServiceAvailability.objects.all()
     serializer_class = ServiceAvailabilitySerializer
-    permission_classes = [IsAuthenticated]
+    permissionpayment_classes = [IsAuthenticated]
 
     def create(self, request, args, *kwargs):
         try:

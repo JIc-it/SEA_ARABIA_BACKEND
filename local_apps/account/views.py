@@ -237,7 +237,7 @@ class VendorLeadCount(APIView):
             seven_days = datetime.date.today() - datetime.timedelta(7)
             # ? takes the count of the leads that are generated in the last 7 days
             new_leads = User.objects.filter(
-                created_at__date__gte=seven_days).count()
+                created_at__date__gte=seven_days, role="Vendor").count()
             active_vendors = Company.objects.filter(is_onboard=True).annotate(
                 service_count=Count(
                     "service", filter=Q(service__is_active=True))
@@ -644,7 +644,8 @@ class GuestUserList(generics.ListAPIView):
 
 class ExportVendorCSVView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
-        queryset = User.objects.filter(role="Vendor", company_company_user__is_onboard=False)
+        queryset = User.objects.filter(
+            role="Vendor", company_company_user__is_onboard=False)
         resource = VendorListExport()
 
         dataset = resource.export(queryset)
