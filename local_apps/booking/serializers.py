@@ -42,3 +42,9 @@ class BookingSerializer(serializers.ModelSerializer):
 
 class BookingStatusSerializer(serializers.Serializer):
     status = serializers.CharField()
+
+
+    
+
+
+    

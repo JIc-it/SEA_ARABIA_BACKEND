@@ -137,3 +137,22 @@ class BookingStatusUpdate(generics.UpdateAPIView):
             return Response({"Booking Status": booking_instance.status}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error : {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
+
+
+# ?---------------------------App views----------------------------------------#
+        
+
+
+class BookingAppList(generics.ListAPIView):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = [
+        "booking_id",
+        "service__name",
+        "user__first_name",
+        "user__last_name"
+    ]
+    filterset_class = BookingFilter
