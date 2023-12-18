@@ -138,7 +138,7 @@ urlpatterns = [
     path('service-filter-list-cms',
          ServiceFilterAdminList.as_view(), name='service-filter-list-cms'),
 
-    path('service_availablitytime_list/<uuid:pk>/<str:date>',
+    path('service_availablitytime_list/<str:date>/<uuid:pk>',
          ServiceAvailablityTime.as_view(), name='service_availablity_time_list'),
 
     path('service_availablitytime_update/<uuid:pk>',

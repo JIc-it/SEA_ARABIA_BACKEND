@@ -385,6 +385,8 @@ class ComboPackageListing(generics.ListAPIView):
 
 
 class ServiceAvailablityTime(generics.RetrieveAPIView):
+    " Service date and time availablity list view "
+
     queryset = ServiceAvailability.objects.all()
     serializer_class = ServiceAvailabilitySerializer
 
@@ -404,6 +406,8 @@ class ServiceAvailablityTime(generics.RetrieveAPIView):
 
 
 class ServiceAvailablityTimeUpdate(generics.UpdateAPIView):
+    """ Servie availablitu date and time update view """
+
     queryset = ServiceAvailability.objects.all()
     serializer_class = ServiceAvailabilitySerializer
 
@@ -412,17 +416,13 @@ class ServiceAvailablityTimeUpdate(generics.UpdateAPIView):
             service_id = kwargs.get('pk')
             # date = request.data.get('date')
             time = request.data.get('time')
-            print(service_id, "<<<<<<")
-            print(ServiceAvailability.objects.all())
 
             if not time:
                 raise ValueError("Time Parameter is missing ")
-
             service_avilability = ServiceAvailability.objects.get(
                 id=service_id,)
             service_avilability.time = time
             service_avilability.save()
-            print(service_avilability.date, '>>>>>>')
             serializer = ServiceAvailabilitySerializer(service_avilability)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
