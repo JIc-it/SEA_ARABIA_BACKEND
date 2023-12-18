@@ -64,7 +64,7 @@ class OfferCreateView(generics.CreateAPIView):
                 companies = None
 
             offer = Offer.objects.create(
-                is_enable=is_enable,
+                is_enable=True if is_enable == 'true' or is_enable == 'True' or is_enable == True else False,
                 name=name,
                 coupon_code=coupon_code,
                 image=image,
@@ -73,16 +73,16 @@ class OfferCreateView(generics.CreateAPIView):
                 up_to_amount=up_to_amount,
                 redemption_type=redemption_type,
                 specify_no=specify_no,
-                purchase_requirement=purchase_requirement,
+                purchase_requirement=True if purchase_requirement == 'true' or purchase_requirement == 'True' or purchase_requirement == True else False,
                 min_purchase_amount=min_purchase_amount,
                 allow_multiple_redeem=allow_multiple_redeem,
                 multiple_redeem_specify_no=multiple_redeem_specify_no,
-                on_home_screen=on_home_screen,
-                on_checkout=on_checkout,
+                on_home_screen=True if on_home_screen == 'true' or on_home_screen == 'True' or on_home_screen == True else False,
+                on_checkout=True if on_checkout == 'true' or on_checkout == 'True' or on_checkout == True else False,
                 start_date=start_date,
                 end_date=end_date,
                 is_lifetime=is_lifetime,
-                apply_global=apply_global)
+                apply_global=True if apply_global == 'true' or apply_global == 'True' or apply_global == True else False)
             offer.services.set(services)
             offer.companies.set(companies)
             offer.save()
