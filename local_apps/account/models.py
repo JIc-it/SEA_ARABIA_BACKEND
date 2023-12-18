@@ -179,6 +179,8 @@ class Bookmark(Main):
     )
     service = models.ForeignKey(Service, on_delete=models.SET_NULL,
                                 blank=True, null=True, related_name='account_bookmark_service')
+    def __str__(self):
+        return self.user if self.first_name else "No user"
 
 
 class Guest(Main):

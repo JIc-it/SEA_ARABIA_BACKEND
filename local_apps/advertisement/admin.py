@@ -6,4 +6,5 @@ from .models import *
 
 @admin.register(Advertisement)
 class AdvertisementAdmin(admin.ModelAdmin):
+    list_display = ['name','created_at','updated_at']
     pass

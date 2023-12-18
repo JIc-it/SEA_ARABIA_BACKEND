@@ -7,3 +7,10 @@ class Advertisement(Main):
     is_active = models.BooleanField(default=False)
     name = models.CharField(max_length=255,blank=True,null=True)
     image = models.ImageField(upload_to="advertisement/advertisement/image",null=True,blank=True)
+
+
+    def __str__(self):
+        return self.name if self.name else "No Advertisement"
+
+
+
