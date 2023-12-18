@@ -54,12 +54,30 @@ class OfferCreateView(generics.CreateAPIView):
             apply_global = request.data.get('apply_global', False)
 
             try:
-                services = Service.objects.filter(id__in=services)
+                if services:
+                    try:
+                        services = list(services)
+                    except:
+                        services = None
+                    if services:
+                        services = Service.objects.filter(id__in=services) if Service.objects.filter(
+                            id__in=services).exists() else None
+                else:
+                    services = None
+
             except Service.DoesNotExist:
                 services = None
 
             try:
-                companies = Company.objects.filter(id__in=companies)
+                if companies:
+                    try:
+                        companies = list(companies)
+                    except:
+                        companies = None
+                    companies = Company.objects.filter(id__in=companies) if Company.objects.filter(
+                        id__in=companies).exists() else None
+                else:
+                    companies = None
             except Company.DoesNotExist:
                 companies = None
 
@@ -83,8 +101,10 @@ class OfferCreateView(generics.CreateAPIView):
                 end_date=end_date,
                 is_lifetime=is_lifetime,
                 apply_global=True if apply_global == 'true' or apply_global == 'True' or apply_global == True else False)
-            offer.services.set(services)
-            offer.companies.set(companies)
+            if services:
+                offer.services.set(services)
+            if companies:
+                offer.companies.set(companies)
             offer.save()
             serializer = OfferSerializer(offer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
