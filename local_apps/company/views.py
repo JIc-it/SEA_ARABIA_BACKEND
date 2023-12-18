@@ -161,6 +161,14 @@ class SiteVisitUpdate(generics.UpdateAPIView):
     queryset = SiteVisit.objects.all()
     serializer_class = SiteVisitSerializer
 
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.attachment = request.data.get('attachment', instance.attachment) and instance.attachment or None
+        instance.save()
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
 
 class SiteVisitView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
@@ -191,6 +199,14 @@ class ProposalUpdate(generics.UpdateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = Proposal.objects.all()
     serializer_class = ProposalSerializer
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.attachment = request.data.get('attachment', instance.attachment) and instance.attachment or None
+        instance.save()
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 
 class ProposalView(generics.RetrieveAPIView):
@@ -223,6 +239,14 @@ class NegotiationUpdate(generics.UpdateAPIView):
     queryset = Negotiation.objects.all()
     serializer_class = NegotiationSerializer
 
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.attachment = request.data.get('attachment', instance.attachment) and instance.attachment or None
+        instance.save()
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
 
 class NegotiationView(generics.RetrieveAPIView):
     # permission_classes = [IsAuthenticated]
@@ -253,6 +277,14 @@ class MOUorCharterUpdate(generics.UpdateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = MOUorCharter.objects.all()
     serializer_class = MOUorCharterSerializer
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.attachment = request.data.get('attachment', instance.attachment) and instance.attachment or None
+        instance.save()
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 
 class MOUorCharterView(generics.RetrieveAPIView):
