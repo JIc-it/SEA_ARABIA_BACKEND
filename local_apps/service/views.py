@@ -102,6 +102,10 @@ class ServiceList(generics.ListAPIView):
     ]
     filterset_class = ServiceFilter
 
+    def get_queryset(self):
+        premium_category = Category.objects.filter(service_service_category__is_premium=True)
+        return Service.objects.filter(category__in=premium_category)
+
 
 class ServiceCreate(generics.CreateAPIView):
     # permission_classes = [IsAuthenticated]
@@ -496,3 +500,24 @@ class ServiceAvailablityTimeUpdate(generics.UpdateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class ServiceListApp(generics.ListAPIView):
+    """for app side service lisiting"""
+   
+    queryset = Service.objects.all()
+    premium_category = Category.objects.filter(service_service_category__is_premium=True)
+    serializer_class = ServiceSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = [
+        "name",
+        "amenities__name",
+        "destination__name",
+    ]
+    filterset_class = ServiceFilter
+
+    def get_queryset(self):
+        premium_category = Category.objects.filter(service_service_category__is_premium=True)
+        return Service.objects.filter(category__in=premium_category)

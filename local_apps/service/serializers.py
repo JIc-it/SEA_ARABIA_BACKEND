@@ -109,6 +109,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     sub_category = SubCategorySerializer(
         many=True, required=False, allow_null=True)
     is_bookmarked = serializers.SerializerMethodField()
+    
 
     class Meta:
         model = Service

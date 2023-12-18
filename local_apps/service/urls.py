@@ -143,6 +143,8 @@ urlpatterns = [
 
     path('service_availablitytime_update/<uuid:pk>',
          ServiceAvailablityTimeUpdate.as_view(), name='service_availablitytime_update'),
+    path('service-listapp',
+          ServiceListApp.as_view(), name='service-listapp'),
 
 
 
