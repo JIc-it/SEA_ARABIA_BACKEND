@@ -156,3 +156,7 @@ class BookingAppList(generics.ListAPIView):
         "user__last_name"
     ]
     filterset_class = BookingFilter
+
+    def get_queryset(self):
+
+        return Booking.objects.filter(user=self.request.user)
