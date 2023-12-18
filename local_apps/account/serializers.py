@@ -187,6 +187,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserListSerializer(serializers.ModelSerializer):
     """ Serializer for listing the user(customer,vendor, and other role types)"""
+
     location = serializers.CharField(source="profileextra.location")
     created_at = serializers.DateTimeField(format="%d-%m-%Y")
     total_booking = serializers.SerializerMethodField()

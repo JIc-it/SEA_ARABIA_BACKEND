@@ -54,7 +54,7 @@ def default_timeslot():
 
 
 class Destination(Main):
-    name = models.CharField(max_length=255,blank=True,null=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -66,7 +66,7 @@ class Destination(Main):
 
 
 class ProfitMethod(Main):
-    name = models.CharField(max_length=255,blank=True,null=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -78,7 +78,7 @@ class ProfitMethod(Main):
 
 
 class PriceCriterion(Main):
-    name = models.CharField(max_length=255,blank=True,null=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -90,7 +90,7 @@ class PriceCriterion(Main):
 
 
 class Duration(Main):
-    time = models.CharField(max_length=255,blank=True,null=True)
+    time = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.time
@@ -106,7 +106,8 @@ class Price(Main):
                                        related_name='service_price_profile_method')
     price_criterion = models.ForeignKey(PriceCriterion, on_delete=models.SET_NULL, blank=True, null=True,
                                         related_name='service_price_price_criterion')
-    price_per = models.CharField(choices=PRICE_TYPE, max_length=100, blank=True, null=True)
+    price_per = models.CharField(
+        choices=PRICE_TYPE, max_length=100, blank=True, null=True)
     price = models.PositiveIntegerField(blank=True, null=True)
     sea_arabia_percentage = models.PositiveIntegerField(blank=True, null=True)
     vendor_percentage = models.PositiveIntegerField(blank=True, null=True)
@@ -144,7 +145,7 @@ class PriceList(Main):
 
 
 class Amenity(Main):
-    name = models.CharField(max_length=255,blank=True,null=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
     image = models.FileField(upload_to="service/amenity/image")
 
     def __str__(self):
@@ -162,9 +163,12 @@ class Service(Main):
     is_top_suggestion = models.BooleanField(default=False)
     is_premium = models.BooleanField(default=False)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    type = models.CharField(choices=SERVICE_TYPE, max_length=100, default="Service", blank=True, null=True)
-    category = models.ManyToManyField(Category, blank=True, related_name='service_service_category')
-    sub_category = models.ManyToManyField(SubCategory, blank=True, related_name='service_service_sub_category')
+    type = models.CharField(
+        choices=SERVICE_TYPE, max_length=100, default="Service", blank=True, null=True)
+    category = models.ManyToManyField(
+        Category, blank=True, related_name='service_service_category')
+    sub_category = models.ManyToManyField(
+        SubCategory, blank=True, related_name='service_service_sub_category')
     name = models.CharField(max_length=200, blank=True, null=True)
     machine_id = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -176,7 +180,9 @@ class Service(Main):
     pickup_point = models.CharField(max_length=200, blank=True, null=True)
     cancellation_policy = models.TextField(blank=True, null=True)
     refund_policy = models.TextField(blank=True, null=True)
-    price = models.ForeignKey(Price, on_delete=models.CASCADE, related_name='service_service_price')
+    price = models.ForeignKey(
+        Price, on_delete=models.CASCADE, related_name='service_service_price')
+    status = models.BooleanField(default=True)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -188,9 +194,11 @@ class Service(Main):
 
 
 class ServiceImage(Main):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="service_image")
+    service = models.ForeignKey(
+        Service, on_delete=models.CASCADE, related_name="service_image")
     image = models.ImageField(upload_to="service/service/image")
-    thumbnail = models.ImageField(upload_to="service/service/image", blank=True, null=True)
+    thumbnail = models.ImageField(
+        upload_to="service/service/image", blank=True, null=True)
     is_thumbnail = models.BooleanField(default=False)
 
     class Meta:
@@ -207,7 +215,8 @@ class ServiceImage(Main):
 
 
 class ServiceReview(Main):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="service_service_review_service", )
+    service = models.ForeignKey(
+        Service, on_delete=models.CASCADE, related_name="service_service_review_service", )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
                              related_name="service_service_review_user", )
     review_title = models.CharField(max_length=500, null=True, blank=True)
@@ -244,16 +253,18 @@ class ServiceAvailability(Main):
 
 class Package(Main):
     is_active = models.BooleanField(default=False)
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="service_package_service")
-    name = models.CharField(max_length=255,blank=True,null=True)
+    service = models.ForeignKey(
+        Service, on_delete=models.CASCADE, related_name="service_package_service")
+    name = models.CharField(max_length=255, blank=True, null=True)
     short_description = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    day = models.CharField(choices=DAY_CHOICES, max_length=100, blank=True, null=True)
-    night = models.CharField(choices=DAY_CHOICES, max_length=100, blank=True, null=True)
+    day = models.CharField(choices=DAY_CHOICES,
+                           max_length=100, blank=True, null=True)
+    night = models.CharField(
+        choices=DAY_CHOICES, max_length=100, blank=True, null=True)
     capacity = models.PositiveIntegerField(default=0)
     image = models.FileField(upload_to="service/package/image")
     price = models.PositiveIntegerField(blank=True, null=True)
-
 
     def __str__(self):
         return self.name if self.name else "No Packages"

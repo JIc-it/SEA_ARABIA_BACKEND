@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import *
 from local_apps.account.models import Bookmark
 from local_apps.main.serializers import *
+from local_apps.booking.models import Booking
 
 
 class DestinationSerializer(serializers.ModelSerializer):
@@ -257,3 +258,31 @@ class PackageSerializer(serializers.ModelSerializer):
         model = Package
         fields = ['id', 'service', 'name',
                   'short_description', 'capacity', 'image', 'price']
+
+
+class ServiceListSerializer(serializers.ModelSerializer):
+    """ Serializer for listing the services """
+    total_booking = serializers.SerializerMethodField(
+        method_name="get_total_booking")
+    company = serializers.CharField(source="company.name")
+    category = serializers.StringRelatedField(many=True)
+    sub_category = serializers.StringRelatedField(many=True)
+
+    def get_total_booking(self, instance):
+        try:
+            total_count = Booking.objects.filter(service=instance).count()
+            return total_count
+        except:
+            return 0
+
+    class Meta:
+        model = Service
+        fields = [
+            "id",
+            "company",
+            "category",
+            "sub_category",
+            "name",
+            "status",
+            "total_booking"
+        ]

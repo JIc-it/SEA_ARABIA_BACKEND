@@ -147,3 +147,4 @@ urlpatterns = [
 
 
 ]
+ServiceList

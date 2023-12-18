@@ -91,9 +91,9 @@ class SubCategoryList(generics.ListAPIView):
 
 
 class ServiceList(generics.ListAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
-    serializer_class = ServiceSerializer
+    serializer_class = ServiceListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = [
         "name",
@@ -110,7 +110,7 @@ class ServiceCreate(generics.CreateAPIView):
 
 
 class ServiceView(generics.RetrieveAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
 
@@ -119,6 +119,12 @@ class ServiceUpdate(generics.UpdateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
+
+    def update(self, request, *args, **kwargs):
+        try:
+            pass
+        except Exception as e:
+            return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
 # Service Price Views
