@@ -231,7 +231,8 @@ class VendorLeadCount(APIView):
     def get(self, request):
         try:
 
-            total_lead_count = User.objects.filter(role="Vendor").count()
+            total_lead_count = User.objects.filter(
+                role="Vendor", company_company_user__is_onboard=False).count()
             total_active_vendors = Company.objects.filter(
                 is_onboard=True).count()
             seven_days = datetime.date.today() - datetime.timedelta(7)
