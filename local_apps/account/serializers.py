@@ -56,6 +56,8 @@ class VendorDetailsSerializer(serializers.ModelSerializer):
         source="company_company_user.address")
     company_website = serializers.CharField(
         source="company_company_user.website")
+    status = serializers.CharField(
+        source="company_company_user.status", default=None)
 
     class Meta:
         model = User
@@ -73,6 +75,7 @@ class VendorDetailsSerializer(serializers.ModelSerializer):
             "registration_number",
             "company_address",
             "company_website",
+            "status",
         ]
 
 
