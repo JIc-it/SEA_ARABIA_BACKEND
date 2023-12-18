@@ -67,4 +67,9 @@ urlpatterns = [
     path('vendor-count-admin', VendorCountList.as_view(),
          name='vendor-count-admin'),
 
+
+    # ? guest user urls
+
+    path("guest-user/list", GuestUserList.as_view(), name="guest_user_list"),
+
 ]

@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from local_apps.company.models import Company
 from rest_framework import status
 from local_apps.service.serializers import ServiceSerializer
+from local_apps.booking.models import Booking
 
 # user cms serializers
 
@@ -202,7 +203,16 @@ class UserListSerializer(serializers.ModelSerializer):
         ]
 
     def get_total_booking(self, instance):
-        return 0
+        try:
+            if instance.role == "Vendor":
+                booking_count = Booking.objects.filter(
+                    service__company__user=instance).count()
+                return booking_count
+            elif instance.role == "User":
+                booking_count = Booking.objects.filter(user=instance).count()
+                return booking_count
+        except Exception as e:
+            return 0
 
 
 class PasswordResetSerializer(serializers.Serializer):
@@ -301,8 +311,7 @@ class BookMarkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bookmark
         fields = "__all__"
-        
-    
+
 
 class BookMarkListSerializer(serializers.ModelSerializer):
     service = ServiceSerializer()
@@ -338,3 +347,11 @@ class UserUpdatedSerializer(serializers.ModelSerializer):
     #             setattr(profile_extra_instance, key, value)
     #         profile_extra_instance.save()
     #     return instance
+
+
+class GuestSerializer(serializers.ModelSerializer):
+    """ serializer for Guest user model """
+
+    class Meta:
+        model = Guest
+        fields = ["first_name", "last_name", "mobile", "email", "location"]

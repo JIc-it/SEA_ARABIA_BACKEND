@@ -102,7 +102,8 @@ class ProfileExtraCreate(generics.CreateAPIView):
 class VendorSerializerList(generics.ListAPIView):
     """ view for listing the vendor in cms """
 
-    queryset = User.objects.filter(role="Vendor", company_company_user__is_onboard=False)
+    queryset = User.objects.filter(
+        role="Vendor", company_company_user__is_onboard=False)
     serializer_class = VendorSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = [
@@ -630,3 +631,8 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
+
+class GuestUserList(generics.ListAPIView):
+    serializer_class = GuestSerializer
+    queryset = Guest.objects.all()

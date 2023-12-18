@@ -198,3 +198,8 @@ class Guest(Main):
 
     def __str__(self):
         return self.first_name if self.first_name else "No Name"
+
+    class Meta:
+        ordering = ["-created_at", "-updated_at"]
+        verbose_name = "Guest User"
+        verbose_name_plural = "Guest Users"
