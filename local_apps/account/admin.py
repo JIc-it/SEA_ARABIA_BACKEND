@@ -119,4 +119,4 @@ class BookMarkAdmin(admin.ModelAdmin):
 
 @admin.register(Guest)
 class GuestAdmin(admin.ModelAdmin):
-    list_display = []
+    list_display = ['first_name', "last_name", "location", "email", "mobile"]

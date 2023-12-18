@@ -393,6 +393,7 @@ class ServiceAvailablityTime(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         try:
             service_id = self.kwargs.get('pk')
+
             date = self.kwargs.get('date')
             service_instance = Service.objects.get(id=service_id)
             if not date:
