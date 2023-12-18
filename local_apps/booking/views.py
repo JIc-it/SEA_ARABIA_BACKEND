@@ -13,6 +13,7 @@ from django.db.models import Case, Count, Q, Sum, IntegerField, When
 from django.shortcuts import get_object_or_404
 import datetime
 from .filters import *
+from django.http import HttpResponse
 
 
 today = datetime.date.today()
@@ -160,3 +161,18 @@ class BookingAppList(generics.ListAPIView):
     def get_queryset(self):
 
         return Booking.objects.filter(user=self.request.user)
+
+
+#Export as CSV
+
+class ExportBookingCSVView(generics.ListAPIView):
+    def get(self, request, *args, **kwargs):
+        queryset = Booking.objects.all()
+        resource = BookingListExport()
+
+        dataset = resource.export(queryset)
+
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="bookings_list.csv"'
+
+        return response

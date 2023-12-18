@@ -3,6 +3,7 @@ from .models import Booking, Payment
 from local_apps.service.serializers import ServiceSerializer
 from local_apps.offer.serializers import OfferSerializer
 from local_apps.account.serializers import UserSerializer
+from import_export import resources
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -43,6 +44,27 @@ class BookingSerializer(serializers.ModelSerializer):
 class BookingStatusSerializer(serializers.Serializer):
     status = serializers.CharField()
 
+
+class BookingListExport(resources.ModelResource):
+    service = resources.Field(column_name='service', attribute='service__name')
+    category = resources.Field(column_name='category', attribute='service__category__name')
+    vendor = resources.Field(column_name='vendor', attribute='service__company__name')
+    user = resources.Field(column_name='user', attribute='user__first_name')
+
+    class Meta:
+        model = Booking
+        fields = ['booking_id',
+                  'service',
+                  'category',
+                  'vendor',
+                  'user',
+                  'user_type',
+                  'end_date',
+                  'created_at',
+                  # 'start_date',
+                  'status']
+
+        export_order = fields
 
     
 

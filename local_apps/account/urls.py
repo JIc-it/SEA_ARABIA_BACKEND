@@ -72,4 +72,7 @@ urlpatterns = [
 
     path("guest-user/list", GuestUserList.as_view(), name="guest_user_list"),
 
+    #export
+    path('vendor-list-export/', ExportVendorCSVView.as_view(), name='vendor-export-csv'),
+
 ]

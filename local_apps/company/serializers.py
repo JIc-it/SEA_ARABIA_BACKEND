@@ -41,6 +41,7 @@ class CompanyAddSerializer(serializers.ModelSerializer):
             "service_summary",
         ]
 
+
 class CompanyCmsSerializer(serializers.ModelSerializer):
     """ serializer for lisiting the company in the admin review cms """
     class Meta:
@@ -68,6 +69,8 @@ class CompanyListSerializer(serializers.ModelSerializer):
 
 class MiscellaneousSerializer(serializers.ModelSerializer):
     attachment = serializers.FileField()
+    status = serializers.CharField(
+        source="company.status", default=None)
 
     class Meta:
         model = Miscellaneous
@@ -89,6 +92,9 @@ class MiscellaneousTypeSerializer(serializers.ModelSerializer):
 class SiteVisitSerializer(serializers.ModelSerializer):
     attachment = serializers.FileField(required=True)
     qualifications = serializers.ListField(required=True,write_only=True)
+    status = serializers.CharField(
+        source="company.status", default=None)
+
     class Meta:
         model = SiteVisit
         exclude = [
@@ -99,6 +105,9 @@ class SiteVisitSerializer(serializers.ModelSerializer):
 
 class ProposalSerializer(serializers.ModelSerializer):
     attachment = serializers.FileField(required=True)
+    status = serializers.CharField(
+        source="company.status", default=None)
+
     class Meta:
         model = Proposal
         exclude = [
@@ -109,6 +118,9 @@ class ProposalSerializer(serializers.ModelSerializer):
 
 class NegotiationSerializer(serializers.ModelSerializer):
     attachment = serializers.FileField(required=True)
+    status = serializers.CharField(
+        source="company.status", default=None)
+
     class Meta:
         model = Negotiation
         exclude = ["created_at", "updated_at"]
@@ -116,16 +128,22 @@ class NegotiationSerializer(serializers.ModelSerializer):
 
 class MOUorCharterSerializer(serializers.ModelSerializer):
     attachment = serializers.FileField(required=True)
+    status = serializers.CharField(
+        source="company.status", default=None)
+
     class Meta:
         model = MOUorCharter
         exclude = ["created_at", "updated_at"]
 
 
 class OnboardStatusSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(
+        source="company.status", default=None)
     
     class Meta:
         model = OnboardStatus
         fields = ["name"]
+
 
 class CompanyOnboardSerializer(serializers.Serializer):
     status = serializers.BooleanField()

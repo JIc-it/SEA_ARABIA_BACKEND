@@ -52,6 +52,8 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
 
+    ordering = ["-created_at", "-updated_at"]
+
     def save(self, *args, **kwargs):
         if not self.account_id:
             last_usr_instance = User.objects.order_by(

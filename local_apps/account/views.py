@@ -25,6 +25,8 @@ from django.contrib.auth import authenticate, login
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from django.http import HttpResponse
+
 # custom Auth
 
 
@@ -636,3 +638,18 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
 class GuestUserList(generics.ListAPIView):
     serializer_class = GuestSerializer
     queryset = Guest.objects.all()
+
+
+# Export as CSV
+
+class ExportVendorCSVView(generics.ListAPIView):
+    def get(self, request, *args, **kwargs):
+        queryset = User.objects.filter(role="Vendor", company_company_user__is_onboard=False)
+        resource = VendorListExport()
+
+        dataset = resource.export(queryset)
+
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="vendor_list.csv"'
+
+        return response

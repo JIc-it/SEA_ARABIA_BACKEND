@@ -6,6 +6,7 @@ from local_apps.company.models import Company
 from rest_framework import status
 from local_apps.service.serializers import ServiceSerializer
 from local_apps.booking.models import Booking
+from import_export import resources
 
 # user cms serializers
 
@@ -355,3 +356,24 @@ class GuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guest
         fields = ["first_name", "last_name", "mobile", "email", "location"]
+
+
+class VendorListExport(resources.ModelResource):
+    created_by = resources.Field(column_name='created_by', attribute='company_company_user__created_by__first_name')
+    location = resources.Field(column_name='location', attribute='profileextra__location')
+    status = resources.Field(column_name='status', attribute='company_company_user__status')
+
+    class Meta:
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "mobile",
+            "location",
+            "created_at",
+            "created_by",
+            "status",
+        ]
+
+        export_order = fields
