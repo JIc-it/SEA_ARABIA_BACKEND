@@ -639,6 +639,14 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
 class GuestUserList(generics.ListAPIView):
     serializer_class = GuestSerializer
     queryset = Guest.objects.all()
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = [
+        "first_name",
+        "last_name",
+        "email",
+        "mobile",
+        "location"
+    ]
 
 
 # Export as CSV
