@@ -10,4 +10,6 @@ urlpatterns = [
     path('offer-service-info/<uuid:pk>/', OfferServiceInfoView.as_view(), name='offer-service-info'),
     path('offer-count/', OfferCountView.as_view(), name='offer-count'),
 
+    path('export-offer-list/', OfferListExportView.as_view(), name='export-offer-list'),
+
 ]

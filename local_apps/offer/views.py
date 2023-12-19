@@ -1,9 +1,10 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import generics, status
 from .models import Offer
-from .serializers import OfferSerializer, OfferServiceInfoSerializer,OfferCountSerializer
+from .serializers import OfferSerializer, OfferServiceInfoSerializer, OfferCountSerializer, OfferListExportResource
 from rest_framework.response import Response
 from local_apps.service.models import Service
 from local_apps.company.models import Company
@@ -244,9 +245,6 @@ class OfferServiceInfoView(generics.ListAPIView):
     #     # Filter services based on the offer ID
     #     return Service.objects.filter(offer__offer_companies__isnull=False).distinct()
 
-           
-
-
 
 class OfferCountView(APIView):
     def get(self, request, *args, **kwargs):
@@ -261,3 +259,18 @@ class OfferCountView(APIView):
         })
 
         return Response(serializer.data)
+
+
+#Export
+
+class OfferListExportView(generics.ListAPIView):
+    def get(self, request, *args, **kwargs):
+        queryset = Offer.objects.all()
+        resource = OfferListExportResource()
+
+        dataset = resource.export(queryset)
+
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="offer_list.csv"'
+
+        return response
