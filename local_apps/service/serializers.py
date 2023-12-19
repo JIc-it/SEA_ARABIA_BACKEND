@@ -111,8 +111,8 @@ class ServiceSerializer(serializers.ModelSerializer):
     service_image = ServiceImageSerializer(
         many=True, required=False, allow_null=True)
     # company = ServiceCompanySerializer(required=False, allow_null=True)
-    category = ServiceCategorySerializer(
-        many=True, required=False, allow_null=True)
+    category = CategorySerializer(many=True, required=False, allow_null=True)
+    amenities = AmenitySerializer(many=True, required=False, allow_null=True)
     sub_category = SubCategorySerializer(
         many=True, required=False, allow_null=True)
     is_bookmarked = serializers.SerializerMethodField()
