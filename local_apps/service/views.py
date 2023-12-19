@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -545,6 +546,26 @@ class ServiceListApp(generics.ListAPIView):
     filterset_class = ServiceFilter
 
     def get_queryset(self):
+
         premium_category = Category.objects.filter(
             service_service_category__is_premium=True)
         return Service.objects.filter(category__in=premium_category)
+
+        premium_category = Category.objects.filter(service_service_category__is_premium=True)
+        return Service.objects.filter(category__in=premium_category)
+
+
+#Export
+
+class ExportServiceCSVView(generics.ListAPIView):
+    def get(self, request, *args, **kwargs):
+        queryset = Service.objects.all()
+        resource = ServiceListExportResource()
+
+        dataset = resource.export(queryset)
+
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="service_list.csv"'
+
+        return response
+

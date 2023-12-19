@@ -146,6 +146,8 @@ urlpatterns = [
     path('service-listapp',
           ServiceListApp.as_view(), name='service-listapp'),
 
+    path('export-service-list', ExportServiceCSVView.as_view(), name='export-service-list'),
+
 
 
 ]

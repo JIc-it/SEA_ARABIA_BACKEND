@@ -260,4 +260,4 @@ class OfferCountView(APIView):
             'disabled_offers': disabled_offers,
         })
 
-        return Response(serializer.data)           
+        return Response(serializer.data)

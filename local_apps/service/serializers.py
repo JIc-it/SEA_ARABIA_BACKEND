@@ -3,6 +3,7 @@ from .models import *
 from local_apps.account.models import Bookmark
 from local_apps.main.serializers import *
 from local_apps.booking.models import Booking
+from import_export import resources, fields, widgets
 
 
 class DestinationSerializer(serializers.ModelSerializer):
@@ -294,3 +295,37 @@ class ServiceListSerializer(serializers.ModelSerializer):
             "status",
             "total_booking"
         ]
+
+
+class ServiceListExportResource(resources.ModelResource):
+    total_booking = fields.Field(column_name='total_booking', attribute='dehydrate_total_booking')
+    category = fields.Field(
+        column_name='category',
+        attribute='category',
+        widget=widgets.ManyToManyWidget(Category, field='name', separator=', ')
+    )
+    sub_category = fields.Field(
+        column_name='sub_category',
+        attribute='sub_category',
+        widget=widgets.ManyToManyWidget(SubCategory, field='name', separator=', ')
+    )
+
+    def dehydrate_total_booking(self, instance):
+        try:
+            total_count = Booking.objects.filter(service=instance).count()
+            return total_count
+        except:
+            return 0
+
+    class Meta:
+        model = Service
+        fields = [
+            "company__name",
+            "category",
+            "sub_category",
+            "name",
+            "status",
+            "total_booking"
+        ]
+
+        export_order = fields
