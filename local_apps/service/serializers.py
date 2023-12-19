@@ -164,14 +164,11 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
     destination = serializers.CharField(
         source="destination.name", required=False, allow_null=True)
     company = serializers.CharField(source="company.name")
-    category = serializers.CharField(source="category.name")
-    # pricing_type = serializers.CharField(source="pricing_type.name")
-    # occasions = serializers.SlugRelatedField(
-    #     many=True, slug_field="name", queryset=Occasion.objects.all()
-    # )
-    amenities = AmenitySerializer(many=True)
+    category = CategorySerializer(many=True, required=False, allow_null=True)
+    amenities = AmenitySerializer(many=True, required=False, allow_null=True)
 
-    class Meta:
+
+class Meta:
         model = Service
         fields = [
             "id",
