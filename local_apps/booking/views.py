@@ -10,6 +10,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.views import APIView
 from rest_framework import status
 from django.db.models import Case, Count, Q, Sum, IntegerField, When
+from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
 import datetime
 from .filters import *
@@ -105,17 +106,35 @@ class BookingView(generics.RetrieveAPIView):
 
 
 class BookingCardCount(APIView):
+    """ Booking card count for admin cms """
+
     def get(self, request):
+        """ Passing id of the vendor will give the count of the booking for the particular vendor only 
+        else return the total count of bookings """
+
         try:
-            booking_count = Booking.objects.all().aggregate(
-                total_booking=Count("pk"),
-                today_booking=Sum(
-                    Case(When(created_at=today, then=1), default=0, output_field=IntegerField())),
-                total_confirmed_booking=Sum(
-                    Case(When(status="Successful", then=1), default=0, output_field=IntegerField())),
-                total_cancelled_booking=Sum(
-                    Case(When(status="Cancelled", then=1), default=0, output_field=IntegerField())),
-            )
+            vendor_id = request.query_params.get('id', None)
+
+            if vendor_id:
+                booking_count = Booking.objects.filter(service__company__user=vendor_id).aggregate(
+                    total_booking=Count("pk"),
+                    today_booking=Coalesce(Sum(
+                        Case(When(created_at=today, then=1), default=0, output_field=IntegerField())), 0),
+                    total_confirmed_booking=Coalesce(Sum(
+                        Case(When(status="Successful", then=1), default=0, output_field=IntegerField())), 0),
+                    total_cancelled_booking=Coalesce(Sum(
+                        Case(When(status="Cancelled", then=1), default=0, output_field=IntegerField())), 0),
+                )
+            else:
+                booking_count = Booking.objects.all().aggregate(
+                    total_booking=Count("pk"),
+                    today_booking=Coalesce(Sum(
+                        Case(When(created_at=today, then=1), default=0, output_field=IntegerField())), 0),
+                    total_confirmed_booking=Coalesce(Sum(
+                        Case(When(status="Successful", then=1), default=0, output_field=IntegerField())), 0),
+                    total_cancelled_booking=Coalesce(Sum(
+                        Case(When(status="Cancelled", then=1), default=0, output_field=IntegerField())), 0),
+                )
 
             return Response(booking_count, status=status.HTTP_200_OK)
         except Exception as e:
@@ -140,9 +159,7 @@ class BookingStatusUpdate(generics.UpdateAPIView):
             return Response(f"Error : {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
-
 # ?---------------------------App views----------------------------------------#
-        
 
 
 class BookingAppList(generics.ListAPIView):
@@ -163,7 +180,7 @@ class BookingAppList(generics.ListAPIView):
         return Booking.objects.filter(user=self.request.user)
 
 
-#Export as CSV
+# Export as CSV
 
 class ExportBookingCSVView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):

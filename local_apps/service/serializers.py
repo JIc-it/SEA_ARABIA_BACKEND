@@ -100,12 +100,19 @@ class ServiceCompanySerializer(serializers.ModelSerializer):
                   ]
 
 
+class ServiceCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["id", "name"]
+
+
 class ServiceSerializer(serializers.ModelSerializer):
     price = PriceSerializer(required=False, allow_null=True)
     service_image = ServiceImageSerializer(
         many=True, required=False, allow_null=True)
     # company = ServiceCompanySerializer(required=False, allow_null=True)
-    category = CategorySerializer(many=True, required=False, allow_null=True)
+    category = ServiceCategorySerializer(
+        many=True, required=False, allow_null=True)
     sub_category = SubCategorySerializer(
         many=True, required=False, allow_null=True)
     is_bookmarked = serializers.SerializerMethodField()
@@ -119,8 +126,6 @@ class ServiceSerializer(serializers.ModelSerializer):
                   'is_premium',
                   'is_bookmarked',
                   'type',
-                  'category',
-                  'sub_category',
                   'name',
                   'machine_id',
                   'description',
@@ -128,14 +133,16 @@ class ServiceSerializer(serializers.ModelSerializer):
                   'bedroom',
                   'toilet',
                   'capacity',
-                  'amenities',
                   'pickup_point',
                   'cancellation_policy',
                   'refund_policy',
-                  'price',
                   'service_image',
                   'company',
+                  'category',
+                  'amenities',
+                  'sub_category',
                   'service_image',
+                  'price',
                   ]
 
     def get_is_bookmarked(self, obj):

@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from .models import *
 from .serializers import *
@@ -121,9 +122,10 @@ class ServiceView(generics.RetrieveAPIView):
 
 
 class ServiceUpdate(generics.UpdateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
+    parser_classes = [MultiPartParser, FormParser]
 
     def update(self, request, *args, **kwargs):
         try:
@@ -131,7 +133,6 @@ class ServiceUpdate(generics.UpdateAPIView):
             is_active = request.data.get('is_active', None)
             is_top_suggestion = request.data.get('is_top_suggestion', None)
             is_premium = request.data.get('is_premium', None)
-            is_bookmarked = request.data.get('is_bookmarked', None)
             type = request.data.get('type', None)
             name = request.data.get('name', None)
             machine_id = request.data.get('machine_id', None)
@@ -150,6 +151,8 @@ class ServiceUpdate(generics.UpdateAPIView):
             service_instance = Service.objects.get(id=service_id)
             service_image = request.data.get('service_image', None)
 
+            print(service_image, '?????????????????????')
+
             if is_verified:
                 service_instance.is_verified = is_verified
             if is_active:
@@ -158,8 +161,6 @@ class ServiceUpdate(generics.UpdateAPIView):
                 service_instance.is_top_suggestion = is_top_suggestion
             if is_premium:
                 service_instance.is_premium = is_premium
-            if is_bookmarked:
-                service_instance.is_bookmarked = is_bookmarked
             if type:
                 service_instance.type = type.title()
             if name:
@@ -188,13 +189,28 @@ class ServiceUpdate(generics.UpdateAPIView):
             service_instance.save()
 
             if amenities_list:
-                service_instance.amenities.set(amenities_list)
+                try:
+                    amenities = amenities_list.replace(" ", "")
+                    amenities = amenities.split(",")
+                except:
+                    amenities = []
+                service_instance.amenities.set(amenities)
 
             if category:
-                service_instance.category.set(category)
+                try:
+                    category_list = category.replace(" ", "")
+                    category_list = category.split(",")
+                except:
+                    category_list = []
+                service_instance.category.set(category_list)
 
             if sub_category:
-                service_instance.sub_category.set(sub_category)
+                try:
+                    sub_category_list = sub_category.replace(" ", "")
+                    sub_category_list = sub_category.split(",")
+                except:
+                    sub_category_list = []
+                service_instance.sub_category.set(sub_category_list)
 
             serializer = self.get_serializer(service_instance)
 
