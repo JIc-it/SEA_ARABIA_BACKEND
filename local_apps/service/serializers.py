@@ -294,3 +294,6 @@ class ServiceListSerializer(serializers.ModelSerializer):
             "status",
             "total_booking"
         ]
+
+
+
