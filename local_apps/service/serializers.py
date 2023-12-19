@@ -90,6 +90,7 @@ class ServiceImageSerializer(serializers.ModelSerializer):
         fields = ['id',
                   "thumbnail",
                   "is_thumbnail",
+                  "service"
                   ]
 
 

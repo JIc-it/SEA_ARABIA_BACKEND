@@ -126,7 +126,6 @@ class ServiceUpdate(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
-    parser_classes = [MultiPartParser, FormParser]
 
     def update(self, request, *args, **kwargs):
         try:
@@ -148,20 +147,22 @@ class ServiceUpdate(generics.UpdateAPIView):
             amenities_list = request.data.get('amenities', [])
             category = request.data.get('category', [])
             sub_category = request.data.get('sub_category', [])
+
             service_id = kwargs.get('pk')
             service_instance = Service.objects.get(id=service_id)
-            service_image = request.data.get('service_image', None)
 
-            print(service_image, '?????????????????????')
+            if is_verified is not None:
+                service_instance.is_verified = True if is_verified == 'true' or is_verified == 'True' or is_verified == True else False
 
-            if is_verified:
-                service_instance.is_verified = is_verified
-            if is_active:
-                service_instance.is_active = is_active
-            if is_top_suggestion:
-                service_instance.is_top_suggestion = is_top_suggestion
-            if is_premium:
-                service_instance.is_premium = is_premium
+            if is_active is not None:
+                service_instance.is_active = True if is_active == 'true' or is_active == 'True' or is_active == True else False
+
+            if is_top_suggestion is not None:
+                service_instance.is_top_suggestion = True if is_top_suggestion == 'true' or is_top_suggestion == 'True' or is_top_suggestion == True else False
+
+            if is_premium is not None:
+                service_instance.is_premium = True if is_premium == 'true' or is_premium == 'True' or is_premium == True else False
+
             if type:
                 service_instance.type = type.title()
             if name:
@@ -170,8 +171,6 @@ class ServiceUpdate(generics.UpdateAPIView):
                 service_instance.machine_id = machine_id
             if description:
                 service_instance.description = description
-            if lounge:
-                service_instance.lounge = lounge
             if lounge:
                 service_instance.lounge = lounge
             if bedroom:
@@ -190,31 +189,30 @@ class ServiceUpdate(generics.UpdateAPIView):
             service_instance.save()
 
             if amenities_list:
-                try:
-                    amenities = amenities_list.replace(" ", "")
-                    amenities = amenities.split(",")
-                except:
-                    amenities = []
-                service_instance.amenities.set(amenities)
+                # try:
+                #     amenities = amenities_list.replace(" ", "")
+                #     amenities = amenities.split(",")
+                # except:
+                #     amenities = []
+                service_instance.amenities.set(amenities_list)
 
             if category:
-                try:
-                    category_list = category.replace(" ", "")
-                    category_list = category.split(",")
-                except:
-                    category_list = []
-                service_instance.category.set(category_list)
+                # try:
+                #     category_list = category.replace(" ", "")
+                #     category_list = category.split(",")
+                # except:
+                #     category_list = []
+                service_instance.category.set(category)
 
             if sub_category:
-                try:
-                    sub_category_list = sub_category.replace(" ", "")
-                    sub_category_list = sub_category.split(",")
-                except:
-                    sub_category_list = []
-                service_instance.sub_category.set(sub_category_list)
+                # try:
+                #     sub_category_list = sub_category.replace(" ", "")
+                #     sub_category_list = sub_category.split(",")
+                # except:
+                #     sub_category_list = []
+                service_instance.sub_category.set(sub_category)
 
             serializer = self.get_serializer(service_instance)
-
             return Response(serializer.data)
 
         except Exception as e:
@@ -238,6 +236,37 @@ class ServiceImageUpdate(generics.UpdateAPIView):
     queryset = ServiceImage.objects.all()
     serializer_class = ServiceImageSerializer
 
+
+class ServiceImageCreate(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ServiceImageSerializer
+
+
+class ServiceImageStatus(generics.UpdateAPIView):
+    ''' View for updating the thumbnail status of the image '''
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = ServiceImageSerializer
+
+    def update(self, request, *args, **kwargs):
+        try:
+            pk = kwargs.get('pk', None)
+            service_id = request.data.get("service_id", None)
+            is_thumbnail = request.data.get('is_thumbnail', None)
+
+            serviceimage_instance = ServiceImage.objects.get(id=pk)
+
+            # thumbnail_exist = ServiceImage.objects.filter(
+            #     service=service_id, is_thumbnail=True).exists()
+
+            # if thumbnail_exist:
+            #     return Response("A thumbnail image already exist", status=status.HTTP_400_BAD_REQUEST)
+            # else:
+            #     serviceimage_instance.is_thumbnail = is_thumbnail
+            #     serviceimage_instance.save()
+            #     return Response("Success", status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 # service review views
 

@@ -80,11 +80,23 @@ urlpatterns = [
         name="service-price-update",
     ),
     #   Service Image urls
+
     path(
         "service-image-update/<uuid:pk>",
         ServiceImageUpdate.as_view(),
         name="service-image-update",
     ),
+    path(
+        "service-image-create",
+        ServiceImageCreate.as_view(),
+        name="service-image-create",
+    ),
+    path(
+        "service-image-status/<uuid:pk>",
+        ServiceImageStatus.as_view(),
+        name="service-image-status",
+    ),
+
     #   Service Review Serializer
     path(
         "service-review-create",
@@ -144,7 +156,7 @@ urlpatterns = [
     path('service_availablitytime_update/<uuid:pk>',
          ServiceAvailablityTimeUpdate.as_view(), name='service_availablitytime_update'),
     path('service-listapp',
-          ServiceListApp.as_view(), name='service-listapp'),
+         ServiceListApp.as_view(), name='service-listapp'),
 
     path('export-service-list', ExportServiceCSVView.as_view(), name='export-service-list'),
 
