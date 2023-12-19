@@ -508,7 +508,6 @@ class ServiceListApp(generics.ListAPIView):
     """for app side service lisiting"""
    
     queryset = Service.objects.all()
-    premium_category = Category.objects.filter(service_service_category__is_premium=True)
     serializer_class = ServiceSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = [
@@ -518,6 +517,4 @@ class ServiceListApp(generics.ListAPIView):
     ]
     filterset_class = ServiceFilter
 
-    def get_queryset(self):
-        premium_category = Category.objects.filter(service_service_category__is_premium=True)
-        return Service.objects.filter(category__in=premium_category)
+    
