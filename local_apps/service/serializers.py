@@ -126,6 +126,7 @@ class ServiceSerializer(serializers.ModelSerializer):
                   'is_top_suggestion',
                   'is_premium',
                   'is_bookmarked',
+                  'is_sail_with_activity',
                   'type',
                   'name',
                   'machine_id',

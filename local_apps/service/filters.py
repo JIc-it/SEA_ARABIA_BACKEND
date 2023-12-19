@@ -32,6 +32,7 @@ class ServiceFilter(django_filters.FilterSet):
             "is_verified",
             "is_active",
             "is_premium",
+            "is_sail_with_activity",
             "company",
             "category",
             "sub_category",

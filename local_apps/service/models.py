@@ -162,6 +162,7 @@ class Service(Main):
     is_active = models.BooleanField(default=False)
     is_top_suggestion = models.BooleanField(default=False)
     is_premium = models.BooleanField(default=False)
+    is_sail_with_activity = models.BooleanField(default=False)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     type = models.CharField(
         choices=SERVICE_TYPE, max_length=100, default="Service", blank=True, null=True)
