@@ -545,15 +545,9 @@ class ServiceListApp(generics.ListAPIView):
     ]
     filterset_class = ServiceFilter
 
-    def get_queryset(self):
+    
 
-        premium_category = Category.objects.filter(
-            service_service_category__is_premium=True)
-        return Service.objects.filter(category__in=premium_category)
-
-        premium_category = Category.objects.filter(service_service_category__is_premium=True)
-        return Service.objects.filter(category__in=premium_category)
-
+        
 
 #Export
 
