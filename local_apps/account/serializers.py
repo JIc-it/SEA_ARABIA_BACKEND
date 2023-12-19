@@ -389,10 +389,10 @@ class VendorListExport(resources.ModelResource):
 class CustomerListExport(resources.ModelResource):
     location = resources.Field(column_name='location', attribute='profileextra__location')
     status = resources.Field(column_name='status', attribute='is_active')
-    bookings = resources.Field(column_name='bookings', attribute='dehydrate_total_booking')
+    bookings = resources.Field(column_name='bookings', attribute='dehydrate_bookings_count')
 
     def dehydrate_bookings_count(self, user):
-        return Booking.objects.filter(booking_user=user).count()
+        return user.booking_booking_user.count()
 
     class Meta:
         model = User
