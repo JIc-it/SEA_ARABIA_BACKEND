@@ -74,5 +74,6 @@ urlpatterns = [
 
     #export
     path('vendor-list-export/', ExportVendorCSVView.as_view(), name='vendor-export-csv'),
+    path('customer-list-export/', ExportCustomerCSVView.as_view(), name='customer-export-csv'),
 
 ]

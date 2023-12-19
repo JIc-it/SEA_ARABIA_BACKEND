@@ -34,9 +34,11 @@ class Payment(Main):
 class Booking(Main):
     booking_id = models.CharField(max_length=255, unique=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.SET_NULL, null=True, blank=True)
+                             on_delete=models.SET_NULL, null=True, blank=True,
+                             related_name='booking_booking_user')
     guest = models.ForeignKey(Guest,
-                              on_delete=models.SET_NULL, null=True, blank=True,)
+                              on_delete=models.SET_NULL, null=True, blank=True,
+                              related_name='booking_booking_user')
     offer = models.ForeignKey(Offer, blank=True, null=True,
                               on_delete=models.SET_NULL, related_name='booking_offer')
     service = models.ForeignKey(Service, blank=True, null=True, on_delete=models.SET_NULL,

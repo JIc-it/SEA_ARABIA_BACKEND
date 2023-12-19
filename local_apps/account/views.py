@@ -663,3 +663,17 @@ class ExportVendorCSVView(generics.ListAPIView):
         response['Content-Disposition'] = 'attachment; filename="vendor_list.csv"'
 
         return response
+
+
+class ExportCustomerCSVView(generics.ListAPIView):
+    def get(self, request, *args, **kwargs):
+        queryset = User.objects.filter(
+            role="User")
+        resource = CustomerListExport()
+
+        dataset = resource.export(queryset)
+
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="customer_list.csv"'
+
+        return response

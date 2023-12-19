@@ -384,3 +384,27 @@ class VendorListExport(resources.ModelResource):
         ]
 
         export_order = fields
+
+
+class CustomerListExport(resources.ModelResource):
+    location = resources.Field(column_name='location', attribute='profileextra__location')
+    status = resources.Field(column_name='status', attribute='is_active')
+    bookings = resources.Field(column_name='bookings', attribute='dehydrate_total_booking')
+
+    def dehydrate_bookings_count(self, user):
+        return Booking.objects.filter(booking_user=user).count()
+
+    class Meta:
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "mobile",
+            "location",
+            "created_at",
+            "bookings",
+            "status",
+        ]
+
+        export_order = fields
