@@ -1,5 +1,6 @@
 from django.db import models
 from local_apps.main.models import Main
+from rest_framework import serializers
 from local_apps.service.models import Service
 from local_apps.company.models import Company
 
@@ -46,3 +47,5 @@ class Offer(Main):
         ordering = ["-created_at", "-updated_at"]
         verbose_name = "Offer"
         verbose_name_plural = "Offers"
+
+

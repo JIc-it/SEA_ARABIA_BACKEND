@@ -3,10 +3,11 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework import generics, status
 from .models import Offer
-from .serializers import OfferSerializer, OfferServiceInfoSerializer
+from .serializers import OfferSerializer, OfferServiceInfoSerializer,OfferCountSerializer
 from rest_framework.response import Response
 from local_apps.service.models import Service
 from local_apps.company.models import Company
+from rest_framework.views import APIView
 
 
 class AdminOfferListView(generics.ListAPIView):
@@ -242,3 +243,21 @@ class OfferServiceInfoView(generics.ListAPIView):
     # def get_queryset(self):
     #     # Filter services based on the offer ID
     #     return Service.objects.filter(offer__offer_companies__isnull=False).distinct()
+
+           
+
+
+
+class OfferCountView(APIView):
+    def get(self, request, *args, **kwargs):
+        total_offers = Offer.objects.count()
+        enabled_offers = Offer.objects.filter(is_enable=True).count()
+        disabled_offers = Offer.objects.filter(is_enable=False).count()
+
+        serializer = OfferCountSerializer({
+            'total_offers': total_offers,
+            'enabled_offers': enabled_offers,
+            'disabled_offers': disabled_offers,
+        })
+
+        return Response(serializer.data)           

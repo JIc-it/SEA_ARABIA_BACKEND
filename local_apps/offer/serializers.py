@@ -16,28 +16,35 @@ class OfferSerializer(serializers.ModelSerializer):
 
 
 
+
+    
+
 class OfferServiceInfoSerializer(serializers.ModelSerializer):
     services = ServiceSerializer(many=True, required=False, allow_null=True)
     companies = CompanySerializer(many=True, required=False, allow_null=True)
-
-    # Add a field to store the count of services for each company
     company_service_count = serializers.SerializerMethodField()
-
+    total_services = serializers.SerializerMethodField()
     class Meta:
         model = Offer
-        fields = '__all__'
-
+        fields = ['companies', 'services', 'company_service_count', 'total_services']
     def get_company_service_count(self, obj):
-        # Assuming 'companies' is the related name in the Offer model for the ManyToManyField
         companies = obj.companies.all()
         counts = {}
-
-        # Iterate through each company and get the count of services
         for company in companies:
             count = obj.services.filter(company=company).count()
-            counts[str(company.id)] = count
-
+            counts[str(company.id)] = {
+                'company_id': company.id,
+                'service_count': count,
+            }
         return counts
+    def get_total_services(self, obj):
+        companies = obj.companies.all()
+        total_services = Service.objects.filter(company__in=companies).count()
+        return total_services
 
 
 
+class OfferCountSerializer(serializers.Serializer):
+    total_offers = serializers.IntegerField()
+    enabled_offers = serializers.IntegerField()
+    disabled_offers = serializers.IntegerField()

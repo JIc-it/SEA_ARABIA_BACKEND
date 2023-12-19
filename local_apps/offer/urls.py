@@ -8,4 +8,6 @@ urlpatterns = [
     path('offers/<uuid:pk>/', OfferRetrieveView.as_view(), name='offer-retrieve'),
     path('offers/<uuid:pk>/update/', OfferUpdateView.as_view(), name='offer-update'),
     path('offer-service-info/<uuid:pk>/', OfferServiceInfoView.as_view(), name='offer-service-info'),
+    path('offer-count/', OfferCountView.as_view(), name='offer-count'),
+
 ]
