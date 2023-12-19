@@ -49,6 +49,8 @@ class CompanyListCms(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Company.objects.all()
     serializer_class = CompanyCmsSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CompanyFilter
 
 
 class CompanyCreate(generics.CreateAPIView):
@@ -103,7 +105,8 @@ class MiscellaneousUpdate(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.attachment = request.data.get('attachment', instance.attachment) and instance.attachment or None
+        instance.attachment = request.data.get(
+            'attachment', instance.attachment) and instance.attachment or None
         instance.save()
 
         serializer = self.get_serializer(instance)
@@ -162,7 +165,8 @@ class SiteVisitUpdate(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.attachment = request.data.get('attachment', instance.attachment) and instance.attachment or None
+        instance.attachment = request.data.get(
+            'attachment', instance.attachment) and instance.attachment or None
         instance.save()
 
         serializer = self.get_serializer(instance)
@@ -201,7 +205,8 @@ class ProposalUpdate(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.attachment = request.data.get('attachment', instance.attachment) and instance.attachment or None
+        instance.attachment = request.data.get(
+            'attachment', instance.attachment) and instance.attachment or None
         instance.save()
 
         serializer = self.get_serializer(instance)
@@ -240,7 +245,8 @@ class NegotiationUpdate(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.attachment = request.data.get('attachment', instance.attachment) and instance.attachment or None
+        instance.attachment = request.data.get(
+            'attachment', instance.attachment) and instance.attachment or None
         instance.save()
 
         serializer = self.get_serializer(instance)
@@ -279,7 +285,8 @@ class MOUorCharterUpdate(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.attachment = request.data.get('attachment', instance.attachment) and instance.attachment or None
+        instance.attachment = request.data.get(
+            'attachment', instance.attachment) and instance.attachment or None
         instance.save()
 
         serializer = self.get_serializer(instance)
@@ -313,7 +320,7 @@ class OnboardVendor(generics.UpdateAPIView):
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
-#vendor onboarding status
+# vendor onboarding status
 
 # class ChangeStatusAPIView(generics.UpdateAPIView):
 #     queryset = Company.objects.all()
