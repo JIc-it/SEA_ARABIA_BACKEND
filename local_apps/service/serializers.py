@@ -109,7 +109,6 @@ class ServiceSerializer(serializers.ModelSerializer):
     sub_category = SubCategorySerializer(
         many=True, required=False, allow_null=True)
     is_bookmarked = serializers.SerializerMethodField()
-    
 
     class Meta:
         model = Service
@@ -263,6 +262,7 @@ class PackageSerializer(serializers.ModelSerializer):
 
 class ServiceListSerializer(serializers.ModelSerializer):
     """ Serializer for listing the services """
+
     total_booking = serializers.SerializerMethodField(
         method_name="get_total_booking")
     company = serializers.CharField(source="company.name")

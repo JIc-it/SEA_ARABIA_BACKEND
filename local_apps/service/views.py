@@ -102,9 +102,10 @@ class ServiceList(generics.ListAPIView):
     ]
     filterset_class = ServiceFilter
 
-    def get_queryset(self):
-        premium_category = Category.objects.filter(service_service_category__is_premium=True)
-        return Service.objects.filter(category__in=premium_category)
+    # def get_queryset(self):
+    #     premium_category = Category.objects.filter(
+    #         service_service_category__is_premium=True)
+    #     return Service.objects.filter(category__in=premium_category)
 
 
 class ServiceCreate(generics.CreateAPIView):
@@ -142,13 +143,12 @@ class ServiceUpdate(generics.UpdateAPIView):
             pickup_point = request.data.get('pickup_point', None)
             cancellation_policy = request.data.get('cancellation_policy', None)
             refund_policy = request.data.get('refund_policy', None)
-            service_image = request.data.get('service_image', None)
-
-            amenities = request.data.get('amenities', None)
+            amenities_list = request.data.get('amenities', [])
             category = request.data.get('category', [])
             sub_category = request.data.get('sub_category', [])
             service_id = kwargs.get('pk')
             service_instance = Service.objects.get(id=service_id)
+            service_image = request.data.get('service_image', None)
 
             if is_verified:
                 service_instance.is_verified = is_verified
@@ -187,7 +187,18 @@ class ServiceUpdate(generics.UpdateAPIView):
 
             service_instance.save()
 
-            return Response("success")
+            if amenities_list:
+                service_instance.amenities.set(amenities_list)
+
+            if category:
+                service_instance.category.set(category)
+
+            if sub_category:
+                service_instance.sub_category.set(sub_category)
+
+            serializer = self.get_serializer(service_instance)
+
+            return Response(serializer.data)
 
         except Exception as e:
             return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
@@ -502,12 +513,12 @@ class ServiceAvailablityTimeUpdate(generics.UpdateAPIView):
             return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 class ServiceListApp(generics.ListAPIView):
     """for app side service lisiting"""
-   
+
     queryset = Service.objects.all()
+    premium_category = Category.objects.filter(
+        service_service_category__is_premium=True)
     serializer_class = ServiceSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = [
@@ -517,4 +528,7 @@ class ServiceListApp(generics.ListAPIView):
     ]
     filterset_class = ServiceFilter
 
-    
+    def get_queryset(self):
+        premium_category = Category.objects.filter(
+            service_service_category__is_premium=True)
+        return Service.objects.filter(category__in=premium_category)
