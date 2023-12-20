@@ -23,6 +23,11 @@ OPERATION_TYPE = (
     ("Round Trip", "Round Trip"),
 )
 
+PACKAGE_OR_EVENT = (
+    ("Package", "Package"),
+    ("Event", "Event"),
+)
+
 
 def default_timeslot():
     return [
@@ -257,15 +262,23 @@ class Package(Main):
     service = models.ForeignKey(
         Service, on_delete=models.CASCADE, related_name="service_package_service")
     name = models.CharField(max_length=255, blank=True, null=True)
+    type = models.CharField(choices=PACKAGE_OR_EVENT,
+                            max_length=20, default='Package')
     short_description = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    day = models.CharField(choices=DAY_CHOICES,
-                           max_length=100, blank=True, null=True)
-    night = models.CharField(
-        choices=DAY_CHOICES, max_length=100, blank=True, null=True)
     capacity = models.PositiveIntegerField(default=0)
     image = models.FileField(upload_to="service/package/image")
     price = models.PositiveIntegerField(blank=True, null=True)
+    amenities = models.ManyToManyField(Amenity, blank=True)
+    cancellation_policy = models.TextField(null=True, blank=True)
+    refund_policy = models.TextField(null=True, blank=True)
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.name if self.name else "No Packages"
+
+    class Meta:
+        ordering = ['-created_at', "-updated_at"]
+        verbose_name = "Package/Event"
+        verbose_name_plural = "Packages/Events"

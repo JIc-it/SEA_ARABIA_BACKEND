@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from local_apps.core.models import Main
-from local_apps.service.models import Service
+from local_apps.service.models import Service, Package
 from local_apps.offer.models import Offer
 from local_apps.account.models import Guest
 BOOKING_STATUS = (
@@ -15,6 +15,12 @@ USER_TYPE = (
     ('Registered', 'Registered'),
     ('Guest', 'Guest'),
     ('Premium', 'Premium'),
+)
+
+
+BOOKING_CHOICE = (
+    ("Booking", "Booking"),
+    ("Enquiry", "Enquiry")
 )
 
 
@@ -45,6 +51,8 @@ class Booking(Main):
                                 related_name='booking_service')
     payment = models.OneToOneField(Payment, blank=True, null=True, on_delete=models.SET_NULL,
                                    related_name='booking_service')
+    package = models.ForeignKey(Package, blank=True, null=True, on_delete=models.SET_NULL,
+                                related_name='booking_booking_package')
     user_type = models.CharField(
         choices=USER_TYPE, default='Registered', max_length=255)
     starting_point = models.CharField(max_length=255, blank=True, null=True)
@@ -61,6 +69,8 @@ class Booking(Main):
         max_length=255, unique=True, blank=True, null=True)
     status = models.CharField(
         choices=BOOKING_STATUS, default='Opened', max_length=255, blank=True, null=True)
+    booking_type = models.CharField(
+        choices=BOOKING_CHOICE, default='Booking', max_length=255, blank=True, null=True)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]

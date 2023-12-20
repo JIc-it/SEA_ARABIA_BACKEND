@@ -145,6 +145,7 @@ class ServiceSerializer(serializers.ModelSerializer):
                   'sub_category',
                   'service_image',
                   'price',
+                  "status"
                   ]
 
     def get_is_bookmarked(self, obj):
@@ -167,7 +168,6 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
     company = serializers.CharField(source="company.name")
     category = CategorySerializer(many=True, required=False, allow_null=True)
     amenities = AmenitySerializer(many=True, required=False, allow_null=True)
-
 
     class Meta:
         model = Service
