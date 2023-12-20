@@ -309,6 +309,7 @@ class ServiceListExportResource(resources.ModelResource):
         widget=widgets.ManyToManyWidget(
             SubCategory, field='name', separator=', ')
     )
+    is_active = resources.Field(column_name='status', attribute='is_active')
 
     def dehydrate_total_booking(self, instance):
         try:
@@ -324,7 +325,7 @@ class ServiceListExportResource(resources.ModelResource):
             "category",
             "sub_category",
             "name",
-            "status",
+            "is_active",
             "total_booking"
         ]
 
