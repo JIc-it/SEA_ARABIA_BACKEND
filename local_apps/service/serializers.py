@@ -170,7 +170,7 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
     amenities = AmenitySerializer(many=True, required=False, allow_null=True)
 
 
-class Meta:
+    class Meta:
         model = Service
         fields = [
             "id",
