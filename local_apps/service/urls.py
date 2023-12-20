@@ -22,7 +22,7 @@ urlpatterns = [
     path(
         "destination-list",
         DestinationList.as_view(),
-        name="destination_list",
+        name="destination_list"
     ),
     path(
         "destination-create",
@@ -87,15 +87,17 @@ urlpatterns = [
         name="service-image-update",
     ),
     path(
-        "service-image-create",
+        "service-image/create",
         ServiceImageCreate.as_view(),
         name="service-image-create",
     ),
     path(
-        "service-image-status/<uuid:pk>",
+        "service-image/status/<uuid:pk>",
         ServiceImageStatus.as_view(),
-        name="service-image-status",
+        name="service-image-status"
     ),
+    path(
+        "service-image/delete/<uuid:pk>", ServiceImageDelete.as_view(), name="service-image-status"),
 
     #   Service Review Serializer
     path(
@@ -158,7 +160,8 @@ urlpatterns = [
     path('service-listapp',
          ServiceListApp.as_view(), name='service-listapp'),
 
-    path('export-service-list', ExportServiceCSVView.as_view(), name='export-service-list'),
+    path('export-service-list', ExportServiceCSVView.as_view(),
+         name='export-service-list'),
 
 
 

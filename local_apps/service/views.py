@@ -252,19 +252,34 @@ class ServiceImageStatus(generics.UpdateAPIView):
         try:
             pk = kwargs.get('pk', None)
             service_id = request.data.get("service_id", None)
+
             is_thumbnail = request.data.get('is_thumbnail', None)
 
             serviceimage_instance = ServiceImage.objects.get(id=pk)
 
-            # thumbnail_exist = ServiceImage.objects.filter(
-            #     service=service_id, is_thumbnail=True).exists()
+            thumbnail_exist = ServiceImage.objects.filter(
+                service=service_id, is_thumbnail=True).exists()
 
-            # if thumbnail_exist:
-            #     return Response("A thumbnail image already exist", status=status.HTTP_400_BAD_REQUEST)
-            # else:
-            #     serviceimage_instance.is_thumbnail = is_thumbnail
-            #     serviceimage_instance.save()
-            #     return Response("Success", status=status.HTTP_200_OK)
+            if thumbnail_exist and is_thumbnail == True:
+                return Response("A thumbnail image already exist", status=status.HTTP_400_BAD_REQUEST)
+            else:
+                serviceimage_instance.is_thumbnail = is_thumbnail
+                serviceimage_instance.save()
+                return Response("Success", status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
+
+class ServiceImageDelete(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ServiceSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            image_id = kwargs.get('pk', None)
+            image_instance = ServiceImage.objects.get(id=image_id)
+            image_instance.delete()
+            return Response("Image deleted successfully", status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
@@ -393,6 +408,7 @@ class ServiceAvailabeListView(generics.ListAPIView):
 
     def get_queryset(self):
         # Get the date and service ID from the URL parameters
+
         date_param = self.kwargs.get('date', None)
         service_id = self.kwargs.get('service_id', None)
 
@@ -574,11 +590,8 @@ class ServiceListApp(generics.ListAPIView):
     ]
     filterset_class = ServiceFilter
 
-    
 
-        
-
-#Export
+# Export
 
 class ExportServiceCSVView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
@@ -591,4 +604,3 @@ class ExportServiceCSVView(generics.ListAPIView):
         response['Content-Disposition'] = 'attachment; filename="service_list.csv"'
 
         return response
-

@@ -88,8 +88,7 @@ class ServiceImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceImage
         fields = ['id',
-                  "thumbnail",
-                  "is_thumbnail",
+                  "image",
                   "service"
                   ]
 
@@ -186,10 +185,10 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
             "category",
         ]
 
-        extra_kwargs = {
-            "service_price": {"required": False},
-            "service_image": {"required": False},
-        }
+    extra_kwargs = {
+        "service_price": {"required": False},
+        "service_image": {"required": False},
+    }
 
 
 class ServiceFilterListSerializer(serializers.ModelSerializer):
@@ -297,7 +296,8 @@ class ServiceListSerializer(serializers.ModelSerializer):
 
 
 class ServiceListExportResource(resources.ModelResource):
-    total_booking = fields.Field(column_name='total_booking', attribute='dehydrate_total_booking')
+    total_booking = fields.Field(
+        column_name='total_booking', attribute='dehydrate_total_booking')
     category = fields.Field(
         column_name='category',
         attribute='category',
@@ -306,7 +306,8 @@ class ServiceListExportResource(resources.ModelResource):
     sub_category = fields.Field(
         column_name='sub_category',
         attribute='sub_category',
-        widget=widgets.ManyToManyWidget(SubCategory, field='name', separator=', ')
+        widget=widgets.ManyToManyWidget(
+            SubCategory, field='name', separator=', ')
     )
 
     def dehydrate_total_booking(self, instance):

@@ -601,7 +601,7 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
             mobile = request.data.get('mobile', None)
             first_name = request.data.get('first_name', None)
             last_name = request.data.get('last_name', None)
-            profile_extra = request.data.get('profile_extra', {})
+            profile_extra = request.data.get('profileextra', {})
             location = profile_extra.get('location', None)
             dob = profile_extra.get('dob', None)
             gender = profile_extra.get('gender', None)
