@@ -677,3 +677,30 @@ class ExportCustomerCSVView(generics.ListAPIView):
         response['Content-Disposition'] = 'attachment; filename="customer_list.csv"'
 
         return response
+
+
+class ExportGuestsCSVView(generics.ListAPIView):
+    def get(self, request, *args, **kwargs):
+        queryset = Guest.objects.all()
+        resource = GuestsListExport()
+
+        dataset = resource.export(queryset)
+
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="guests_list.csv"'
+
+        return response
+
+
+class ExportOnboardVendorsCSVView(generics.ListAPIView):
+    def get(self, request, *args, **kwargs):
+        queryset = User.objects.filter(
+            role="Vendor", company_company_user__is_onboard=True)
+        resource = OnboardVendorsListExport()
+
+        dataset = resource.export(queryset)
+
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="vendor_users_list.csv"'
+
+        return response

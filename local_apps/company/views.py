@@ -209,7 +209,7 @@ class ProposalList(generics.ListAPIView):
 
     def get_queryset(self):
         company_id = self.request.query_params.get("id")
-        return SiteVisit.objects.filter(company=company_id)
+        return Proposal.objects.filter(company=company_id)
 
 
 class ProposalUpdate(generics.UpdateAPIView):
@@ -263,7 +263,7 @@ class NegotiationList(generics.ListAPIView):
 
     def get_queryset(self):
         company_id = self.request.query_params.get("id")
-        return SiteVisit.objects.filter(company=company_id)
+        return Negotiation.objects.filter(company=company_id)
 
 
 class NegotiationUpdate(generics.UpdateAPIView):
@@ -317,7 +317,7 @@ class MOUorCharterList(generics.ListAPIView):
 
     def get_queryset(self):
         company_id = self.request.query_params.get("id")
-        return SiteVisit.objects.filter(company=company_id)
+        return MOUorCharter.objects.filter(company=company_id)
 
 
 class MOUorCharterUpdate(generics.UpdateAPIView):

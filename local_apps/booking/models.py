@@ -38,7 +38,7 @@ class Booking(Main):
                              related_name='booking_booking_user')
     guest = models.ForeignKey(Guest,
                               on_delete=models.SET_NULL, null=True, blank=True,
-                              related_name='booking_booking_user')
+                              related_name='booking_booking_guest')
     offer = models.ForeignKey(Offer, blank=True, null=True,
                               on_delete=models.SET_NULL, related_name='booking_offer')
     service = models.ForeignKey(Service, blank=True, null=True, on_delete=models.SET_NULL,
