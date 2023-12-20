@@ -189,28 +189,29 @@ class ServiceUpdate(generics.UpdateAPIView):
             service_instance.save()
 
             if amenities_list:
-                # try:
-                #     amenities = amenities_list.replace(" ", "")
-                #     amenities = amenities.split(",")
-                # except:
-                #     amenities = []
-                service_instance.amenities.set(amenities_list)
+                try:
+                    amenities = amenities_list.replace(" ", "")
+                    amenities = amenities.split(",")
+                except:
+                    amenities = []
+                service_instance.amenities.set(amenities)
 
             if category:
-                # try:
-                #     category_list = category.replace(" ", "")
-                #     category_list = category.split(",")
-                # except:
-                #     category_list = []
-                service_instance.category.set(category)
+                try:
+                    category_list = category.replace(" ", "")
+                    category_list = category.split(",")
+                except:
+                    category_list = []
+                print(category_list)
+                service_instance.category.set(category_list)
 
             if sub_category:
-                # try:
-                #     sub_category_list = sub_category.replace(" ", "")
-                #     sub_category_list = sub_category.split(",")
-                # except:
-                #     sub_category_list = []
-                service_instance.sub_category.set(sub_category)
+                try:
+                    sub_category_list = sub_category.replace(" ", "")
+                    sub_category_list = sub_category.split(",")
+                except:
+                    sub_category_list = []
+                service_instance.sub_category.set(sub_category_list)
 
             serializer = self.get_serializer(service_instance)
             return Response(serializer.data)
