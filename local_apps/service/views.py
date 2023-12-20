@@ -637,6 +637,13 @@ class ServiceReviewListApp(generics.ListAPIView):
     serializer_class = ServiceReviewSerializer
     lookup_field = 'pk'
 
+
+    def get_queryset(self):
+        service_id = self.kwargs.get("pk")
+        service_list = ServiceReview.objects.filter(service=service_id)
+
+        return service_list
+
   
 
 
