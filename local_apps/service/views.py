@@ -261,7 +261,7 @@ class ServiceImageStatus(generics.UpdateAPIView):
             thumbnail_exist = ServiceImage.objects.filter(
                 service=service_id, is_thumbnail=True).exists()
 
-            if thumbnail_exist and is_thumbnail == True:
+            if thumbnail_exist:
                 return Response("A thumbnail image already exist", status=status.HTTP_400_BAD_REQUEST)
             else:
                 serviceimage_instance.is_thumbnail = is_thumbnail
@@ -284,18 +284,6 @@ class ServiceImageDelete(generics.DestroyAPIView):
         except Exception as e:
             return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
-# service review views
-
-
-class ServiceReviewCreate(generics.CreateAPIView):
-    # permission_classes = [IsAuthenticated]
-    serializer_class = ServiceReviewSerializer
-
-
-class ServiceReviewUpdate(generics.CreateAPIView):
-    # permission_classes = [IsAuthenticated]
-    queryset = ServiceReview.objects.all()
-    serializer_class = ServiceReviewSerializer
 
 
 class ServiceFilterList(generics.ListAPIView):
@@ -605,3 +593,54 @@ class ExportServiceCSVView(generics.ListAPIView):
         response['Content-Disposition'] = 'attachment; filename="service_list.csv"'
 
         return response
+
+
+
+# service review views
+
+
+class ServiceReviewCreate(generics.CreateAPIView):
+    """for app side review creation"""
+    serializer_class = ServiceReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        
+        service_id = self.kwargs.get('service_id') or request.data.get('service')
+
+       
+        if Booking.objects.filter(user=request.user, service_id=service_id).exists():
+            booking = Booking.objects.get(user=request.user, service_id=service_id)
+
+            
+            if booking.status == 'Completed':
+                
+                if not ServiceReview.objects.filter(user=request.user, service_id=service_id).exists():
+                   
+                    serializer = self.get_serializer(data=request.data)
+                    serializer.is_valid(raise_exception=True)
+                    serializer.save(user=request.user, service_id=service_id)
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                else:
+                    return Response({"message": "You have already reviewed this service."}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"message": "Service not completed yet."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+   
+            return Response({"message": "You have not booked this service yet."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class ServiceReviewListApp(generics.ListAPIView):
+    """view for review"""
+    queryset = ServiceReview.objects.all()
+    serializer_class = ServiceReviewSerializer
+    lookup_field = 'pk'
+
+  
+
+
+class ServiceReviewUpdate(generics.CreateAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = ServiceReview.objects.all()
+    serializer_class = ServiceReviewSerializer

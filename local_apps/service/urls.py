@@ -111,6 +111,11 @@ urlpatterns = [
         name="service-review-list",
     ),
     path(
+        "service-review-applist/<uuid:pk>",
+        ServiceReviewListApp.as_view(),
+        name="service-review-applist",
+    ),
+    path(
         "service-filter-list",
         ServiceFilterList.as_view(),
         name="service-filter-list",
