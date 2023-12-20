@@ -105,12 +105,26 @@ class MiscellaneousUpdate(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.attachment = request.data.get(
-            'attachment', instance.attachment) and instance.attachment or None
-        instance.save()
+        attachment_data = request.data.get('attachment')
 
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        if attachment_data is not None:
+            # Handle file upload separately
+            instance.attachment = attachment_data
+            instance.save(update_fields=['attachment'])
+
+        # Create a mutable copy of the request data
+        mutable_data = request.data.copy()
+
+        # Remove 'attachment' from the mutable data to avoid validation issues
+        mutable_data.pop('attachment', None)
+
+        serializer = self.get_serializer(instance, data=mutable_data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=400)
 
 
 class MiscellaneousView(generics.RetrieveAPIView):
