@@ -111,11 +111,6 @@ urlpatterns = [
         name="service-review-list",
     ),
     path(
-        "service-review-applist/<uuid:pk>",
-        ServiceReviewListApp.as_view(),
-        name="service-review-applist",
-    ),
-    path(
         "service-filter-list",
         ServiceFilterList.as_view(),
         name="service-filter-list",
@@ -132,17 +127,13 @@ urlpatterns = [
         ServiceTopSuggestion.as_view(),
         name="top-suggestions",
     ),
-    # # near by activities
-    # path("near-by-activites",
-    #      NearByActivities.as_view(),
-    #     name="near-by-activites"
-    #     ),
-    # # recommendation on activity side
-    # path("recommendation",
-    #      Recommendation.as_view(),
-    #      name="recommmendation"),
-
-    # category based listing
+    # review list
+    path(
+        "service-review-applist/<uuid:pk>",
+        ServiceReviewListApp.as_view(),
+        name="service-review-applist",
+    ),
+    # category based list
     path("category-based-listing/<str:category_name>/",
          CategoryBasedListing.as_view(),
          name="category-based-listing"
@@ -150,10 +141,12 @@ urlpatterns = [
 
     path('servicesavailable/<str:date>/<uuid:service_id>/',
          ServiceAvailabeListView.as_view(), name='service-availabe'),
+    # Combo package list
     path('combopackages', ComboPackageListing.as_view(), name='combopackages'),
 
     path('service-booking-availability/<uuid:service>/<str:date>/',
          AdminServiceBookingAvailabilityList.as_view(), name='service-booking-availability'),
+
     path('service-filter-list-cms',
          ServiceFilterAdminList.as_view(), name='service-filter-list-cms'),
 
@@ -162,6 +155,9 @@ urlpatterns = [
 
     path('service_availablitytime_update/<uuid:pk>',
          ServiceAvailablityTimeUpdate.as_view(), name='service_availablitytime_update'),
+
+    # service listing for app side
+    
     path('service-listapp',
          ServiceListApp.as_view(), name='service-listapp'),
 
@@ -171,4 +167,4 @@ urlpatterns = [
 
 
 ]
-ServiceList
+
