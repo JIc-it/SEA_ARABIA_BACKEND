@@ -409,6 +409,17 @@ class CustomerListExport(resources.ModelResource):
 
         export_order = fields
 
+    def booking_booking_user(self, user):
+        return user.booking_booking_user
+
+    def export_field(self, field, obj):
+        if field.attribute == 'booking_booking_user':
+            return self.calculate_booking_count(obj)
+        return super(CustomerListExport, self).export_field(field, obj)
+
+    def calculate_booking_count(self, user):
+        return Booking.objects.filter(user=user).count()
+
 
 class GuestsListExport(resources.ModelResource):
     class Meta:
@@ -427,6 +438,7 @@ class GuestsListExport(resources.ModelResource):
 class OnboardVendorsListExport(resources.ModelResource):
     location = resources.Field(column_name='location', attribute='profileextra__location')
     status = resources.Field(column_name='status', attribute='is_active')
+    bookings = resources.Field(column_name='bookings', attribute='booking_booking_user')
 
     class Meta:
         model = User
@@ -437,9 +449,20 @@ class OnboardVendorsListExport(resources.ModelResource):
             "mobile",
             "location",
             "created_at",
-            # "total_bookings",
+            "bookings",
             "status",
         ]
 
         export_order = fields
+
+    def booking_booking_user(self, user):
+        return user.booking_booking_user
+
+    def export_field(self, field, obj):
+        if field.attribute == 'booking_booking_user':
+            return self.calculate_booking_count(obj)
+        return super(OnboardVendorsListExport, self).export_field(field, obj)
+
+    def calculate_booking_count(self, user):
+        return Booking.objects.filter(user=user).count()
 

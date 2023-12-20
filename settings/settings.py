@@ -44,6 +44,7 @@ LOCAL_APPS = [
     "local_apps.main.apps.MainConfig",
     "local_apps.offer.apps.OfferConfig",
     "local_apps.advertisement.apps.AdvertisementConfig",
+    "local_apps.api_report.apps.ApiReportConfig",
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -58,7 +59,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "local_apps.report.middlewares.APILogMiddleware",
+    "local_apps.api_report.middleware.APILogMiddleware",
+    # "local_apps.report.middlewares.APILogMiddleware",
 ]
 X_FRAME_OPTIONS = "SAMEORIGIN"
 SILENCED_SYSTEM_CHECKS = ["security.W019"]
