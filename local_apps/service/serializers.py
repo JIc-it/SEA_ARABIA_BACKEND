@@ -263,7 +263,7 @@ class PackageSerializer(serializers.ModelSerializer):
     """for combopackeges"""
     class Meta:
         model = Package
-        fields = ['id', 'service', 'name',
+        fields = ['id','is_active', 'service', 'name',
                   'short_description', 'capacity', 'image', 'price']
 
 
