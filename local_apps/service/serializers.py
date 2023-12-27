@@ -64,7 +64,7 @@ class PriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Price
         fields = ['id',"service", "is_active", "name", "price", "is_range", "location",
-            "duration_hour", "duration_minute", "time",
+            "duration_hour", "duration_minute", "duration_day","time",
             "end_time", "day", "end_day", "date", "end_date"
             ]
 
