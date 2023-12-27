@@ -108,7 +108,7 @@ class ServiceCategorySerializer(serializers.ModelSerializer):
 
 
 class ServiceSerializer(serializers.ModelSerializer):
-    service_price_service = PriceSerializer(allow_null=True,many=True)
+    service_price_service = PriceSerializer(allow_null=True,many=True,required=False)
     service_image = ServiceImageSerializer(
         many=True, required=False, allow_null=True)
     # company = ServiceCompanySerializer(required=False, allow_null=True)

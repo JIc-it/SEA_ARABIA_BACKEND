@@ -11,7 +11,7 @@ urlpatterns = [
          name="user-profile-create"),
     # Vendor urls
     # vendor list api
-    path("vendor-list", VendorSerializerList.as_view(), name="vendor-list",),
+    path("vendor-list", VendorList.as_view(), name="vendor-list",),
     # vendor create api
     path("vendor-create", VendorAdd.as_view(), name="vendor-create",),
     # vendor Details api

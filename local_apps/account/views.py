@@ -101,7 +101,7 @@ class ProfileExtraCreate(generics.CreateAPIView):
 # cms views
 
 
-class VendorSerializerList(generics.ListAPIView):
+class VendorList(generics.ListAPIView):
     """ view for listing the vendor in cms """
 
     queryset = User.objects.filter(

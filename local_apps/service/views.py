@@ -111,9 +111,195 @@ class ServiceList(generics.ListAPIView):
 
 
 class ServiceCreate(generics.CreateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
+
+    # def create(self, request, *args, **kwargs):
+        # try:
+        #     is_verified = request.data.get('is_verified', None)
+        #     is_active = request.data.get('is_active', None)
+        #     is_top_suggestion = request.data.get('is_top_suggestion', None)
+        #     is_premium = request.data.get('is_premium', None)
+        #     is_sail_with_activity = request.data.get('is_sail_with_activity', None)
+        #     type = request.data.get('type', None)
+        #     name = request.data.get('name', None)
+        #     machine_id = request.data.get('machine_id', None)
+        #     description = request.data.get('description', None)
+        #     lounge = request.data.get('lounge', None)
+        #     bedroom = request.data.get('bedroom', None)
+        #     toilet = request.data.get('toilet', None)
+        #     capacity = request.data.get('capacity', None)
+        #     pickup_point = request.data.get('pickup_point', None)
+        #     cancellation_policy = request.data.get('cancellation_policy', None)
+        #     refund_policy = request.data.get('refund_policy', None)
+        #     is_duration = request.data.get('is_duration', None)
+        #     is_date = request.data.get('is_date', None)
+        #     is_day = request.data.get('is_day', None)
+        #     is_time = request.data.get('is_time', None)
+        #     is_destination = request.data.get('is_destination', None)
+        #     price_type = request.data.get('price_type', None)
+        #     profit_method = request.data.get('profit_method', None)
+            
+
+        #     service_prices = request.data.pop('service_price_service',[])  
+        #     amenities_list = request.data.pop('amenities', None)
+        #     category = request.data.pop('category', [])
+        #     sub_category = request.data.pop('sub_category', [])
+
+        #     service_instance = Service.objects.create(**request.data)
+
+
+            # if is_verified is not None:
+            #     service_instance.is_verified = True if is_verified == 'true' or is_verified == 'True' or is_verified == True else False
+
+            # if is_active is not None:
+            #     service_instance.is_active = True if is_active == 'true' or is_active == 'True' or is_active == True else False
+
+            # if is_top_suggestion is not None:
+            #     service_instance.is_top_suggestion = True if is_top_suggestion == 'true' or is_top_suggestion == 'True' or is_top_suggestion == True else False
+
+            # if is_premium is not None:
+            #     service_instance.is_premium = True if is_premium == 'true' or is_premium == 'True' or is_premium == True else False
+
+            # if is_sail_with_activity is not None:
+            #     service_instance.is_sail_with_activity = True if is_sail_with_activity == 'true' or is_sail_with_activity == 'True' or is_sail_with_activity == True else False
+            
+            # if is_duration is not None:
+            #     service_instance.is_duration = True if is_duration == 'true' or is_duration == 'True' or is_duration == True else False
+            
+            # if is_date is not None:
+            #     service_instance.is_date = True if is_date == 'true' or is_date == 'True' or is_date == True else False
+            
+            # if is_day is not None:
+            #     service_instance.is_day = True if is_day == 'true' or is_day == 'True' or is_day == True else False
+            
+            # if is_time is not None:
+            #     service_instance.is_time = True if is_time == 'true' or is_time == 'True' or is_time == True else False
+            
+            # if is_destination is not None:
+            #     service_instance.is_destination = True if is_destination == 'true' or is_destination == 'True' or is_destination == True else False
+
+            # if type:
+            #     service_instance.type = type.title()
+            # if name:
+            #     service_instance.name = name
+            # if machine_id:
+            #     service_instance.machine_id = machine_id
+            # if description:
+            #     service_instance.description = description
+            # if lounge:
+            #     service_instance.lounge = lounge
+            # if bedroom:
+            #     service_instance.bedroom = bedroom
+            # if toilet:
+            #     service_instance.toilet = toilet
+            # if capacity:
+            #     service_instance.capacity = capacity
+            # if pickup_point:
+            #     service_instance.pickup_point = pickup_point
+            # if cancellation_policy:
+            #     service_instance.cancellation_policy = cancellation_policy
+            # if refund_policy:
+            #     service_instance.refund_policy = refund_policy
+            # if profit_method:
+            #     profit_method_instance = ProfitMethod.objects.get(id = profit_method)
+            #     service_instance.profit_method = profit_method_instance
+            # if price_type:
+            #     price_type_instance = PriceType.objects.get(id = price_type)
+            #     service_instance.price_type = price_type_instance
+
+            # service_instance.save()
+
+            # if amenities_list:
+            #     try:
+            #         amenities = amenities_list.replace(" ", "")
+            #         amenities = amenities.split(",")
+            #     except:
+            #         amenities = []
+            #     service_instance.amenities.set(amenities)
+
+            # if category:
+            #     try:
+            #         category_list = category.replace(" ", "")
+            #         category_list = category.split(",")
+            #     except:
+            #         category_list = []
+            #     print(category_list)
+            #     service_instance.category.set(category_list)
+
+            # if sub_category:
+            #     try:
+            #         sub_category_list = sub_category.replace(" ", "")
+            #         sub_category_list = sub_category.split(",")
+            #     except:
+            #         sub_category_list = []
+            #     service_instance.sub_category.set(sub_category_list)
+
+            # for service_price in service_prices:
+            #     """ updating the service prices """
+
+            #     price_id = service_price.get('id',None)
+            #     is_active = service_price.get('is_active',None)
+            #     service_name = service_price.get('name',None)
+            #     price = service_price.get('price',None)
+            #     is_range = service_price.get('is_range',None)
+            #     location = service_price.get('location',None)
+            #     duration_hour = service_price.get('duration_hour',None)
+            #     duration_minute = service_price.get('duration_minute',None)
+            #     duration_day = service_price.get('duration_day',None)
+            #     end_time = service_price.get('end_time',None)
+            #     time = service_price.get('time',None)
+            #     day = service_price.get('day',None)
+            #     end_day = service_price.get('end_day',None)
+            #     date = service_price.get('date',None)
+            #     end_date = service_price.get('end_date',None)
+
+
+            #     if price_id:
+            #         price_instance = Price.objects.get(id=price_id)
+
+            #         if is_active is not None:
+            #             price_instance.is_active = True if is_active == 'true' or is_active == 'True' or is_active == True else False
+
+            #         if is_range is not None:
+            #             price_instance.is_range = True if is_range == 'true' or is_range == 'True' or is_range == True else False
+
+            #         if service_name:
+            #             price_instance.name = service_name
+            #         if price:
+            #             price_instance.price = price
+            #         if location:
+            #             location_instance = Destination.objects.get(id=location)
+            #             price_instance.location = location_instance
+            #         if duration_hour:
+            #             price_instance.duration_hour = duration_hour
+            #         if duration_minute:
+            #             price_instance.duration_minute = duration_minute
+            #         if duration_day:
+            #             price_instance.duration_day = duration_day
+            #         if end_time:
+            #             price_instance.endtime = end_time
+            #         if time:
+            #             price_instance.time = time
+            #         if day:
+            #             price_instance.day = day.title()
+            #         if end_day:
+            #             price_instance.end_day = end_day.title()
+            #         if date:
+            #             price_instance.date = date
+            #         if end_date:
+            #             price_instance.end_date = end_date
+
+            #         price_instance.save()
+
+            # serializer = self.get_serializer(service_instance)
+        #     return Response("serializer.data")
+
+        # except Exception as e:
+        #     return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 class ServiceView(generics.RetrieveAPIView):
@@ -133,6 +319,7 @@ class ServiceUpdate(generics.UpdateAPIView):
             is_active = request.data.get('is_active', None)
             is_top_suggestion = request.data.get('is_top_suggestion', None)
             is_premium = request.data.get('is_premium', None)
+            is_sail_with_activity = request.data.get('is_sail_with_activity', None)
             type = request.data.get('type', None)
             name = request.data.get('name', None)
             machine_id = request.data.get('machine_id', None)
@@ -144,7 +331,19 @@ class ServiceUpdate(generics.UpdateAPIView):
             pickup_point = request.data.get('pickup_point', None)
             cancellation_policy = request.data.get('cancellation_policy', None)
             refund_policy = request.data.get('refund_policy', None)
-            amenities_list = request.data.get('amenities', [])
+            is_duration = request.data.get('is_duration', None)
+            is_date = request.data.get('is_date', None)
+            is_day = request.data.get('is_day', None)
+            is_time = request.data.get('is_time', None)
+            is_destination = request.data.get('is_destination', None)
+            price_type = request.data.get('price_type', None)
+            profit_method = request.data.get('profit_method', None)
+            
+
+            service_prices = request.data.get('service_price_service',[])
+            
+            
+            amenities_list = request.data.get('amenities', None)
             category = request.data.get('category', [])
             sub_category = request.data.get('sub_category', [])
 
@@ -162,6 +361,24 @@ class ServiceUpdate(generics.UpdateAPIView):
 
             if is_premium is not None:
                 service_instance.is_premium = True if is_premium == 'true' or is_premium == 'True' or is_premium == True else False
+
+            if is_sail_with_activity is not None:
+                service_instance.is_sail_with_activity = True if is_sail_with_activity == 'true' or is_sail_with_activity == 'True' or is_sail_with_activity == True else False
+            
+            if is_duration is not None:
+                service_instance.is_duration = True if is_duration == 'true' or is_duration == 'True' or is_duration == True else False
+            
+            if is_date is not None:
+                service_instance.is_date = True if is_date == 'true' or is_date == 'True' or is_date == True else False
+            
+            if is_day is not None:
+                service_instance.is_day = True if is_day == 'true' or is_day == 'True' or is_day == True else False
+            
+            if is_time is not None:
+                service_instance.is_time = True if is_time == 'true' or is_time == 'True' or is_time == True else False
+            
+            if is_destination is not None:
+                service_instance.is_destination = True if is_destination == 'true' or is_destination == 'True' or is_destination == True else False
 
             if type:
                 service_instance.type = type.title()
@@ -185,6 +402,12 @@ class ServiceUpdate(generics.UpdateAPIView):
                 service_instance.cancellation_policy = cancellation_policy
             if refund_policy:
                 service_instance.refund_policy = refund_policy
+            if profit_method:
+                profit_method_instance = ProfitMethod.objects.get(id = profit_method)
+                service_instance.profit_method = profit_method_instance
+            if price_type:
+                price_type_instance = PriceType.objects.get(id = price_type)
+                service_instance.price_type = price_type_instance
 
             service_instance.save()
 
@@ -212,6 +435,63 @@ class ServiceUpdate(generics.UpdateAPIView):
                 except:
                     sub_category_list = []
                 service_instance.sub_category.set(sub_category_list)
+
+            for service_price in service_prices:
+                """ updating the service prices """
+
+                price_id = service_price.get('id',None)
+                is_active = service_price.get('is_active',None)
+                service_name = service_price.get('name',None)
+                price = service_price.get('price',None)
+                is_range = service_price.get('is_range',None)
+                location = service_price.get('location',None)
+                duration_hour = service_price.get('duration_hour',None)
+                duration_minute = service_price.get('duration_minute',None)
+                duration_day = service_price.get('duration_day',None)
+                end_time = service_price.get('end_time',None)
+                time = service_price.get('time',None)
+                day = service_price.get('day',None)
+                end_day = service_price.get('end_day',None)
+                date = service_price.get('date',None)
+                end_date = service_price.get('end_date',None)
+
+
+                if price_id:
+                    price_instance = Price.objects.get(id=price_id)
+
+                    if is_active is not None:
+                        price_instance.is_active = True if is_active == 'true' or is_active == 'True' or is_active == True else False
+
+                    if is_range is not None:
+                        price_instance.is_range = True if is_range == 'true' or is_range == 'True' or is_range == True else False
+
+                    if service_name:
+                        price_instance.name = service_name
+                    if price:
+                        price_instance.price = price
+                    if location:
+                        location_instance = Destination.objects.get(id=location)
+                        price_instance.location = location_instance
+                    if duration_hour:
+                        price_instance.duration_hour = duration_hour
+                    if duration_minute:
+                        price_instance.duration_minute = duration_minute
+                    if duration_day:
+                        price_instance.duration_day = duration_day
+                    if end_time:
+                        price_instance.endtime = end_time
+                    if time:
+                        price_instance.time = time
+                    if day:
+                        price_instance.day = day.title()
+                    if end_day:
+                        price_instance.end_day = end_day.title()
+                    if date:
+                        price_instance.date = date
+                    if end_date:
+                        price_instance.end_date = end_date
+
+                    price_instance.save()
 
             serializer = self.get_serializer(service_instance)
             return Response(serializer.data)
@@ -656,7 +936,7 @@ class ServiceReviewUpdate(generics.CreateAPIView):
 
 class ProfitMethodList(generics.ListAPIView):
     """ view for listing the Profit Method"""
-    
+
     permission_classes = [IsAuthenticated]
     queryset = ProfitMethod.objects.all()
     serializer_class = ProfitMethodSerializer
