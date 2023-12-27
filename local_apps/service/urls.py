@@ -178,12 +178,7 @@ urlpatterns = [
     path('package-list',
          PackageListAPIView.as_view(), name='package-list'),
 
-
-
-
-
     
-
 
 ]
 
