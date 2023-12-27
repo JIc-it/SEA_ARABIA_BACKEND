@@ -178,7 +178,10 @@ urlpatterns = [
     path('package-list',
          PackageListAPIView.as_view(), name='package-list'),
 
-    
+    path('price-type-list',
+         PriceTypeList.as_view(), name='price-type-list'),
 
+    path('profit-method-list',
+         ProfitMethodList.as_view(), name='profit-method-list'),
 ]
 

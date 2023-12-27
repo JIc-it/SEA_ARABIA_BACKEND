@@ -343,3 +343,22 @@ class ServiceListExportResource(resources.ModelResource):
         ]
 
         export_order = fields
+
+
+
+
+
+# class ProfitMethodList(generics.ListAPIView):
+#     """ view for listing the Profit Method"""
+    
+#     permission_classes = [IsAuthenticated]
+#     queryset = ProfitMethod.objects.all()
+#     serializer_class = ProfitMethodSerializer
+
+
+# class PriceTypeList(generics.ListAPIView):
+#     """ view for listing the Price Type"""
+
+#     permission_classes = [IsAuthenticated]
+#     queryset = PriceType.objects.all()
+#     serializer_class = PriceTypeSerializer

@@ -115,39 +115,46 @@ class ServiceCreate(generics.CreateAPIView):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
 
-    # def create(self, request, *args, **kwargs):
-        # try:
-        #     is_verified = request.data.get('is_verified', None)
-        #     is_active = request.data.get('is_active', None)
-        #     is_top_suggestion = request.data.get('is_top_suggestion', None)
-        #     is_premium = request.data.get('is_premium', None)
-        #     is_sail_with_activity = request.data.get('is_sail_with_activity', None)
-        #     type = request.data.get('type', None)
-        #     name = request.data.get('name', None)
-        #     machine_id = request.data.get('machine_id', None)
-        #     description = request.data.get('description', None)
-        #     lounge = request.data.get('lounge', None)
-        #     bedroom = request.data.get('bedroom', None)
-        #     toilet = request.data.get('toilet', None)
-        #     capacity = request.data.get('capacity', None)
-        #     pickup_point = request.data.get('pickup_point', None)
-        #     cancellation_policy = request.data.get('cancellation_policy', None)
-        #     refund_policy = request.data.get('refund_policy', None)
-        #     is_duration = request.data.get('is_duration', None)
-        #     is_date = request.data.get('is_date', None)
-        #     is_day = request.data.get('is_day', None)
-        #     is_time = request.data.get('is_time', None)
-        #     is_destination = request.data.get('is_destination', None)
-        #     price_type = request.data.get('price_type', None)
-        #     profit_method = request.data.get('profit_method', None)
+    def create(self, request, *args, **kwargs):
+        try:
+            is_verified = request.data.get('is_verified', None)
+            is_active = request.data.get('is_active', None)
+            is_top_suggestion = request.data.get('is_top_suggestion', None)
+            is_premium = request.data.get('is_premium', None)
+            is_sail_with_activity = request.data.get('is_sail_with_activity', None)
+            type = request.data.get('type', None)
+            name = request.data.get('name', None)
+            machine_id = request.data.get('machine_id', None)
+            description = request.data.get('description', None)
+            lounge = request.data.get('lounge', None)
+            bedroom = request.data.get('bedroom', None)
+            toilet = request.data.get('toilet', None)
+            capacity = request.data.get('capacity', None)
+            pickup_point = request.data.get('pickup_point', None)
+            cancellation_policy = request.data.get('cancellation_policy', None)
+            refund_policy = request.data.get('refund_policy', None)
+            is_duration = request.data.get('is_duration', None)
+            is_date = request.data.get('is_date', None)
+            is_day = request.data.get('is_day', None)
+            is_time = request.data.get('is_time', None)
+            is_destination = request.data.get('is_destination', None)
+            price_type = request.data.get('price_type', None)
+            profit_method = request.data.get('profit_method', None)
             
 
-        #     service_prices = request.data.pop('service_price_service',[])  
-        #     amenities_list = request.data.pop('amenities', None)
-        #     category = request.data.pop('category', [])
-        #     sub_category = request.data.pop('sub_category', [])
+            service_prices = request.data.pop('service_price_service',[])  
+            amenities_list = request.data.pop('amenities', None)
+            category = request.data.pop('category', [])
+            sub_category = request.data.pop('sub_category', [])
+            profit_id = request.data.pop('profit_method',None)
+            price_id = request.data.pop('price_type',None)
+            company_id = request.data.pop('company',None)
 
-        #     service_instance = Service.objects.create(**request.data)
+            company_instance = Company.objects.get(id=company_id)
+            profit_instance = ProfitMethod.objects.get(id=profit_id)
+            price_instance = PriceType.objects.get(id=price_id)
+
+            service_instance = Service.objects.create(company = company_instance,profit_method=profit_instance,price_type=price_instance,**request.data)
 
 
             # if is_verified is not None:
@@ -294,10 +301,10 @@ class ServiceCreate(generics.CreateAPIView):
             #         price_instance.save()
 
             # serializer = self.get_serializer(service_instance)
-        #     return Response("serializer.data")
+            return Response("serializer.data")
 
-        # except Exception as e:
-        #     return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -319,6 +326,7 @@ class ServiceUpdate(generics.UpdateAPIView):
             is_active = request.data.get('is_active', None)
             is_top_suggestion = request.data.get('is_top_suggestion', None)
             is_premium = request.data.get('is_premium', None)
+            is_recommended = request.data.get('is_recommended', None)
             is_sail_with_activity = request.data.get('is_sail_with_activity', None)
             type = request.data.get('type', None)
             name = request.data.get('name', None)
@@ -352,6 +360,9 @@ class ServiceUpdate(generics.UpdateAPIView):
 
             if is_verified is not None:
                 service_instance.is_verified = True if is_verified == 'true' or is_verified == 'True' or is_verified == True else False
+
+            if is_recommended is not None:
+                service_instance.is_recommended = True if is_recommended == 'true' or is_recommended == 'True' or is_recommended == True else False
 
             if is_active is not None:
                 service_instance.is_active = True if is_active == 'true' or is_active == 'True' or is_active == True else False
@@ -947,3 +958,46 @@ class PriceTypeList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = PriceType.objects.all()
     serializer_class = PriceTypeSerializer
+
+class PackageCreateAPIView(generics.CreateAPIView):
+    """for cms side"""
+    queryset = Package.objects.all()
+    serializer_class = PackageSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PackageFilter
+    
+
+    def perform_create(self, serializer):
+      
+        serializer.save()
+
+
+class PackageUpdateAPIView(generics.UpdateAPIView):
+    queryset = Package.objects.all()
+    serializer_class = PackageSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PackageFilter
+    lookup_field = 'id'  
+
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+    
+
+class PackagDeleteAPIView(generics.DestroyAPIView):
+    queryset = Package.objects.all()
+    serializer_class = PackageSerializer
+    lookup_field = 'pk'
+
+
+
+class PackageListAPIView(generics.ListAPIView):
+    queryset = Package.objects.all()
+    serializer_class = PackageSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PackageFilter
+    
