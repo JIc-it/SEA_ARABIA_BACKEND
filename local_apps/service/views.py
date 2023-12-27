@@ -261,7 +261,7 @@ class ServiceImageStatus(generics.UpdateAPIView):
             thumbnail_exist = ServiceImage.objects.filter(
                 service=service_id, is_thumbnail=True).exists()
 
-            if thumbnail_exist:
+            if thumbnail_exist and is_thumbnail == True:
                 return Response("A thumbnail image already exist", status=status.HTTP_400_BAD_REQUEST)
             else:
                 serviceimage_instance.is_thumbnail = is_thumbnail
@@ -651,3 +651,20 @@ class ServiceReviewUpdate(generics.CreateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = ServiceReview.objects.all()
     serializer_class = ServiceReviewSerializer
+
+
+
+class ProfitMethodList(generics.ListAPIView):
+    """ view for listing the Profit Method"""
+    
+    permission_classes = [IsAuthenticated]
+    queryset = ProfitMethod.objects.all()
+    serializer_class = ProfitMethodSerializer
+
+
+class PriceTypeList(generics.ListAPIView):
+    """ view for listing the Price Type"""
+
+    permission_classes = [IsAuthenticated]
+    queryset = PriceType.objects.all()
+    serializer_class = PriceTypeSerializer

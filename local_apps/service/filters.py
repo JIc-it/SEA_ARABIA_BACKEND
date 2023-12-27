@@ -34,11 +34,11 @@ class ServiceFilter(django_filters.FilterSet):
             "is_premium",
             "is_sail_with_activity",
             "is_top_suggestion",
-            "is_recommended",
+            # "is_recommended",
             "company",
             "category",
             "sub_category",
-            "pickup_point",
+            # "pickup_point",
             "amenities",
             "type",
         ]

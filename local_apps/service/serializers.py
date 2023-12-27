@@ -24,64 +24,64 @@ class ProfitMethodSerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 
-class PriceCriterionSerializer(serializers.ModelSerializer):
+class PriceTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PriceCriterion
-        fields = ["id", "name"]
+        model = PriceType
+        fields = ["id", "name","per_ticket",]
 
 
-class DurationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Duration
-        fields = ["id", "time"]
+# class PriceCriterionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = PriceCriterion
+#         fields = ["id", "name"]
 
 
-class PriceListForPriceSerializer(serializers.ModelSerializer):
-    destination = DestinationSerializer(required=False, allow_null=True)
-    duration = DurationSerializer(required=False, allow_null=True)
+# class DurationSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Duration
+        # fields = ["id", "time"]
 
-    class Meta:
-        model = PriceList
-        fields = ['id',
-                  'operation_type',
-                  'destination',
-                  'duration',
-                  'price']
+
+# class PriceListForPriceSerializer(serializers.ModelSerializer):
+#     destination = DestinationSerializer(required=False, allow_null=True)
+#     duration = DurationSerializer(required=False, allow_null=True)
+
+#     class Meta:
+#         model = PriceList
+#         fields = ['id',
+#                   'operation_type',
+#                   'destination',
+#                   'duration',
+#                   'price']
 
 
 class PriceSerializer(serializers.ModelSerializer):
-    profile_method = ProfitMethodSerializer(required=False, allow_null=True)
-    price_criterion = PriceCriterionSerializer(required=False, allow_null=True)
-    duration = DurationSerializer(required=False, allow_null=True)
-    price_list = PriceListForPriceSerializer(required=False, allow_null=True)
-
+    # profile_method = ProfitMethodSerializer(required=False, allow_null=True)
+    # price_criterion = PriceCriterionSerializer(required=False, allow_null=True)
+    # duration = DurationSerializer(required=False, allow_null=True)
+    # price_list = PriceListForPriceSerializer(required=False, allow_null=True)
+    location = serializers.CharField(source = "location.name")
     class Meta:
         model = Price
-        fields = ['id',
-                  'profile_method',
-                  'price_criterion',
-                  'price_per',
-                  'price',
-                  'sea_arabia_percentage',
-                  'vendor_percentage',
-                  'markup_fee',
-                  'price_list',
-                  'duration']
+        fields = ['id',"service", "is_active", "name", "price", "is_range", "location",
+            "duration_hour", "duration_minute", "time",
+            "end_time", "day", "end_day", "date", "end_date"
+            ]
 
 
-class PriceListSerializer(serializers.ModelSerializer):
-    price_map = PriceSerializer(required=False, allow_null=True)
-    destination = DestinationSerializer(required=False, allow_null=True)
-    duration = DurationSerializer(required=False, allow_null=True)
+# class PriceListSerializer(serializers.ModelSerializer):
+#     price_map = PriceSerializer(required=False, allow_null=True)
+#     destination = DestinationSerializer(required=False, allow_null=True)
+#     duration = DurationSerializer(required=False, allow_null=True)
 
-    class Meta:
-        model = PriceList
-        fields = ['id',
-                  'price_map',
-                  'operation_type',
-                  'destination',
-                  'duration',
-                  'price']
+#     class Meta:
+#         model = PriceList
+#         fields = ['id',
+#                   'price_map',
+#                   'operation_type',
+#                   'destination',
+#                   'duration',
+#                   'price']
 
 
 class ServiceImageSerializer(serializers.ModelSerializer):
@@ -108,7 +108,7 @@ class ServiceCategorySerializer(serializers.ModelSerializer):
 
 
 class ServiceSerializer(serializers.ModelSerializer):
-    price = PriceSerializer(required=False, allow_null=True)
+    service_price_service = PriceSerializer(allow_null=True,many=True)
     service_image = ServiceImageSerializer(
         many=True, required=False, allow_null=True)
     # company = ServiceCompanySerializer(required=False, allow_null=True)
@@ -117,6 +117,10 @@ class ServiceSerializer(serializers.ModelSerializer):
     sub_category = SubCategorySerializer(
         many=True, required=False, allow_null=True)
     is_bookmarked = serializers.SerializerMethodField()
+    company = serializers.CharField(source = "company.name")
+    price_type = serializers.CharField(source = "price_type.name")
+    profit_method = serializers.CharField(source = "profit_method.name")
+
 
     class Meta:
         model = Service
@@ -127,7 +131,7 @@ class ServiceSerializer(serializers.ModelSerializer):
                   'is_premium',
                   'is_bookmarked',
                   'is_sail_with_activity',
-                  'is_recommended',
+                #   'is_recommended',
                   'type',
                   'name',
                   'machine_id',
@@ -136,7 +140,7 @@ class ServiceSerializer(serializers.ModelSerializer):
                   'bedroom',
                   'toilet',
                   'capacity',
-                  'pickup_point',
+                #   'pickup_point',
                   'cancellation_policy',
                   'refund_policy',
                   'service_image',
@@ -145,8 +149,15 @@ class ServiceSerializer(serializers.ModelSerializer):
                   'amenities',
                   'sub_category',
                   'service_image',
-                  'price',
-                  "status"
+                #   'price',
+                  "is_duration",
+                  "is_date",
+                  "is_day",
+                  "is_time",
+                  "is_destination",
+                  "price_type",
+                  "profit_method",
+                  "service_price_service",
                   ]
 
     def get_is_bookmarked(self, obj):

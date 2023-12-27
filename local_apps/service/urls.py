@@ -156,6 +156,12 @@ urlpatterns = [
     path('service_availablitytime_update/<uuid:pk>',
          ServiceAvailablityTimeUpdate.as_view(), name='service_availablitytime_update'),
 
+    path('profit-method-list',
+         ProfitMethodList.as_view(), name='profit_method_list'),
+
+    path('price-type-list',
+         PriceTypeList.as_view(), name='price_type_list'),
+
     # service listing for app side
     
     path('service-listapp',
