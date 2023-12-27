@@ -446,7 +446,7 @@ class ServiceTopSuggestion(generics.ListAPIView):
     """ views for top suggestions & top activites   """
 
     queryset = Service.objects.filter(is_top_suggestion=True)
-    serializer_class = ExploreMoreSerializer
+    serializer_class = ServiceSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ServiceFilter
 
@@ -465,7 +465,7 @@ class ExploreMore(generics.ListAPIView):
 
     # permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
-    serializer_class = ExploreMoreSerializer
+    serializer_class = ServiceSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ServiceFilter
 

@@ -111,7 +111,7 @@ class PackageFilter(django_filters.FilterSet):
         model = Package
         fields = [
             "is_active",
-            " name",
-            " type",
+            "name",
+            "type",
             
         ]
