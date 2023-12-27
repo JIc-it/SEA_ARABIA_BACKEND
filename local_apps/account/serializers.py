@@ -76,6 +76,7 @@ class VendorDetailsSerializer(serializers.ModelSerializer):
             "company_address",
             "company_website",
             "status",
+            "account_id",
         ]
 
 

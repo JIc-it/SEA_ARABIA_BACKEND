@@ -156,12 +156,6 @@ urlpatterns = [
     path('service_availablitytime_update/<uuid:pk>',
          ServiceAvailablityTimeUpdate.as_view(), name='service_availablitytime_update'),
 
-    path('profit-method-list',
-         ProfitMethodList.as_view(), name='profit_method_list'),
-
-    path('price-type-list',
-         PriceTypeList.as_view(), name='price_type_list'),
-
     # service listing for app side
     
     path('service-listapp',
@@ -170,7 +164,21 @@ urlpatterns = [
     path('export-service-list', ExportServiceCSVView.as_view(),
          name='export-service-list'),
 
+    # Package listing for cms side
 
+    path('package-create',
+         PackageCreateAPIView.as_view(), name='package-create'),
+    
+    path('package-update/<uuid:pk>',
+         PackageUpdateAPIView.as_view(), name='package-update'),
+
+    path('package-remove/<uuid:pk>',
+         PackagDeleteAPIView.as_view(), name='package-remove'),
+
+    path('package-list',
+         PackageListAPIView.as_view(), name='package-list'),
+
+    
 
 ]
 
