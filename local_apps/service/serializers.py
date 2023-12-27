@@ -271,11 +271,12 @@ class ServiceAvailabilitySerializer(serializers.ModelSerializer):
 
 
 class PackageSerializer(serializers.ModelSerializer):
-    """for combopackeges"""
+    """for combo package listing"""
+    service = ServiceSerializer() 
+
     class Meta:
         model = Package
-        fields = ['id','is_active', 'service', 'name',
-                  'short_description', 'capacity', 'image', 'price']
+        fields = ['id', 'is_active', 'service', 'name', 'short_description', 'capacity', 'image', 'price']
 
 
 class ServiceListSerializer(serializers.ModelSerializer):
