@@ -653,18 +653,45 @@ class ServiceReviewUpdate(generics.CreateAPIView):
     serializer_class = ServiceReviewSerializer
 
 
-
-class ProfitMethodList(generics.ListAPIView):
-    """ view for listing the Profit Method"""
+class PackageCreateAPIView(generics.CreateAPIView):
+    """for cms side"""
+    queryset = Package.objects.all()
+    serializer_class = PackageSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PackageFilter
     
-    permission_classes = [IsAuthenticated]
-    queryset = ProfitMethod.objects.all()
-    serializer_class = ProfitMethodSerializer
+
+    def perform_create(self, serializer):
+      
+        serializer.save()
 
 
-class PriceTypeList(generics.ListAPIView):
-    """ view for listing the Price Type"""
+class PackageUpdateAPIView(generics.UpdateAPIView):
+    queryset = Package.objects.all()
+    serializer_class = PackageSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PackageFilter
+    lookup_field = 'id'  
 
-    permission_classes = [IsAuthenticated]
-    queryset = PriceType.objects.all()
-    serializer_class = PriceTypeSerializer
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+    
+
+class PackagDeleteAPIView(generics.DestroyAPIView):
+    queryset = Package.objects.all()
+    serializer_class = PackageSerializer
+    lookup_field = 'pk'
+
+
+
+class PackageListAPIView(generics.ListAPIView):
+    queryset = Package.objects.all()
+    serializer_class = PackageSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PackageFilter
+    

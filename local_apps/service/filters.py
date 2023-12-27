@@ -105,3 +105,13 @@ class ServiceReviewFilter(django_filters.FilterSet):
         ]
 
 
+
+class PackageFilter(django_filters.FilterSet):
+    class Meat:
+        model = Package
+        fields = [
+            "is_active",
+            " name",
+            " type",
+            
+        ]

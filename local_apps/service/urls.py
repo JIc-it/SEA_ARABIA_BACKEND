@@ -170,6 +170,25 @@ urlpatterns = [
     path('export-service-list', ExportServiceCSVView.as_view(),
          name='export-service-list'),
 
+    # Package listing for cms side
+
+    path('package-create',
+         PackageCreateAPIView.as_view(), name='package-create'),
+    
+    path('package-update/<uuid:pk>',
+         PackageUpdateAPIView.as_view(), name='package-update'),
+
+    path('package-remove/<uuid:pk>',
+         PackagDeleteAPIView.as_view(), name='package-remove'),
+
+    path('package-list',
+         PackageListAPIView.as_view(), name='package-list'),
+
+
+
+
+
+    
 
 
 ]
