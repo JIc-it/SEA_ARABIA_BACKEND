@@ -1036,7 +1036,7 @@ class UpdateAvailabilityView(generics.UpdateAPIView):
             service_availability_instance.all_slots_available = True
             service_availability_instance.save()
 
-        elif update_type == 'by_time':
+        elif update_type == 'time':
             # Handle by_time logic
             time = int(request.query_params.get('time', 0))
             date_str = self.kwargs.get('date')
