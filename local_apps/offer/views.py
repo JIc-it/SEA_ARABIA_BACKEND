@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 # Create your views here.
 from rest_framework import generics, status
 from .models import Offer
@@ -9,11 +10,18 @@ from rest_framework.response import Response
 from local_apps.service.models import Service
 from local_apps.company.models import Company
 from rest_framework.views import APIView
+from .filters import OfferFilter
 
 
 class AdminOfferListView(generics.ListAPIView):
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = [
+        "name",
+        "coupon_code",
+    ]
+    filterset_class = OfferFilter
 
 
 class BeastDealsOfferListView(generics.ListAPIView):
