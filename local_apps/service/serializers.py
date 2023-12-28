@@ -27,7 +27,7 @@ class ProfitMethodSerializer(serializers.ModelSerializer):
 class PriceTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = PriceType
-        fields = ["id", "name","per_ticket",]
+        fields = ["id", "name", "per_ticket",]
 
 
 # class PriceCriterionSerializer(serializers.ModelSerializer):
@@ -60,13 +60,14 @@ class PriceSerializer(serializers.ModelSerializer):
     # price_criterion = PriceCriterionSerializer(required=False, allow_null=True)
     # duration = DurationSerializer(required=False, allow_null=True)
     # price_list = PriceListForPriceSerializer(required=False, allow_null=True)
-    location = serializers.CharField(source = "location.name")
+    location = serializers.CharField(source="location.name")
+
     class Meta:
         model = Price
-        fields = ['id',"service", "is_active", "name", "price", "is_range", "location",
-            "duration_hour", "duration_minute", "duration_day","time",
-            "end_time", "day", "end_day", "date", "end_date"
-            ]
+        fields = ['id', "service", "is_active", "name", "price", "is_range", "location",
+                  "duration_hour", "duration_minute", "duration_day", "time",
+                  "end_time", "day", "end_day", "date", "end_date"
+                  ]
 
 
 # class PriceListSerializer(serializers.ModelSerializer):
@@ -108,7 +109,8 @@ class ServiceCategorySerializer(serializers.ModelSerializer):
 
 
 class ServiceSerializer(serializers.ModelSerializer):
-    service_price_service = PriceSerializer(allow_null=True,many=True,required=False)
+    service_price_service = PriceSerializer(
+        allow_null=True, many=True, required=False)
     service_image = ServiceImageSerializer(
         many=True, required=False, allow_null=True)
     # company = ServiceCompanySerializer(required=False, allow_null=True)
@@ -117,10 +119,9 @@ class ServiceSerializer(serializers.ModelSerializer):
     sub_category = SubCategorySerializer(
         many=True, required=False, allow_null=True)
     is_bookmarked = serializers.SerializerMethodField()
-    company = serializers.CharField(source = "company.name")
-    price_type = serializers.CharField(source = "price_type.name")
-    profit_method = serializers.CharField(source = "profit_method.name")
-
+    company = serializers.CharField(source="company.name")
+    price_type = serializers.CharField(source="price_type.name")
+    profit_method = serializers.CharField(source="profit_method.name")
 
     class Meta:
         model = Service
@@ -271,11 +272,12 @@ class ServiceAvailabilitySerializer(serializers.ModelSerializer):
 
 class PackageSerializer(serializers.ModelSerializer):
     """for combo package listing"""
-    service = ServiceSerializer() 
+    service = ServiceSerializer()
 
     class Meta:
         model = Package
-        fields = ['id', 'is_active', 'service', 'name', 'short_description', 'capacity', 'image', 'price']
+        fields = ['id', 'is_active', 'service', 'name',
+                  'short_description', 'capacity', 'image', 'price']
 
 
 class ServiceListSerializer(serializers.ModelSerializer):
@@ -302,7 +304,6 @@ class ServiceListSerializer(serializers.ModelSerializer):
             "category",
             "sub_category",
             "name",
-            "status",
             "total_booking"
         ]
 
@@ -344,12 +345,9 @@ class ServiceListExportResource(resources.ModelResource):
         export_order = fields
 
 
-
-
-
 # class ProfitMethodList(generics.ListAPIView):
 #     """ view for listing the Profit Method"""
-    
+
 #     permission_classes = [IsAuthenticated]
 #     queryset = ProfitMethod.objects.all()
 #     serializer_class = ProfitMethodSerializer
