@@ -71,6 +71,24 @@ class CompanyUpdate(generics.UpdateAPIView):
     serializer_class = CompanySerializer
 
 
+class CompanyActiveUpdate(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Company.objects.all()
+    serializer_class = CompanySerializer
+
+    def update(self, request, *args, **kwargs):
+        try:
+            company = Company.objects.get(pk=kwargs['pk'])
+            active_status = request.data.get('status', None)
+            if active_status:
+                company.is_active = True if active_status == True or active_status == 'True' or active_status == 'true' else False
+            company.save()
+            serializer = CompanySerializer(company)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 # Miscellaneous Types Views
 
 

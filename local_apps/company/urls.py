@@ -1,7 +1,6 @@
 from django.urls import path
 from .views import *
 
-
 urlpatterns = [
     #   ServiceTag urls
     path("servicetag-list", ServiceTagList.as_view(), name="servicetag-list"),
@@ -16,17 +15,19 @@ urlpatterns = [
     path("company-update/<uuid:pk>", CompanyUpdate.as_view(),
          name="companydetails-update"),
 
+    path("company-active-update/<uuid:pk>", CompanyActiveUpdate.as_view(), name="company-active-update"),
+
     #   Miscellaneous urls
     path(
         "miscellaneoustype-list", MiscellaneousTypeList.as_view(), name="miscellaneoustype-list"),
     path("miscellaneous-list/", MiscellaneousList.as_view(),
          name="miscellaneous-list"),
     path("miscellaneous-create/", MiscellaneousCreate.as_view(),
-         name="miscellaneous-create",),
+         name="miscellaneous-create", ),
     path("miscellaneous-view/<uuid:pk>",
-         MiscellaneousView.as_view(), name="miscellaneous-view",),
+         MiscellaneousView.as_view(), name="miscellaneous-view", ),
     path("miscellaneous-update/<uuid:pk>",
-         MiscellaneousUpdate.as_view(), name="miscellaneous-update",),
+         MiscellaneousUpdate.as_view(), name="miscellaneous-update", ),
 
     # qualifications list
     path("qualification-list", QualificationsList.as_view(),
@@ -52,7 +53,7 @@ urlpatterns = [
     path("negotation-view/<uuid:pk>",
          NegotiationView.as_view(), name="negotation-view"),
     path("negotation-update/<uuid:pk>",
-         NegotiationUpdate.as_view(), name="negotation-update",),
+         NegotiationUpdate.as_view(), name="negotation-update", ),
     # MOUorCharter urls
     path("mou-list/", MOUorCharterList.as_view(), name="mou-list"),
     path("mou-create/", MOUorCharterCreate.as_view(), name="mou-create"),
@@ -63,7 +64,6 @@ urlpatterns = [
 
     path("onboard-vendor/<uuid:pk>",
          OnboardVendor.as_view(), name="onboard-vendor"),
-
 
     path("companycms-list", CompanyListCms.as_view(), name="companycms-list"),
 
