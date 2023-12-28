@@ -995,8 +995,8 @@ class PackageListAPIView(generics.ListAPIView):
 class UpdateAvailabilityView(generics.UpdateAPIView):
     serializer_class = ServiceAvailabilitySerializer
 
-    def update(self, request, args, *kwargs):
-        service_id = self.kwargs['service']
+    def update(self, request, *args, **kwargs):
+        service_id = kwargs['service']
         update_type = request.query_params.get('update_type', None)
 
         # Retrieve the Service instance based on the provided UUID

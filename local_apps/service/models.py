@@ -270,7 +270,7 @@ class ServiceAvailability(Main):
     def __str__(self):
         return self.service.name
 
-    def save(self, args, *kwargs):
+    def save(self, *args, **kwargs):
         if self.all_slots_available:
             self.time = default_true_time_slot()
 
