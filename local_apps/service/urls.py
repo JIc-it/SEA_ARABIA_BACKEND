@@ -147,6 +147,9 @@ urlpatterns = [
     path('service-booking-availability/<uuid:service>/<str:date>/',
          AdminServiceBookingAvailabilityList.as_view(), name='service-booking-availability'),
 
+    path('update-availability/<uuid:service>/<str:date>/',
+         UpdateAvailabilityView.as_view(), name='mark-availability'),
+
     path('service-filter-list-cms',
          ServiceFilterAdminList.as_view(), name='service-filter-list-cms'),
 
@@ -183,4 +186,5 @@ urlpatterns = [
 
     path('profit-method-list',
          ProfitMethodList.as_view(), name='profit-method-list'),
+
 ]

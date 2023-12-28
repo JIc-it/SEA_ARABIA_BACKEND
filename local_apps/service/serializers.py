@@ -27,7 +27,7 @@ class ProfitMethodSerializer(serializers.ModelSerializer):
 class PriceTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = PriceType
-        fields = ["id", "name", "per_ticket",]
+        fields = ["id", "name", "per_ticket", ]
 
 
 # class PriceCriterionSerializer(serializers.ModelSerializer):
@@ -39,7 +39,7 @@ class PriceTypeSerializer(serializers.ModelSerializer):
 # class DurationSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Duration
-        # fields = ["id", "time"]
+# fields = ["id", "time"]
 
 
 # class PriceListForPriceSerializer(serializers.ModelSerializer):
@@ -267,7 +267,7 @@ class ServiceAvailabilitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ServiceAvailability
-        fields = ["id", "service", "date", "time", "created_at", "updated_at"]
+        fields = ["id", "service", "date", "time", "all_slots_available", "created_at"]
 
 
 class PackageSerializer(serializers.ModelSerializer):
@@ -343,7 +343,6 @@ class ServiceListExportResource(resources.ModelResource):
         ]
 
         export_order = fields
-
 
 # class ProfitMethodList(generics.ListAPIView):
 #     """ view for listing the Profit Method"""

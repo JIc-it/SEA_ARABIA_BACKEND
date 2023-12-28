@@ -990,3 +990,103 @@ class PackageListAPIView(generics.ListAPIView):
     serializer_class = PackageSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = PackageFilter
+
+
+class UpdateAvailabilityView(generics.UpdateAPIView):
+    serializer_class = ServiceAvailabilitySerializer
+
+    def update(self, request, args, *kwargs):
+        service_id = self.kwargs['service']
+        update_type = request.query_params.get('update_type', None)
+
+        # Retrieve the Service instance based on the provided UUID
+        service_instance = Service.objects.get(id=service_id)
+
+        date_str = self.kwargs.get('date')
+        try:
+            date_obj = datetime.strptime(date_str, "%d-%m-%Y").date()
+        except ValueError:
+            return Response({"error": f"Invalid date format for {date_str}. "
+                                      f"Use DD-MM-YYYY."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # Use get_or_create to retrieve or create the ServiceAvailability instance
+        service_availability_instance, created = (ServiceAvailability.objects.get_or_create
+                                                  (service=service_instance, date=date_obj))
+
+        if update_type == 'all':
+            # Handle by_duration logic
+            date_str = self.kwargs.get('date')
+            try:
+                date_obj = datetime.strptime(date_str, "%d-%m-%Y").date()
+            except ValueError:
+                return Response({"error": f"Invalid date format for {date_str}. "
+                                          f"Use DD-MM-YYYY."},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                service_availability_instance = (ServiceAvailability.objects.get
+                                                 (service=service_instance, date=date_obj))
+            except ServiceAvailability.DoesNotExist:
+                return Response({"error": f"Service availability not found for "
+                                          f"{date_str}."},
+                                status=status.HTTP_404_NOT_FOUND)
+
+            service_availability_instance.time = default_true_time_slot()
+            service_availability_instance.all_slots_available = True
+            service_availability_instance.save()
+
+        elif update_type == 'by_time':
+            # Handle by_time logic
+            time = int(request.query_params.get('time', 0))
+            date_str = self.kwargs.get('date')
+            try:
+                date_obj = datetime.strptime(date_str, "%d-%m-%Y").date()
+            except ValueError:
+                return Response({"error": f"Invalid date format for {date_str}. "
+                                          f"Use DD-MM-YYYY."},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                service_availability_instance = (ServiceAvailability.objects.get
+                                                 (service=service_instance, date=date_obj))
+            except ServiceAvailability.DoesNotExist:
+                return Response({"error": f"Service availability not found for "
+                                          f"{date_str}."},
+                                status=status.HTTP_404_NOT_FOUND)
+
+            # Update the availability for the specific time
+            for slot in service_availability_instance.time:
+                if slot['time'] == time:
+                    slot['make_slot_available'] = True
+
+            service_availability_instance.save()
+
+        elif update_type == 'date':
+            # Handle by_duration logic
+            date_str = self.kwargs.get('date')
+            try:
+                date_obj = datetime.strptime(date_str, "%d-%m-%Y").date()
+            except ValueError:
+                return Response({"error": f"Invalid date format for {date_str}. "
+                                          f"Use DD-MM-YYYY."},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                service_availability_instance = (ServiceAvailability.objects.get
+                                                 (service=service_instance, date=date_obj))
+            except ServiceAvailability.DoesNotExist:
+                return Response({"error": f"Service availability not found for "
+                                          f"{date_str}."},
+                                status=status.HTTP_404_NOT_FOUND)
+
+            service_availability_instance.time = default_true_time_slot()
+            service_availability_instance.all_slots_available = True
+            service_availability_instance.save()
+
+        else:
+            return Response({"error": "Invalid update_type"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"message": "Availability updated successfully"},
+                        status=status.HTTP_201_CREATED)
