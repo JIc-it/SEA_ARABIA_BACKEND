@@ -157,7 +157,7 @@ urlpatterns = [
          ServiceAvailablityTimeUpdate.as_view(), name='service_availablitytime_update'),
 
     # service listing for app side
-    
+
     path('service-listapp',
          ServiceListApp.as_view(), name='service-listapp'),
 
@@ -168,7 +168,7 @@ urlpatterns = [
 
     path('package-create',
          PackageCreateAPIView.as_view(), name='package-create'),
-    
+
     path('package-update/<uuid:pk>',
          PackageUpdateAPIView.as_view(), name='package-update'),
 
@@ -184,4 +184,3 @@ urlpatterns = [
     path('profit-method-list',
          ProfitMethodList.as_view(), name='profit-method-list'),
 ]
-
