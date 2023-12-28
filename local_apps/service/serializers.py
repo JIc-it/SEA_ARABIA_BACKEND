@@ -232,6 +232,7 @@ class ServiceReviewListSerializer(serializers.ModelSerializer):
 
     service = serializers.CharField(source="service.name")
     user = serializers.CharField(source="user.first_name")
+    created_at = serializers.SerializerMethodField()
 
     class Meta:
         model = ServiceReview
@@ -241,7 +242,11 @@ class ServiceReviewListSerializer(serializers.ModelSerializer):
             "review_title",
             "review_summary",
             "rating",
+            "created_at"
         ]
+
+    def get_created_at(self, obj):
+        return obj.created_at.date().isoformat()
 
     # def get_is_bookmarked(self, obj):
     #     request = self.context.get('request')
@@ -267,7 +272,8 @@ class ServiceAvailabilitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ServiceAvailability
-        fields = ["id", "service", "date", "time", "all_slots_available", "created_at"]
+        fields = ["id", "service", "date", "time",
+                  "all_slots_available", "created_at"]
 
 
 class PackageSerializer(serializers.ModelSerializer):

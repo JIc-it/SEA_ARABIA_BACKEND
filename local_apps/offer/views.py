@@ -16,7 +16,7 @@ from .filters import OfferFilter
 class AdminOfferListView(generics.ListAPIView):
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer
-    filter_backends = [SearchFilter]
+    filter_backends = [DjangoFilterBackend,SearchFilter]
     search_fields = [
         "name",
         "coupon_code",
@@ -27,6 +27,8 @@ class AdminOfferListView(generics.ListAPIView):
 class BeastDealsOfferListView(generics.ListAPIView):
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_class = OfferFilter
 
     def get_queryset(self):
         try:
