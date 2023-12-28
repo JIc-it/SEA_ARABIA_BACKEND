@@ -1,10 +1,10 @@
+import re
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-
 from .models import *
 from .serializers import *
 from local_apps.company.filters import CompanyFilter
@@ -20,12 +20,107 @@ from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.db.models import Count, Q, Case, When, IntegerField, Sum
 import datetime
-
 from django.contrib.auth import authenticate, login
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from django.http import HttpResponse
+import requests
+from urllib.parse import unquote, quote
+import secrets
+import string
+
+# Google OAuth 2.0 configuration
+GOOGLE_CLIENT_ID = '28175996828-ls8r9c9l27r7kfvj28tv0ijrhgujt296.apps.googleusercontent.com'
+GOOGLE_CLIENT_SECRET = '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'
+GOOGLE_REDIRECT_URI = 'http://localhost:8888/google_callback'
+
+GOOGLE_AUTHORIZATION_URL = 'https://accounts.google.com/o/oauth2/auth'
+GOOGLE_TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
+GOOGLE_USER_INFO_URL = 'https://www.googleapis.com/oauth2/v1/userinfo'
+scopes = ['email', 'profile', 'https://www.googleapis.com/auth/user.phonenumbers.read']
+scope_quoted = quote(" ".join(scopes))
+
+
+def generate_random_password(length=12):
+    # Define the characters to include in the password
+    characters = string.ascii_letters + string.digits + string.punctuation
+
+    # Use secrets.choice to select random characters for the password
+    password = ''.join(secrets.choice(characters) for _ in range(length))
+
+    return password
+
+
+def validate_gmail(email):
+    # Define the regular expression for a Gmail email address
+    pattern = re.compile(r'^[a-zA-Z0-9_.+-]+@gmail\.com$')
+
+    # Use the match() method to check if the email matches the pattern
+    match = pattern.match(email)
+
+    # Return True if the email is a valid Gmail address, otherwise False
+    return bool(match)
+
+
+class GoogleAuth(APIView):
+    def get(self, request):
+        try:
+            authorization_url = (
+                f'{GOOGLE_AUTHORIZATION_URL}?client_id={GOOGLE_CLIENT_ID}'
+                f'&redirect_uri={GOOGLE_REDIRECT_URI}&response_type=code&scope=email'
+            )
+            return Response(authorization_url, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        try:
+            code = request.data.get('code', None)
+            if code:
+                auth_code = unquote(code)
+                token_data = {
+                    'code': auth_code,
+                    'client_id': GOOGLE_CLIENT_ID,
+                    'client_secret': GOOGLE_CLIENT_SECRET,
+                    'redirect_uri': GOOGLE_REDIRECT_URI,
+                    'grant_type': 'authorization_code'
+                }
+                token_response = requests.post(GOOGLE_TOKEN_URL, data=token_data)
+                token_info = token_response.json()
+                user_info_response = requests.get(
+                    GOOGLE_USER_INFO_URL, headers={'Authorization': f'Bearer {token_info["access_token"]}'}
+                )
+                user_info = user_info_response.json()
+                email = user_info['email']
+                first_name = user_info['name']
+                last_name = user_info['family_name']
+
+                if validate_gmail(email):
+                    if User.objects.filter(email=email).exists():
+                        user = User.objects.get(email=email)
+                        refresh = RefreshToken.for_user(user)
+                        access_token = str(refresh.access_token)
+                        refresh_token = str(refresh)
+                        return Response({'access': access_token, 'refresh': refresh_token}, status=status.HTTP_200_OK)
+                    else:
+                        user = User.objects.create_user(first_name=first_name,
+                                                        last_name=last_name,
+                                                        email=email,
+                                                        role='User',
+                                                        password=generate_random_password())
+                        refresh = RefreshToken.for_user(user)
+                        access_token = str(refresh.access_token)
+                        refresh_token = str(refresh)
+                        return Response({'access': access_token, 'refresh': refresh_token},
+                                        status=status.HTTP_201_CREATED)
+                else:
+                    raise Exception('Invalid gmail address found')
+            else:
+                raise Exception('Code must be provided')
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 # custom Auth
 
@@ -346,7 +441,7 @@ class RequestOTPView(APIView):
                 )
                 return Response(
                     {"detail": "OTP sent successfully.",
-                        "user_id": str(user.id)},
+                     "user_id": str(user.id)},
                     status=status.HTTP_200_OK,
                 )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -532,7 +627,6 @@ class BookMarkCreationAPI(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-
         serializer.save(user=self.request.user)
 
 
@@ -551,7 +645,6 @@ class BookMarkListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-
         return Bookmark.objects.filter(user=self.request.user)
 
 
