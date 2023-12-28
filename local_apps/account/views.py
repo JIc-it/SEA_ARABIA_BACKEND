@@ -67,7 +67,7 @@ class GoogleAuth(APIView):
         try:
             authorization_url = (
                 f'{GOOGLE_AUTHORIZATION_URL}?client_id={GOOGLE_CLIENT_ID}'
-                f'&redirect_uri={GOOGLE_REDIRECT_URI}&response_type=code&scope=email'
+                f'&redirect_uri={GOOGLE_REDIRECT_URI}&response_type=code&scope={scope_quoted}'
             )
             return Response(authorization_url, status=status.HTTP_200_OK)
         except Exception as e:
@@ -92,7 +92,7 @@ class GoogleAuth(APIView):
                 )
                 user_info = user_info_response.json()
                 email = user_info['email']
-                first_name = user_info['name']
+                first_name = user_info['given_name']
                 last_name = user_info['family_name']
 
                 if validate_gmail(email):
