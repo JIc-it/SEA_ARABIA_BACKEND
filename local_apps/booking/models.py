@@ -112,4 +112,41 @@ class Booking(Main):
         verbose_name_plural = 'Bookings'
 
     def __str__(self):
-        return self.booking_id 
+        return self.booking_id
+
+    def save(self, *args, **kwargs):
+        temp_price = self.price.price if self.price and self.price.price else 0
+        offer_amount = 0
+
+        if self.booking_item in ['Activity', 'Service']:
+            redeem_temp = False
+            if self.offer.redemption_type in ['One-Time', 'Limited-Number']:
+                if self.offer.redemption_type == 'One-Time' and self.offer.redeem_count < 1:
+                    redeem_temp = True
+                elif self.offer.redemption_type == 'Limited-Number' and self.offer.specify_no >= self.offer.redeem_count:
+                    redeem_temp = True
+            else:
+                redeem_temp = True
+            if self.price and self.offer and redeem_temp:
+                if self.offer.discount_type == 'Percentage':
+                    offer_amount = (temp_price * self.offer.discount_value) / 100
+                    if offer_amount >= self.offer.up_to_amount:
+                        offer_amount = self.offer.up_to_amount
+                else:
+                    offer_amount = self.offer.discount_value
+                if self.offer.purchase_requirement and self.offer.min_purchase_amount <= temp_price:
+                    self.price_total = temp_price - offer_amount
+                else:
+                    self.price_total = temp_price
+            else:
+                self.price_total = self.price if self.price and self.price.price else 0
+        elif self.booking_item in ['Package', 'Event']:
+            self.price_total = self.package.price if self.package and self.package.price else 0
+        else:
+            self.price_total = 0
+
+        if self.offer:
+            self.offer.redeem_count = self.offer.redeem_count + 1
+            self.offer.save()
+
+        super(Booking, self).save(*args, **kwargs)
