@@ -262,6 +262,7 @@ class AllUserDetailsSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             "id",
+            "account_id",
             "email",
             "mobile",
             "role",
