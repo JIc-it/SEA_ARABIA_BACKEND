@@ -271,6 +271,7 @@ class AllUserDetailsSerializer(serializers.ModelSerializer):
             "company_company_user",
             "profileextra",
             "status",
+            "is_active"
         ]
 # ----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
 # usersignup
@@ -367,9 +368,12 @@ class GuestSerializer(serializers.ModelSerializer):
 
 
 class VendorListExport(resources.ModelResource):
-    created_by = resources.Field(column_name='created_by', attribute='company_company_user__created_by__first_name')
-    location = resources.Field(column_name='location', attribute='profileextra__location')
-    status = resources.Field(column_name='status', attribute='company_company_user__status')
+    created_by = resources.Field(
+        column_name='created_by', attribute='company_company_user__created_by__first_name')
+    location = resources.Field(
+        column_name='location', attribute='profileextra__location')
+    status = resources.Field(column_name='status',
+                             attribute='company_company_user__status')
 
     class Meta:
         model = User
@@ -388,9 +392,11 @@ class VendorListExport(resources.ModelResource):
 
 
 class CustomerListExport(resources.ModelResource):
-    location = resources.Field(column_name='location', attribute='profileextra__location')
+    location = resources.Field(
+        column_name='location', attribute='profileextra__location')
     status = resources.Field(column_name='status', attribute='is_active')
-    bookings = resources.Field(column_name='bookings', attribute='booking_booking_user')
+    bookings = resources.Field(
+        column_name='bookings', attribute='booking_booking_user')
 
     # def dehydrate_bookings_count(self, user):
     #     return user.booking_booking_user.count()
@@ -437,9 +443,11 @@ class GuestsListExport(resources.ModelResource):
 
 
 class OnboardVendorsListExport(resources.ModelResource):
-    location = resources.Field(column_name='location', attribute='profileextra__location')
+    location = resources.Field(
+        column_name='location', attribute='profileextra__location')
     status = resources.Field(column_name='status', attribute='is_active')
-    bookings = resources.Field(column_name='bookings', attribute='booking_booking_user')
+    bookings = resources.Field(
+        column_name='bookings', attribute='booking_booking_user')
 
     class Meta:
         model = User
@@ -466,4 +474,3 @@ class OnboardVendorsListExport(resources.ModelResource):
 
     def calculate_booking_count(self, user):
         return Booking.objects.filter(user=user).count()
-
