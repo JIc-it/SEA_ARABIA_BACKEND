@@ -1,16 +1,23 @@
 import django_filters
 from .models import Offer
 
-
 class OfferFilter(django_filters.FilterSet):
-    expiry_start_date = django_filters.CharFilter(
+    expiry_start_date = django_filters.DateFilter(
         field_name='end_date',
         lookup_expr='gte',
+        label='Expiry Start Date (greater than or equal to)'
     )
 
-    expiry_end_date = django_filters.CharFilter(
+    expiry_end_date = django_filters.DateFilter(
         field_name='end_date',
         lookup_expr='lte',
+        label='Expiry End Date (less than or equal to)'
+    )
+
+    name = django_filters.CharFilter(
+        field_name='name',
+        lookup_expr='icontains',
+        label='Name contains'
     )
 
     is_enable = django_filters.Filter(
@@ -29,5 +36,7 @@ class OfferFilter(django_filters.FilterSet):
         fields = [
             'is_enable',
             'expiry_start_date',
-            'expiry_end_date'
+            'expiry_end_date',
+            'name',
+            
         ]
