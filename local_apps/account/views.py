@@ -747,7 +747,7 @@ class GuestUserList(generics.ListAPIView):
 class ExportVendorCSVView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         queryset = User.objects.filter(
-            role="Vendor", company_company_user__is_onboard=False)
+            role="Vendor")
         resource = VendorListExport()
 
         dataset = resource.export(queryset)
