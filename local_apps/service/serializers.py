@@ -4,6 +4,7 @@ from local_apps.account.models import Bookmark
 from local_apps.main.serializers import *
 from local_apps.booking.models import Booking
 from import_export import resources, fields, widgets
+from django.db.models import Avg
 
 
 class DestinationSerializer(serializers.ModelSerializer):
@@ -250,6 +251,8 @@ class ServiceReviewListSerializer(serializers.ModelSerializer):
     service = serializers.CharField(source="service.name")
     user = serializers.CharField(source="user.first_name")
     created_at = serializers.SerializerMethodField()
+    star_rating = serializers.SerializerMethodField()
+
 
     class Meta:
         model = ServiceReview
@@ -260,10 +263,19 @@ class ServiceReviewListSerializer(serializers.ModelSerializer):
             "review_summary",
             "rating",
             "created_at"
+            "star_rating",
         ]
 
     def get_created_at(self, obj):
         return obj.created_at.date().isoformat()
+    
+    """for star rating count"""
+    
+    def get_star_rating(self, obj):
+        service = obj.service
+        star_rating = ServiceReview.objects.filter(service=service).aggregate(Avg('rating'))['rating__avg']
+        return round(star_rating, 2) if star_rating else None
+
 
     # def get_is_bookmarked(self, obj):
     #     request = self.context.get('request')

@@ -813,7 +813,7 @@ class ServiceReviewCreate(generics.CreateAPIView):
 class ServiceReviewListApp(generics.ListAPIView):
     """view for review"""
     queryset = ServiceReview.objects.all()
-    serializer_class = ServiceReviewSerializer
+    serializer_class = ServiceReviewListSerializer
     lookup_field = 'pk'
 
     def get_queryset(self):
