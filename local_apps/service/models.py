@@ -76,7 +76,8 @@ DAY_CHOICE = (
 
 TIME_CHOICES = [(str(time), str(time)) for time in range(0, 25)]
 DURATION_HOUR_CHOICES = [(str(hour), str(hour)) for hour in range(0, 25)]
-DURATION_MINUTE_CHOICES = [(str(minute), str(minute)) for minute in range(0, 61)]
+DURATION_MINUTE_CHOICES = [(str(minute), str(minute))
+                           for minute in range(0, 61)]
 DURATION_DAY_CHOICES = [(str(day), str(day)) for day in range(0, 32)]
 DATE_CHOICES = [(str(date), str(date)) for date in range(32)]
 DAY_CHOICES = [(i, str(i)) for i in range(1, 30)]
@@ -174,7 +175,11 @@ class Service(Main):
                                       related_name='service_service_profit_method')
     price_type = models.ForeignKey(PriceType, on_delete=models.SET_NULL, blank=True, null=True,
                                    related_name='service_service_price_type')
-    
+    vendor_percentage = models.CharField(max_length=255, blank=True, null=True)
+    sea_arabia_percentage = models.CharField(
+        max_length=255, blank=True, null=True)
+    markup_fee = models.PositiveIntegerField(blank=True, null=True)
+
     class Meta:
         ordering = ["-created_at", "-updated_at"]
         verbose_name = "Service"
@@ -185,22 +190,32 @@ class Service(Main):
 
 
 class Price(Main):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True, related_name='service_price_service')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE,
+                                blank=True, null=True, related_name='service_price_service')
     is_active = models.BooleanField(default=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     price = models.PositiveIntegerField(blank=True, null=True)
     is_range = models.BooleanField(default=False)
-    location = models.ForeignKey(Destination, on_delete=models.SET_NULL, blank=True, null=True, related_name='location')
-    duration_hour = models.CharField(max_length=128, choices=DURATION_HOUR_CHOICES, default='', blank=True, null=True)
+    location = models.ForeignKey(
+        Destination, on_delete=models.SET_NULL, blank=True, null=True, related_name='location')
+    duration_hour = models.CharField(
+        max_length=128, choices=DURATION_HOUR_CHOICES, default='', blank=True, null=True)
     duration_minute = models.CharField(max_length=128, choices=DURATION_MINUTE_CHOICES, default='', blank=True,
                                        null=True)
-    duration_day = models.CharField(max_length=128, choices=DURATION_DAY_CHOICES, default='', blank=True, null=True)
-    time = models.CharField(max_length=128, choices=TIME_CHOICES, default='', blank=True, null=True)
-    end_time = models.CharField(max_length=128, choices=TIME_CHOICES, default='', blank=True, null=True)
-    day = models.CharField(max_length=128, choices=DAY_CHOICE, default='', blank=True, null=True)
-    end_day = models.CharField(max_length=128, choices=DAY_CHOICE, default='', blank=True, null=True)
-    date = models.CharField(max_length=128, choices=DATE_CHOICES, default='', blank=True, null=True)
-    end_date = models.CharField(max_length=128, choices=DATE_CHOICES, default='', blank=True, null=True)
+    duration_day = models.CharField(
+        max_length=128, choices=DURATION_DAY_CHOICES, default='', blank=True, null=True)
+    time = models.CharField(
+        max_length=128, choices=TIME_CHOICES, default='', blank=True, null=True)
+    end_time = models.CharField(
+        max_length=128, choices=TIME_CHOICES, default='', blank=True, null=True)
+    day = models.CharField(max_length=128, choices=DAY_CHOICE,
+                           default='', blank=True, null=True)
+    end_day = models.CharField(
+        max_length=128, choices=DAY_CHOICE, default='', blank=True, null=True)
+    date = models.CharField(
+        max_length=128, choices=DATE_CHOICES, default='', blank=True, null=True)
+    end_date = models.CharField(
+        max_length=128, choices=DATE_CHOICES, default='', blank=True, null=True)
 
     def __str__(self):
         return self.service.name

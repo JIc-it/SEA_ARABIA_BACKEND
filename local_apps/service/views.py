@@ -217,6 +217,10 @@ class ServiceUpdate(generics.UpdateAPIView):
             is_destination = request.data.get('is_destination', None)
             price_type = request.data.get('price_type', None)
             profit_method = request.data.get('profit_method', None)
+            vendor_percentage = request.data.get('vendor_percentage', None)
+            sea_arabia_percentage = request.data.get(
+                'sea_arabia_percentage', None)
+            markup_fee = request.data.get('markup_fee', None)
 
             service_prices = request.data.get('service_price_service', [])
 
@@ -282,6 +286,13 @@ class ServiceUpdate(generics.UpdateAPIView):
                 service_instance.cancellation_policy = cancellation_policy
             if refund_policy:
                 service_instance.refund_policy = refund_policy
+            if vendor_percentage:
+                service_instance.vendor_percentage = vendor_percentage
+            if sea_arabia_percentage:
+                service_instance.sea_arabia_percentage = sea_arabia_percentage
+            if markup_fee:
+                service_instance.markup_fee = markup_fee
+
             if profit_method:
                 profit_method_instance = ProfitMethod.objects.get(
                     id=profit_method)
@@ -725,7 +736,7 @@ class ServiceAvailablityTimeUpdate(generics.UpdateAPIView):
 
 
 class ServiceListApp(generics.ListAPIView):
-    """for app side service lisiting"""
+    """ for app side service lisiting """
 
     queryset = Service.objects.all()
     premium_category = Category.objects.filter(
