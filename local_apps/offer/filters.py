@@ -1,14 +1,22 @@
 import django_filters
-from .models import Offer
+from .models import *
+from datetime import datetime
+
+class DateFilter(django_filters.DateFilter):
+    def filter(self, qs, value):
+        if value:
+            value = datetime.combine(value, datetime.min.time())  # Combine date with minimum time
+            return super().filter(qs, value)
+        return qs
 
 class OfferFilter(django_filters.FilterSet):
-    expiry_start_date = django_filters.DateFilter(
-        field_name='end_date',
+    expiry_start_date = DateFilter(
+        field_name='start_date',
         lookup_expr='gte',
         label='Expiry Start Date (greater than or equal to)'
     )
 
-    expiry_end_date = django_filters.DateFilter(
+    expiry_end_date = DateFilter(
         field_name='end_date',
         lookup_expr='lte',
         label='Expiry End Date (less than or equal to)'
@@ -26,8 +34,8 @@ class OfferFilter(django_filters.FilterSet):
     )
 
     def filter_is_enable(self, queryset, name, value):
-        data_true = True if value == 'True' or value == 'true' or value == True else None
-        data_false = False if value == 'False' or value == 'false' or value == False else None
+        data_true = True if value in ['True', 'true', True] else None
+        data_false = False if value in ['False', 'false', False] else None
         value = data_true if data_true else data_false
         return queryset.filter(**{name: value})
 
@@ -38,5 +46,4 @@ class OfferFilter(django_filters.FilterSet):
             'expiry_start_date',
             'expiry_end_date',
             'name',
-            
         ]

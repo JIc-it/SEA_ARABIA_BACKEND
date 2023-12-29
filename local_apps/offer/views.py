@@ -11,6 +11,8 @@ from local_apps.service.models import Service
 from local_apps.company.models import Company
 from rest_framework.views import APIView
 from .filters import OfferFilter
+from django.utils import timezone
+
 
 
 class AdminOfferListView(generics.ListAPIView):
@@ -32,7 +34,16 @@ class BeastDealsOfferListView(generics.ListAPIView):
 
     def get_queryset(self):
         try:
-            return Offer.objects.filter(is_enable=True)
+        
+            current_datetime = timezone.now()
+
+           
+            queryset = Offer.objects.filter(is_enable=True, start_date__lte=current_datetime)
+
+           
+            queryset = queryset.exclude(end_date__lt=current_datetime)
+
+            return queryset
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
