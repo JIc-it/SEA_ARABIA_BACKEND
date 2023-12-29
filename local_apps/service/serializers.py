@@ -119,6 +119,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     sub_category = SubCategorySerializer(
         many=True, required=False, allow_null=True)
     is_bookmarked = serializers.SerializerMethodField()
+    bookmark_id = serializers.SerializerMethodField()
     company = serializers.CharField(source="company.name")
     price_type = serializers.CharField(source="price_type.name")
     profit_method = serializers.CharField(source="profit_method.name")
@@ -131,6 +132,7 @@ class ServiceSerializer(serializers.ModelSerializer):
                   'is_top_suggestion',
                   'is_premium',
                   'is_bookmarked',
+                  'bookmark_id',
                   'is_sail_with_activity',
                   'is_recommended',
                   'type',
@@ -174,6 +176,15 @@ class ServiceSerializer(serializers.ModelSerializer):
             return False
         except:
             return False
+    
+    def get_bookmark_id(self, obj):
+     
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            bookmark = Bookmark.objects.filter(user=request.user, service=obj).first()
+            if bookmark:
+                return bookmark.id
+        return None
 
 
 class ExploreMoreSerializer(serializers.ModelSerializer):
