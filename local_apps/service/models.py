@@ -179,6 +179,9 @@ class Service(Main):
     sea_arabia_percentage = models.CharField(
         max_length=255, blank=True, null=True)
     markup_fee = models.PositiveIntegerField(blank=True, null=True)
+    per_head_booking = models.BooleanField(default=False)
+    purchase_limit_min = models.PositiveIntegerField(null=True, blank=True)
+    purchase_limit_max = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]

@@ -221,6 +221,9 @@ class ServiceUpdate(generics.UpdateAPIView):
             sea_arabia_percentage = request.data.get(
                 'sea_arabia_percentage', None)
             markup_fee = request.data.get('markup_fee', None)
+            per_head_booking = request.data.get('per_head_booking', None)
+            purchase_limit_min = request.data.get('purchase_limit_min', None)
+            purchase_limit_max = request.data.get('purchase_limit_max', None)
 
             service_prices = request.data.get('service_price_service', [])
 
@@ -233,6 +236,9 @@ class ServiceUpdate(generics.UpdateAPIView):
 
             if is_verified is not None:
                 service_instance.is_verified = True if is_verified == 'true' or is_verified == 'True' or is_verified == True else False
+
+            if per_head_booking is not None:
+                service_instance.per_head_booking = True if per_head_booking == 'true' or per_head_booking == 'True' or per_head_booking == True else False
 
             if is_recommended is not None:
                 service_instance.is_recommended = True if is_recommended == 'true' or is_recommended == 'True' or is_recommended == True else False
@@ -292,6 +298,10 @@ class ServiceUpdate(generics.UpdateAPIView):
                 service_instance.sea_arabia_percentage = sea_arabia_percentage
             if markup_fee:
                 service_instance.markup_fee = markup_fee
+            if purchase_limit_min:
+                service_instance.purchase_limit_min = purchase_limit_min
+            if purchase_limit_max:
+                service_instance.purchase_limit_max = purchase_limit_max
 
             if profit_method:
                 profit_method_instance = ProfitMethod.objects.get(
