@@ -399,8 +399,11 @@ class ServiceUpdate(generics.UpdateAPIView):
                     if location:
                         location_instance = Destination.objects.get(
                             id=location)
-                    Price.objects.create(
-                        service=service_instance, location=location_instance, **service_price)
+                        Price.objects.create(
+                            service=service_instance, location=location_instance, **service_price)
+                    else:
+                        Price.objects.create(
+                            service=service_instance, **service_price)
 
             serializer = self.get_serializer(service_instance)
             return Response(serializer.data)

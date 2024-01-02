@@ -61,7 +61,7 @@ class PriceSerializer(serializers.ModelSerializer):
     # price_criterion = PriceCriterionSerializer(required=False, allow_null=True)
     # duration = DurationSerializer(required=False, allow_null=True)
     # price_list = PriceListForPriceSerializer(required=False, allow_null=True)
-    location = serializers.CharField(source="location.name")
+    location = serializers.SerializerMethodField()
 
     class Meta:
         model = Price
@@ -69,6 +69,12 @@ class PriceSerializer(serializers.ModelSerializer):
                   "duration_hour", "duration_minute", "duration_day", "time",
                   "end_time", "day", "end_day", "date", "end_date"
                   ]
+
+    def get_location(self, obj):
+        try:
+            return obj.location.name
+        except:
+            return None
 
 
 # class PriceListSerializer(serializers.ModelSerializer):
