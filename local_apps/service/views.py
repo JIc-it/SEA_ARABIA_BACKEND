@@ -518,17 +518,17 @@ class ServiceAvailabilityCreate(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            service = request.data.get('service', None)
-            if service and Service.objects.filter(id=service).exists():
-                service = Service.objects.filter(id=service)
+            service_id = request.data.get('service', None)
+            if service_id and Service.objects.filter(id=service_id).exists():
+                service_instance = Service.objects.get(id=service_id)
                 date = request.data.get('date', None)
                 time = request.data.get('time', None)
-                all = request.data.get('all', None)
+                all_slots_available = request.data.get('all', None)
 
-                instance = ServiceAvailability.objects.create(service=service,
+                instance = ServiceAvailability.objects.create(service=service_instance,
                                                               date=date,
                                                               time=time,
-                                                              all_slots_available=all)
+                                                              all_slots_available=all_slots_available)
             else:
                 return Response({"error": "Service not found"}, status=status.HTTP_400_BAD_REQUEST)
 
