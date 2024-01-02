@@ -122,8 +122,8 @@ class ServiceSerializer(serializers.ModelSerializer):
     is_bookmarked = serializers.SerializerMethodField()
     bookmark_id = serializers.SerializerMethodField()
     company = serializers.CharField(source="company.name")
-    price_type = serializers.CharField(source="price_type.name")
-    profit_method = serializers.CharField(source="profit_method.name")
+    # price_type = serializers.CharField(source="price_type.name")
+    profit_method = ProfitMethodSerializer(required=False)
 
     class Meta:
         model = Service
@@ -164,7 +164,7 @@ class ServiceSerializer(serializers.ModelSerializer):
                   "is_day",
                   "is_time",
                   "is_destination",
-                  "price_type",
+                  #   "price_type",
                   "profit_method",
                   "service_price_service",
                   ]
@@ -384,18 +384,3 @@ class ServiceListExportResource(resources.ModelResource):
         ]
 
         export_order = fields
-
-# class ProfitMethodList(generics.ListAPIView):
-#     """ view for listing the Profit Method"""
-
-#     permission_classes = [IsAuthenticated]
-#     queryset = ProfitMethod.objects.all()
-#     serializer_class = ProfitMethodSerializer
-
-
-# class PriceTypeList(generics.ListAPIView):
-#     """ view for listing the Price Type"""
-
-#     permission_classes = [IsAuthenticated]
-#     queryset = PriceType.objects.all()
-#     serializer_class = PriceTypeSerializer

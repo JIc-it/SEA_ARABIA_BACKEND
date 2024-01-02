@@ -200,7 +200,7 @@ class ServiceUpdate(generics.UpdateAPIView):
             is_recommended = request.data.get('is_recommended', None)
             is_sail_with_activity = request.data.get(
                 'is_sail_with_activity', None)
-            type = request.data.get('type', None)
+            types = request.data.get('type', None)
             name = request.data.get('name', None)
             machine_id = request.data.get('machine_id', None)
             description = request.data.get('description', None)
@@ -271,8 +271,8 @@ class ServiceUpdate(generics.UpdateAPIView):
             if is_destination is not None:
                 service_instance.is_destination = True if is_destination == 'true' or is_destination == 'True' or is_destination == True else False
 
-            if type:
-                service_instance.type = type.title()
+            if types:
+                service_instance.type = types.title()
             if name:
                 service_instance.name = name
             if machine_id:
@@ -625,8 +625,10 @@ class ServiceAvailabeListView(generics.ListAPIView):
         try:
             # Attempt to parse as date, if fails, assume it's a year-month parameter
             try:
-                date_object = datetime.strptime(date_or_month_param, "%Y-%m-%d").date()
-                services = ServiceAvailability.objects.filter(date=date_object, service=service_id)
+                date_object = datetime.strptime(
+                    date_or_month_param, "%Y-%m-%d").date()
+                services = ServiceAvailability.objects.filter(
+                    date=date_object, service=service_id)
             except ValueError:
                 year, month = map(int, date_or_month_param.split('-'))
                 services = ServiceAvailability.objects.filter(
