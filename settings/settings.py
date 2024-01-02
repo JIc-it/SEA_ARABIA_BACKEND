@@ -200,10 +200,10 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ],    
+    ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'local_apps.account.authentication.CustomJWTAuthentication',    
+        'local_apps.account.authentication.CustomJWTAuthentication',
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 10,
@@ -244,3 +244,8 @@ SIMPLE_JWT = {
 }
 
 IMPORT_FORMATS = [CSV]
+
+
+TAP_API_KEY = 'pk_test_4kaV9If6D2OC0GQW8pSsgYjP'
+TAP_SECRET_KEY = 'sk_test_mKI8rCSWV0vhQ9TdlonBZ16i'
+TAP_BASE_URL = 'https://api.tap.company/v2/'

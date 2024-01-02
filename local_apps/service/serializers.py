@@ -177,12 +177,13 @@ class ServiceSerializer(serializers.ModelSerializer):
             return False
         except:
             return False
-    
+
     def get_bookmark_id(self, obj):
-     
+
         request = self.context.get('request')
         if request and request.user.is_authenticated:
-            bookmark = Bookmark.objects.filter(user=request.user, service=obj).first()
+            bookmark = Bookmark.objects.filter(
+                user=request.user, service=obj).first()
             if bookmark:
                 return bookmark.id
         return None
@@ -273,14 +274,14 @@ class ServiceReviewListSerializer(serializers.ModelSerializer):
 
     def get_created_at(self, obj):
         return obj.created_at.date().isoformat()
-    
+
     """for star rating count"""
-    
+
     def get_star_rating(self, obj):
         service = obj.service
-        star_rating = ServiceReview.objects.filter(service=service).aggregate(Avg('rating'))['rating__avg']
+        star_rating = ServiceReview.objects.filter(
+            service=service).aggregate(Avg('rating'))['rating__avg']
         return round(star_rating, 2) if star_rating else None
-
 
     # def get_is_bookmarked(self, obj):
     #     request = self.context.get('request')

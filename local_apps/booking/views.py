@@ -1,3 +1,5 @@
+import requests
+import json
 from rest_framework import generics, status
 from .models import Booking, Payment
 from .serializers import *
@@ -15,6 +17,7 @@ from django.shortcuts import get_object_or_404
 import datetime
 from .filters import *
 from django.http import HttpResponse
+from django.conf import settings
 
 
 today = datetime.date.today()
@@ -98,6 +101,50 @@ class BookingCreateView(generics.CreateAPIView):
             )
 
             booking.save()
+
+            # payment initialization
+
+            api_key = settings.TAP_API_KEY
+            base_url = settings.TAP_BASE_URL
+            secret_key = settings.TAP_SECRET_KEY
+
+            url = base_url + "authorize/"
+
+            payload = {
+                "amount": 2,  # mandatory
+                "currency": "KWD",  # mandatory
+                "metadata": {  # not  mandatory
+                    "udf1": "Sea Arabia TXN ID",
+                    "udf2": "Service Name",
+                    "udf3": "Service Category",
+                },
+                "customer": {  # mandatory
+                    "first_name": "Sea",
+                    "middle_name": "Arabia",
+                    "last_name": "User",
+                    "email": "prince@jicitsolution.com",
+                    "phone": {
+                        "country_code": "91",
+                        "number": "9999999999"
+                    }
+                },
+                "merchant": {"id": "1234"},
+                "source": {"id": "src_all"},  # mandatory
+                # mandatory
+                "redirect": {"url": "http://your_website.com/redirecturl"}
+            }
+            headers = {
+                "accept": "application/json",
+                "content-type": "application/json",
+                "Authorization": "Bearer "+secret_key
+            }
+
+            response = requests.post(url, json=payload, headers=headers)
+            try:
+                json_response = response.json()
+                print('>>>', json.dumps(json_response, indent=2))
+            except json.JSONDecodeError:
+                print(response.text)
 
             serializer = BookingSerializer(booking)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -203,5 +250,7 @@ class ExportBookingCSVView(generics.ListAPIView):
 
 # Payment Section
 
+
 class PaymentInitiate(generics.CreateAPIView):
+    serializer_class = ""
     pass
