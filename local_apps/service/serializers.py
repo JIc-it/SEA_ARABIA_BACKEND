@@ -93,6 +93,8 @@ class PriceSerializer(serializers.ModelSerializer):
 
 
 class ServiceImageSerializer(serializers.ModelSerializer):
+    service = serializers.CharField(source="service.name")
+
     class Meta:
         model = ServiceImage
         fields = ['id',
