@@ -516,7 +516,7 @@ class ServiceAvailabilityCreate(generics.CreateAPIView):
     serializer_class = ServiceAvailabilitySerializer
     permission_classes = [IsAuthenticated]
 
-    def create(self, request, args, *kwargs):
+    def create(self, request, *args, **kwargs):
         try:
             service = request.data.get('service', None)
             if service and Service.objects.filter(id=service).exists():
