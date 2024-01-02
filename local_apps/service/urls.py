@@ -139,8 +139,11 @@ urlpatterns = [
          name="category-based-listing"
          ),
 
-    path('servicesavailable/<str:date>/<uuid:service_id>/',
+    # path('servicesavailable/<str:date>/<uuid:service_id>/',
+    #      ServiceAvailabeListView.as_view(), name='service-availabe'),
+    path('servicesavailable/<str:date_or_month>/<uuid:service_id>/',
          ServiceAvailabeListView.as_view(), name='service-availabe'),
+
     # Combo package list
     path('combopackages', ComboPackageListing.as_view(), name='combopackages'),
 

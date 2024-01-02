@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import HttpResponse
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
@@ -618,24 +619,27 @@ class ServiceAvailabeListView(generics.ListAPIView):
     serializer_class = ServiceAvailabilitySerializer
 
     def get_queryset(self):
-        # Get the date and service ID from the URL parameters
-        date_param = self.kwargs.get('date', None)
-        month_param = self.kwargs.get("month")
+        date_or_month_param = self.kwargs.get('date_or_month', None)
         service_id = self.kwargs.get('service_id', None)
 
         try:
-            # Parse date and month parameters
-            date_object = datetime.strptime(date_param, "%Y-%m-%d").date() if date_param else None
-            month = datetime.strptime(month_param, "%Y-%m").date() if month_param else None
+            # Attempt to parse as date, if fails, assume it's a year-month parameter
+            try:
+                date_object = datetime.strptime(date_or_month_param, "%Y-%m-%d").date()
+                services = ServiceAvailability.objects.filter(date=date_object, service=service_id)
+            except ValueError:
+                year, month = map(int, date_or_month_param.split('-'))
+                services = ServiceAvailability.objects.filter(
+                    Q(date__year=year, date__month=month) | Q(date__isnull=True),
+                    service=service_id
+                )
 
-            # Filter services based on date and/or month
-            services = ServiceAvailability.objects.filter(
-                date=date_object, month=month, service=service_id)
-            return services
-
-        except ValueError:
-            # Invalid date format
+        except (ValueError, IndexError) as e:
+            # Print the exception details for debugging
+            print(f"Error: {e}")
             return ServiceAvailability.objects.none()
+
+        return services
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
