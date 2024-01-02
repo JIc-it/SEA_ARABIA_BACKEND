@@ -1,11 +1,9 @@
-from datetime import date
 from django.db import models
 from django.conf import settings
 from local_apps.core.models import Main
 from local_apps.service.models import Service, Package, Price
 from local_apps.offer.models import Offer
 from local_apps.account.models import Guest
-from django.core.exceptions import ValidationError
 
 BOOKING_STATUS = (
     ('Upcoming', 'Upcoming'),
@@ -82,6 +80,13 @@ class Booking(Main):
     price = models.ForeignKey(Price, blank=True, null=True, on_delete=models.SET_NULL,
                               related_name='booking_booking_price')
     user_type = models.CharField(choices=USER_TYPE, default='Registered', max_length=255)
+    first_name=models.CharField(max_length=255, blank=True, null=True)
+    last_name=models.CharField(max_length=255, blank=True, null=True)
+    phone_number=models.CharField(max_length=255, blank=True, null=True)
+    email=models.EmailField(null=True,blank=True)
+    for_myself=models.BooleanField(blank=True, null=True)
+    for_someone_else=models.BooleanField(default=False,blank=True, null=True)
+    destination = models.CharField(max_length=255, blank=True, null=True)
     booking_for = models.CharField(choices=BOOKING_FOR_TYPE, default='My Self', max_length=255)
     booking_item = models.CharField(choices=BOOKING_ITEM_TYPE, default='Service', max_length=255)
     starting_point = models.CharField(max_length=255, blank=True, null=True)
@@ -180,3 +185,4 @@ class Booking(Main):
             self.offer.save()
 
         super(Booking, self).save(*args, **kwargs)
+
