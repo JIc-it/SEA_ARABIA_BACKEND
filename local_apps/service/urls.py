@@ -144,7 +144,7 @@ urlpatterns = [
     # Combo package list
     path('combopackages', ComboPackageListing.as_view(), name='combopackages'),
 
-    path('service-booking-availability/<uuid:service>/<str:date>/',
+    path('service-booking-availability/<uuid:service>/<str:month>/<str:date>/',
          AdminServiceBookingAvailabilityList.as_view(), name='service-booking-availability'),
 
     path('update-availability/<uuid:service>/<str:date>/',

@@ -619,28 +619,33 @@ class ServiceAvailabeListView(generics.ListAPIView):
 
     def get_queryset(self):
         # Get the date and service ID from the URL parameters
-
         date_param = self.kwargs.get('date', None)
+        month_param = self.kwargs.get("month")
         service_id = self.kwargs.get('service_id', None)
 
         try:
-            date_object = datetime.strptime(date_param, "%Y-%m-%d").date()
+            # Parse date and month parameters
+            date_object = datetime.strptime(date_param, "%Y-%m-%d").date() if date_param else None
+            month = datetime.strptime(month_param, "%Y-%m").date() if month_param else None
+
+            # Filter services based on date and/or month
             services = ServiceAvailability.objects.filter(
-                date=date_object, service=service_id)
+                date=date_object, month=month, service=service_id)
             return services
 
         except ValueError:
             # Invalid date format
-            return None
+            return ServiceAvailability.objects.none()
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
 
-        if queryset is not None:
+        if queryset.exists():
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response({"error": "Invalid date format or service ID"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "No services available for the given criteria"},
+                            status=status.HTTP_404_NOT_FOUND)
 
 
 class AdminServiceBookingAvailabilityList(generics.ListAPIView):
