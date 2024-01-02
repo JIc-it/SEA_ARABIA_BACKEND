@@ -1122,4 +1122,4 @@ class UpdateAvailabilityView(generics.UpdateAPIView):
 
 class ServiceIndividualView(generics.RetrieveAPIView):
     queryset = Service.objects.all()
-    serializer_class =  ServiceD
+    serializer_class =  ServiceIndividualSerializer
