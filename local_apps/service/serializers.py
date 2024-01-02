@@ -201,7 +201,7 @@ class ServiceIndividualSerializer(serializers.ModelSerializer):
     price = PriceSerializer(required=False, allow_null=True)
     service_image = ServiceImageSerializer(many=True)
     destination = serializers.CharField(
-        source="destination.name", required=False, allow_null=True)
+        source="location.name", required=False, allow_null=True)
     company = serializers.CharField(source="company.name")
     category = CategorySerializer(many=True, required=False, allow_null=True)
     amenities = AmenitySerializer(many=True, required=False, allow_null=True)
