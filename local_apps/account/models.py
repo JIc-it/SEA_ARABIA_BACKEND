@@ -75,9 +75,20 @@ class User(AbstractUser):
         super(User, self).save(*args, **kwargs)
 
 
+class GCCLocations(Main):
+    location = models.CharField(max_length=255, null=True, blank=True)
+    country_flag = models.ImageField(
+        upload_to="account/gcclocations/country_flag", null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.location if self.location else "No Location"
+
+
 class ProfileExtra(Main):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    location = models.CharField(blank=True, null=True, max_length=255)
+    location = models.ForeignKey(
+        GCCLocations, blank=True, null=True, on_delete=models.CASCADE)
     image = models.ImageField(
         upload_to='account/profile_extra/image', blank=True, null=True)
     dob = models.DateField(blank=True, null=True, max_length=255)
@@ -181,6 +192,7 @@ class Bookmark(Main):
     )
     service = models.ForeignKey(Service, on_delete=models.SET_NULL,
                                 blank=True, null=True, related_name='account_bookmark_service')
+
     def __str__(self):
         return str(self.user)
 

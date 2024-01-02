@@ -72,9 +72,16 @@ urlpatterns = [
     path("guest-user/list", GuestUserList.as_view(), name="guest_user_list"),
 
     # export
-    path('vendor-list-export/', ExportVendorCSVView.as_view(), name='vendor-export-csv'),
-    path('customer-list-export/', ExportCustomerCSVView.as_view(), name='customer-export-csv'),
-    path('guests-list-export/', ExportGuestsCSVView.as_view(), name='guests-export-csv'),
-    path('onboard-vendors-list-export/', ExportOnboardVendorsCSVView.as_view(), name='onboard-vendors-export-csv'),
+    path('vendor-list-export/', ExportVendorCSVView.as_view(),
+         name='vendor-export-csv'),
+    path('customer-list-export/', ExportCustomerCSVView.as_view(),
+         name='customer-export-csv'),
+    path('guests-list-export/', ExportGuestsCSVView.as_view(),
+         name='guests-export-csv'),
+    path('onboard-vendors-list-export/', ExportOnboardVendorsCSVView.as_view(),
+         name='onboard-vendors-export-csv'),
+
+    # gcc location listing
+    path('gcc-locations', GccLocationList.as_view(), name='gcc-locations'),
 
 ]

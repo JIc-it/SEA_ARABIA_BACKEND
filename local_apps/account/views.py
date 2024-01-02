@@ -176,6 +176,9 @@ class UserCreate(generics.CreateAPIView):
             dob = request.data.get("dob")
             password = request.data.get("password")
 
+            if location:
+                location_instance = GCCLocations.objects.get(id=location)
+
             user = User.objects.create_user(first_name=first_name,
                                             last_name=last_name,
                                             email=email,
@@ -184,7 +187,7 @@ class UserCreate(generics.CreateAPIView):
                                             password=password)
 
             ProfileExtra.objects.create(
-                user=user, location=location, gender=gender.title(), dob=dob)
+                user=user, location=location_instance, gender=gender.title(), dob=dob)
 
             data = UserCreateSerializer(user)
             return Response(data.data, status=status.HTTP_200_OK)
@@ -262,9 +265,11 @@ class VendorAdd(generics.CreateAPIView):
         location_data = self.request.data.get("location")
         created_by = self.request.user
         user = serializer.save()
+
         if location_data:
+            location_instance = GCCLocations.objects.get(id=location_data)
             profile_extra = ProfileExtra.objects.create(
-                user=user, location=location_data
+                user=user, location=location_instance
             )
         new_lead = OnboardStatus.objects.get(order=1)
         Company.objects.create(
@@ -316,7 +321,8 @@ class VendorDetailsAdd(generics.UpdateAPIView):
             profile_instance, created = ProfileExtra.objects.get_or_create(
                 user=user)
             if location_data:
-                profile_instance.location = location_data
+                location_instance = GCCLocations.objects.get(id=location_data)
+                profile_instance.location = location_instance
                 profile_instance.save()
 
             #   updating the company details VendorAddDetailsSerialzier
@@ -749,7 +755,8 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
                 user_instance.last_name = last_name
 
             if location:
-                profile_instance.location = location
+                location_instance = GCCLocations.objects.get(id=location)
+                profile_instance.location = location_instance
 
             if dob:
                 profile_instance.dob = dob
@@ -836,3 +843,9 @@ class ExportOnboardVendorsCSVView(generics.ListAPIView):
         response['Content-Disposition'] = 'attachment; filename="vendor_users_list.csv"'
 
         return response
+
+
+class GccLocationList(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = GccLocationSerializer
+    queryset = GCCLocations.objects.filter(is_active=True)

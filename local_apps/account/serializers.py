@@ -136,6 +136,9 @@ class VendorAddDetailsSerialzier(serializers.ModelSerializer):
 
 
 class ProfileExtraSerializer(serializers.ModelSerializer):
+
+    location = serializers.CharField(source="location.location")
+
     class Meta:
         model = ProfileExtra
         fields = ["id", "location", "image", "dob", "gender"]
@@ -495,3 +498,15 @@ class OnboardVendorsListExport(resources.ModelResource):
 
     def calculate_booking_count(self, user):
         return Booking.objects.filter(user=user).count()
+
+
+class GccLocationSerializer(serializers.ModelSerializer):
+    """ Serialize GCC Locations """
+
+    class Meta:
+        model = GCCLocations
+        fields = [
+            "id",
+            "location",
+            "country_flag"
+        ]

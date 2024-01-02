@@ -124,3 +124,8 @@ class BookMarkAdmin(admin.ModelAdmin):
 @admin.register(Guest)
 class GuestAdmin(admin.ModelAdmin):
     list_display = ['first_name', "last_name", "location", "email", "mobile"]
+
+
+@admin.register(GCCLocations)
+class GCCLocationAdmin(admin.ModelAdmin):
+    pass
