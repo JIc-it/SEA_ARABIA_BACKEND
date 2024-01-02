@@ -188,7 +188,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         return None
 
 
-class ExploreMoreSerializer(serializers.ModelSerializer):
+class ServiceIndividualSerializer(serializers.ModelSerializer):
     """serializer for showing the data in explore more section"""
 
     price = PriceSerializer(required=False, allow_null=True)
@@ -204,7 +204,6 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
-            "pickup_point",
             "price",
             "capacity",
             "service_image",
@@ -213,6 +212,13 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
             "amenities",
             "description",
             "category",
+            "description",
+            "lounge",
+            "bedroom",
+            "toilet",
+            "capacity",
+            "cancellation_policy",
+            "refund_policy",
         ]
 
     extra_kwargs = {
