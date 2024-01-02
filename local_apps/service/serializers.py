@@ -237,6 +237,10 @@ class ServiceIndividualSerializer(serializers.ModelSerializer):
 class ServiceFilterListSerializer(serializers.ModelSerializer):
     service_image = ServiceImageSerializer(
         many=True, required=False, allow_null=True)
+    category = CategorySerializer(many=True, required=False, allow_null=True)
+    sub_category = SubCategorySerializer(
+        many=True, required=False, allow_null=True)
+    company = serializers.CharField(source="company.name")
 
     class Meta:
         model = Service
