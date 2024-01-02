@@ -309,54 +309,9 @@ class Package(Main):
     capacity = models.PositiveIntegerField(default=0)
     image = models.FileField(upload_to="service/package/image")
     price = models.PositiveIntegerField(blank=True, null=True)
-    is_duration = models.BooleanField(default=False)
-    is_date = models.BooleanField(default=False)
-    is_day = models.BooleanField(default=False)
-    is_time = models.BooleanField(default=False)
-    is_destination = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name if self.name else "No Packages"
-
-
-class PricePackage(Main):
-    package = models.ForeignKey(Package, on_delete=models.CASCADE,
-                                blank=True, null=True,
-                                related_name='service_price_package_package')
-    is_active = models.BooleanField(default=True)
-    name = models.CharField(max_length=255, blank=True, null=True)
-    price = models.PositiveIntegerField(blank=True, null=True)
-    is_range = models.BooleanField(default=False)
-    location = models.ForeignKey(
-        Destination, on_delete=models.SET_NULL, blank=True, null=True,
-        related_name='service_price_package_location')
-    duration_hour = models.CharField(
-        max_length=128, choices=DURATION_HOUR_CHOICES, default='', blank=True, null=True)
-    duration_minute = models.CharField(max_length=128,
-                                       choices=DURATION_MINUTE_CHOICES,
-                                       default='', blank=True,
-                                       null=True)
-    duration_day = models.CharField(
-        max_length=128, choices=DURATION_DAY_CHOICES, default='', blank=True, null=True)
-    time = models.CharField(
-        max_length=128, choices=TIME_CHOICES, default='', blank=True, null=True)
-    end_time = models.CharField(
-        max_length=128, choices=TIME_CHOICES, default='', blank=True, null=True)
-    day = models.CharField(max_length=128, choices=DAY_CHOICE,
-                           default='', blank=True, null=True)
-    end_day = models.CharField(
-        max_length=128, choices=DAY_CHOICE, default='', blank=True, null=True)
-    date = models.CharField(
-        max_length=128, choices=DATE_CHOICES, default='', blank=True, null=True)
-    end_date = models.CharField(
-        max_length=128, choices=DATE_CHOICES, default='', blank=True, null=True)
-
-    def __str__(self):
-        return self.package.name
-
-    class Meta:
-        verbose_name = 'Package Price'
-        verbose_name_plural = 'Package Prices'
 
 
 class CapacityCount(Main):
