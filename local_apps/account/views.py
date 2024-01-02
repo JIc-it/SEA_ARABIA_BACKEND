@@ -37,7 +37,8 @@ GOOGLE_REDIRECT_URI = 'http://localhost:8888/google_callback'
 GOOGLE_AUTHORIZATION_URL = 'https://accounts.google.com/o/oauth2/auth'
 GOOGLE_TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
 GOOGLE_USER_INFO_URL = 'https://www.googleapis.com/oauth2/v1/userinfo'
-scopes = ['email', 'profile', 'https://www.googleapis.com/auth/user.phonenumbers.read']
+scopes = ['email', 'profile',
+          'https://www.googleapis.com/auth/user.phonenumbers.read']
 scope_quoted = quote(" ".join(scopes))
 
 
@@ -85,10 +86,12 @@ class GoogleAuth(APIView):
                     'redirect_uri': GOOGLE_REDIRECT_URI,
                     'grant_type': 'authorization_code'
                 }
-                token_response = requests.post(GOOGLE_TOKEN_URL, data=token_data)
+                token_response = requests.post(
+                    GOOGLE_TOKEN_URL, data=token_data)
                 token_info = token_response.json()
                 user_info_response = requests.get(
-                    GOOGLE_USER_INFO_URL, headers={'Authorization': f'Bearer {token_info["access_token"]}'}
+                    GOOGLE_USER_INFO_URL, headers={
+                        'Authorization': f'Bearer {token_info["access_token"]}'}
                 )
                 user_info = user_info_response.json()
                 email = user_info['email']
@@ -707,7 +710,7 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
             gender = profile_extra.get('gender', None)
             user_instance = get_object_or_404(User, id=user_id)
             profile_instance, _ = ProfileExtra.objects.get_or_create(
-                ProfileExtra, user=user_instance)
+                user=user_instance)
 
             if email:
                 user_instance.email = email
@@ -737,6 +740,8 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
 
 
 class GuestUserList(generics.ListAPIView):
+
+    ''' guest user listing for cms '''
     serializer_class = GuestSerializer
     queryset = Guest.objects.all()
     filter_backends = [DjangoFilterBackend, SearchFilter]

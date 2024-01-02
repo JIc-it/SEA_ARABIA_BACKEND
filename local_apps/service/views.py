@@ -468,9 +468,10 @@ class ServiceImageDelete(generics.DestroyAPIView):
 
 
 class ServiceFilterList(generics.ListAPIView):
-    """View for filtering the service in service review listing section"""
 
-    """View for filtering the service in service review listing section (VMS)   """
+    """ View for filtering the service in service review listing section    """
+
+    """ View for filtering the service in service review listing section (VMS)   """
     permission_classes = [IsAuthenticated]
     serializer_class = ServiceFilterListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
