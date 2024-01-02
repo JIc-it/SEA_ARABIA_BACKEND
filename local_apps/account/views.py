@@ -163,7 +163,33 @@ class LoginView(APIView):
 
 class UserCreate(generics.CreateAPIView):
     # permission_classes = [IsAuthenticated]
-    serializer_class = UserSerializer
+    serializer_class = UserCreateSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            first_name = request.data.get("first_name")
+            last_name = request.data.get("last_name")
+            email = request.data.get("email")
+            mobile = request.data.get("mobile")
+            location = request.data.get("location")
+            gender = request.data.get("gender")
+            dob = request.data.get("dob")
+            password = request.data.get("password")
+
+            user = User.objects.create_user(first_name=first_name,
+                                            last_name=last_name,
+                                            email=email,
+                                            role='User',
+                                            mobile=mobile,
+                                            password=password)
+
+            ProfileExtra.objects.create(
+                user=user, location=location, gender=gender.title(), dob=dob)
+
+            data = UserCreateSerializer(user)
+            return Response(data.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserList(generics.ListAPIView):
@@ -622,6 +648,7 @@ class UserSignUp(generics.CreateAPIView):
             return Response(response_data, status=status.HTTP_201_CREATED)
         return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+
 class BookMarkCreationAPI(generics.CreateAPIView):
     """bookmark creation"""
     queryset = Bookmark.objects.all()
@@ -629,14 +656,14 @@ class BookMarkCreationAPI(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-       
+
         user = request.user
-        service_id = request.data.get('service')  
-        existing_bookmark = Bookmark.objects.filter(user=user, service_id=service_id).exists()
+        service_id = request.data.get('service')
+        existing_bookmark = Bookmark.objects.filter(
+            user=user, service_id=service_id).exists()
         if existing_bookmark:
             return Response({'error': 'You have already bookmarked this service.'}, status=status.HTTP_400_BAD_REQUEST)
 
-       
         return super().create(request, *args, **kwargs)
 
 

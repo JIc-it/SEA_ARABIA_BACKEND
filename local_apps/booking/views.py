@@ -47,8 +47,10 @@ class BookingCreateView(generics.CreateAPIView):
 
             # Get related objects
             offer = Offer.objects.get(id=offer_id) if offer_id else None
-            service = Service.objects.get(id=service_id) if service_id else None
-            payment = Payment.objects.get(id=payment_id) if payment_id else None
+            service = Service.objects.get(
+                id=service_id) if service_id else None
+            payment = Payment.objects.get(
+                id=payment_id) if payment_id else None
 
             # Extract JSON fields
             user_details = request.data.get('user_details', {})
@@ -76,7 +78,8 @@ class BookingCreateView(generics.CreateAPIView):
                 end_date=request.data.get('end_date'),
                 slot_details=request.data.get('slot_details'),
                 additional_hours=request.data.get('additional_hours', 0),
-                additional_hours_amount=request.data.get('additional_hours_amount', 0),
+                additional_hours_amount=request.data.get(
+                    'additional_hours_amount', 0),
                 number_of_people=request.data.get('number_of_people', 1),
                 status=request.data.get('status', 'Opened'),
                 booking_type=request.data.get('booking_type', 'Booking'),
@@ -196,3 +199,9 @@ class ExportBookingCSVView(generics.ListAPIView):
         response['Content-Disposition'] = 'attachment; filename="bookings_list.csv"'
 
         return response
+
+
+# Payment Section
+
+class PaymentInitiate(generics.CreateAPIView):
+    pass
