@@ -3,6 +3,10 @@ from django.contrib import admin
 from .forms import UpdateUserForm, AddUserForm
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
+admin.site.site_header = 'Sea Arabia Admin'
+admin.site.site_title = 'Sea Arabia Admin Panel'
+admin.site.index_title = 'Welcome To Sea Arabia Admin Panel'
+
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):

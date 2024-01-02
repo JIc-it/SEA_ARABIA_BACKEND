@@ -26,7 +26,6 @@ urlpatterns = [
     path("api/token/blacklist/", TokenBlacklistView.as_view(), name="token_blacklist"),
     # path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('login/', LoginView.as_view(), name='login'),
-    path('report/', include('local_apps.api_report.urls', namespace='report')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
