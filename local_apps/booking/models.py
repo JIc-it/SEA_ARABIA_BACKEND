@@ -1,3 +1,4 @@
+from datetime import date
 from django.db import models
 from django.conf import settings
 from local_apps.core.models import Main
