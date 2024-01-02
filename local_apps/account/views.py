@@ -206,7 +206,7 @@ class UserList(generics.ListAPIView):
     search_fields = [
         "first_name",
         "last_name",
-        "profileextra__location",
+        "profileextra__location__location",
         "email",
         "mobile"
     ]
@@ -241,13 +241,13 @@ class VendorList(generics.ListAPIView):
         "email",
         "first_name",
         "last_name",
-        "profileextra__location",
+        "profileextra__location__location",
     ]
     ordering_fields = [
         "first_name",
         "last_name",
         "created_at",
-        "profileextra__location",
+        "profileextra__location__location",
     ]
     filterset_class = VendorFilter
 
