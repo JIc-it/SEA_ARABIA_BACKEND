@@ -619,15 +619,22 @@ class UserSignUp(generics.CreateAPIView):
             return Response(response_data, status=status.HTTP_201_CREATED)
         return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-
 class BookMarkCreationAPI(generics.CreateAPIView):
     """bookmark creation"""
     queryset = Bookmark.objects.all()
     serializer_class = BookMarkSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def create(self, request, *args, **kwargs):
+       
+        user = request.user
+        service_id = request.data.get('service')  
+        existing_bookmark = Bookmark.objects.filter(user=user, service_id=service_id).exists()
+        if existing_bookmark:
+            return Response({'error': 'You have already bookmarked this service.'}, status=status.HTTP_400_BAD_REQUEST)
+
+       
+        return super().create(request, *args, **kwargs)
 
 
 # class BookMarkListView(generics.ListAPIView):
