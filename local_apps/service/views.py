@@ -511,6 +511,33 @@ class ServiceReviewList(generics.ListAPIView):
         return service_list
 
 
+# class ServiceAvailabilityCreate(generics.CreateAPIView):
+#     queryset = ServiceAvailability.objects.all()
+#     serializer_class = ServiceAvailabilitySerializer
+#     permission_classes = [IsAuthenticated]
+#
+#     def create(self, request, *args, **kwargs):
+#         try:
+#             service_id = request.data.get('service', None)
+#             if service_id and Service.objects.filter(id=service_id).exists():
+#                 service_instance = Service.objects.get(id=service_id)
+#                 date = request.data.get('date', None)
+#                 time = request.data.get('time', None)
+#                 all_slots_available = request.data.get('all', None)
+#
+#                 instance = ServiceAvailability.objects.create(service=service_instance,
+#                                                               date=date,
+#                                                               time=time,
+#                                                               all_slots_available=all_slots_available)
+#             else:
+#                 return Response({"error": "Service not found"}, status=status.HTTP_400_BAD_REQUEST)
+#
+#             serializer = ServiceAvailabilitySerializer(instance)
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 class ServiceAvailabilityCreate(generics.CreateAPIView):
     queryset = ServiceAvailability.objects.all()
     serializer_class = ServiceAvailabilitySerializer
@@ -523,12 +550,21 @@ class ServiceAvailabilityCreate(generics.CreateAPIView):
                 service_instance = Service.objects.get(id=service_id)
                 date = request.data.get('date', None)
                 time = request.data.get('time', None)
-                all_slots_available = request.data.get('all', None)
 
-                instance = ServiceAvailability.objects.create(service=service_instance,
-                                                              date=date,
-                                                              time=time,
-                                                              all_slots_available=all_slots_available)
+                # Determine the availability based on provided time or use default_false_time_slot
+                if time is not None:
+                    all_slots_available = [
+                        {'time': i, 'make_slot_available': (i == int(time))} for i in range(24)
+                    ]
+                else:
+                    all_slots_available = default_true_time_slot()
+
+                instance = ServiceAvailability.objects.create(
+                    service=service_instance,
+                    date=date,
+                    time=time,
+                    all_slots_available=all_slots_available
+                )
             else:
                 return Response({"error": "Service not found"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -617,10 +653,14 @@ class AdminServiceBookingAvailabilityList(generics.ListAPIView):
             service = Service.objects.get(id=service_id)
 
             date = self.kwargs.get("date")
+            month = self.kwargs.get("month")
             if not date:
                 raise ValueError("Date parameter is missing.")
+            if not month:
+                raise ValueError("Month parameter is missing.")
 
-            return Booking.objects.filter(service=service, start_date__date=date)
+            return Booking.objects.filter(service=service, start_date__date=date,
+                                          start_date__month=month)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -669,17 +709,17 @@ class ExploreMore(generics.ListAPIView):
 #     filter_backends = [DjangoFilterBackend]
 #     flterset_class = ServiceFilter
 
-    # def get_queryset(self):
-    #     try:
-    #         user = self.request.user
-    #         if user.is_authenticated:
-    #             # Filter services based on bookmarks
-    #             bookmarked_service_ids = Bookmark.objects.filter(user=user).values_list('service__id', flat=True)
-    #             return Service.objects.filter(id__in=bookmarked_service_ids)
-    #         else:
-    #             return Service.objects.none()
-    #     except:
-    #         pass
+# def get_queryset(self):
+#     try:
+#         user = self.request.user
+#         if user.is_authenticated:
+#             # Filter services based on bookmarks
+#             bookmarked_service_ids = Bookmark.objects.filter(user=user).values_list('service__id', flat=True)
+#             return Service.objects.filter(id__in=bookmarked_service_ids)
+#         else:
+#             return Service.objects.none()
+#     except:
+#         pass
 
 
 class CategoryBasedListing(generics.ListAPIView):
@@ -741,7 +781,7 @@ class ServiceAvailablityTimeUpdate(generics.UpdateAPIView):
             if not time:
                 raise ValueError("Time Parameter is missing ")
             service_avilability = ServiceAvailability.objects.get(
-                id=service_id,)
+                id=service_id, )
             service_avilability.time = time
             service_avilability.save()
             serializer = ServiceAvailabilitySerializer(service_avilability)
@@ -807,7 +847,8 @@ class ServiceReviewCreate(generics.CreateAPIView):
                     serializer.save(user=request.user, service_id=service_id)
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 else:
-                    return Response({"message": "You have already reviewed this service."}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"message": "You have already reviewed this service."},
+                                    status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({"message": "Service not completed yet."}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -858,7 +899,6 @@ class PackageCreateAPIView(generics.CreateAPIView):
     filterset_class = PackageFilter
 
     def perform_create(self, serializer):
-
         serializer.save()
 
 
