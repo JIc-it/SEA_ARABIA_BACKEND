@@ -158,7 +158,7 @@ class ServiceSerializer(serializers.ModelSerializer):
                   'purchase_limit_min',
                   'purchase_limit_max',
                   'capacity',
-                  'pickup_point_or_address',
+                  'pickup_point_or_location',
                   'cancellation_policy',
                   'refund_policy',
                   'service_image',
@@ -202,8 +202,8 @@ class ServiceIndividualSerializer(serializers.ModelSerializer):
 
     price = PriceSerializer(required=False, allow_null=True)
     service_image = ServiceImageSerializer(many=True)
-    destination = serializers.CharField(
-        source="location.name", required=False, allow_null=True)
+    # destination = serializers.CharField(
+    #     source="location.name", required=False, allow_null=True)
     company = serializers.CharField(source="company.name")
     category = CategorySerializer(many=True, required=False, allow_null=True)
     amenities = AmenitySerializer(many=True, required=False, allow_null=True)
@@ -216,7 +216,7 @@ class ServiceIndividualSerializer(serializers.ModelSerializer):
             "price",
             "capacity",
             "service_image",
-            "destination",
+            "pickup_point_or_location",
             "company",
             "amenities",
             "description",

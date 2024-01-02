@@ -163,7 +163,7 @@ class Service(Main):
     toilet = models.PositiveIntegerField(blank=True, null=True)
     capacity = models.CharField(max_length=200, blank=True, null=True)
     amenities = models.ManyToManyField(Amenity, blank=True)
-    pickup_point_or_address = models.TextField(blank=True, null=True)
+    pickup_point_or_location = models.TextField(blank=True, null=True)
     cancellation_policy = models.TextField(blank=True, null=True)
     refund_policy = models.TextField(blank=True, null=True)
     is_duration = models.BooleanField(default=False)
