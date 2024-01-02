@@ -175,6 +175,7 @@ class UserCreate(generics.CreateAPIView):
             gender = request.data.get("gender")
             dob = request.data.get("dob")
             password = request.data.get("password")
+            role = request.data.get("role")
 
             if location:
                 location_instance = GCCLocations.objects.get(id=location)
@@ -182,7 +183,7 @@ class UserCreate(generics.CreateAPIView):
             user = User.objects.create_user(first_name=first_name,
                                             last_name=last_name,
                                             email=email,
-                                            role='User',
+                                            role=role,
                                             mobile=mobile,
                                             password=password)
 
@@ -655,7 +656,6 @@ class UserSignUp(generics.CreateAPIView):
         return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class BookmarkCreateAPIView(generics.CreateAPIView):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
@@ -677,7 +677,7 @@ class BookmarkCreateAPIView(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        
+
 
 # class BookMarkListView(generics.ListAPIView):
 #     """bookmark listing"""
@@ -708,13 +708,13 @@ class BookMarkDeleteView(generics.DestroyAPIView):
         try:
             service = Service.objects.get(id=self.kwargs['service_id'])
             if service and Bookmark.objects.filter(user=request.user, service=service).exists():
-                Bookmark.objects.get(user=request.user, service=service).delete()
+                Bookmark.objects.get(
+                    user=request.user, service=service).delete()
                 return Response(data={'message': 'Bookmark deleted successfully'}, status=status.HTTP_200_OK)
             else:
                 return Response(data={'message': 'Bookmark delete failed'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class UserProfileView(generics.RetrieveAPIView):

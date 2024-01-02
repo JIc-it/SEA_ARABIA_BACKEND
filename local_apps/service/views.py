@@ -347,7 +347,7 @@ class ServiceUpdate(generics.UpdateAPIView):
                 service_name = service_price.get('name', None)
                 price = service_price.get('price', None)
                 is_range = service_price.get('is_range', None)
-                location = service_price.get('location', None)
+                location = service_price.pop('location', None)
                 duration_hour = service_price.get('duration_hour', None)
                 duration_minute = service_price.get('duration_minute', None)
                 duration_day = service_price.get('duration_day', None)
@@ -395,6 +395,12 @@ class ServiceUpdate(generics.UpdateAPIView):
                         price_instance.end_date = end_date
 
                     price_instance.save()
+                else:
+                    if location:
+                        location_instance = Destination.objects.get(
+                            id=location)
+                    Price.objects.create(
+                        service=service_instance, location=location_instance, **service_price)
 
             serializer = self.get_serializer(service_instance)
             return Response(serializer.data)
@@ -1124,4 +1130,4 @@ class UpdateAvailabilityView(generics.UpdateAPIView):
 
 class ServiceIndividualView(generics.RetrieveAPIView):
     queryset = Service.objects.all()
-    serializer_class =  ServiceIndividualSerializer
+    serializer_class = ServiceIndividualSerializer
