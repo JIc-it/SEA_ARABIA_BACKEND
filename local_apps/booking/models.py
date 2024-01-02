@@ -5,6 +5,7 @@ from local_apps.core.models import Main
 from local_apps.service.models import Service, Package, Price
 from local_apps.offer.models import Offer
 from local_apps.account.models import Guest
+from django.core.exceptions import ValidationError
 
 BOOKING_STATUS = (
     ('Upcoming', 'Upcoming'),
@@ -165,8 +166,10 @@ class Booking(Main):
 
             if self.offer.purchase_requirement == True and self.price.price >= self.offer.min_purchase_amount:
                 redeem_temp=True
-            else:
-                redeem_temp= False   
+                
+            else: 
+                redeem_temp= False
+
         elif self.booking_item in ['Package', 'Event']:
             self.price_total = self.package.price if self.package and self.package.price else 0
         else:
