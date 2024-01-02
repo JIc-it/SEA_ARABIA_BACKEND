@@ -49,11 +49,11 @@ urlpatterns = [
 
     # bookmark urls
 
-    path('bookmark-create/', BookMarkCreationAPI.as_view(),
+    path('bookmark-create/', BookmarkCreateAPIView.as_view(),
          name="bookmark-create"),
     path('bookmark-list/', BookMarkListView.as_view(), name="bookmark-list"),
-    path('bookmark-delete/<uuid:pk>/',
-         BookMarkDeleteView.as_view(), name="bookmark-delete"),
+
+    path('bookmarks/delete/<uuid:service_id>/', BookMarkDeleteView.as_view(), name='bookmark-delete'),
 
     # ? vendor card count urls
 

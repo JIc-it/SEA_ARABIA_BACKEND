@@ -655,11 +655,16 @@ class UserSignUp(generics.CreateAPIView):
         return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class BookMarkCreationAPI(generics.CreateAPIView):
+
+class BookmarkCreateAPIView(generics.CreateAPIView):
     """bookmark creation"""
     queryset = Bookmark.objects.all()
-    serializer_class = BookMarkSerializer
+    serializer_class = BookmarkSerializer
     permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+       
+        serializer.save(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
 
@@ -671,6 +676,18 @@ class BookMarkCreationAPI(generics.CreateAPIView):
             return Response({'error': 'You have already bookmarked this service.'}, status=status.HTTP_400_BAD_REQUEST)
 
         return super().create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+      
+        user = self.request.user
+        service = serializer.validated_data['service']
+        if Bookmark.objects.filter(user=user, service=service).exists():
+            return Response({"message": "You have already bookmarked this service."}, status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 # class BookMarkListView(generics.ListAPIView):
@@ -684,7 +701,7 @@ class BookMarkCreationAPI(generics.CreateAPIView):
 
 class BookMarkListView(generics.ListAPIView):
     """bookmark listing"""
-    serializer_class = BookMarkListSerializer
+    serializer_class = BookmarkListSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -692,18 +709,23 @@ class BookMarkListView(generics.ListAPIView):
 
 
 class BookMarkDeleteView(generics.DestroyAPIView):
-    """bookmark deletion"""
+    """Bookmark deletion"""
     queryset = Bookmark.objects.all()
-    serializer_class = BookMarkListSerializer
-    lookup_field = 'pk'
+    serializer_class = BookmarkListSerializer
+    lookup_url_kwarg = 'service_id'
+    permission_classes = [IsAuthenticated]
 
     def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(data={'message': 'Bookmark deleted successfully'}, status=status.HTTP_200_OK)
+        try:
+            service = Service.objects.get(id=self.kwargs['service_id'])
+            if service and Bookmark.objects.filter(user=request.user, service=service).exists():
+                Bookmark.objects.get(user=request.user, service=service).delete()
+                return Response(data={'message': 'Bookmark deleted successfully'}, status=status.HTTP_200_OK)
+            else:
+                return Response(data={'message': 'Bookmark delete failed'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    def perform_destroy(self, instance):
-        instance.delete()
 
 
 class UserProfileView(generics.RetrieveAPIView):

@@ -1118,3 +1118,8 @@ class UpdateAvailabilityView(generics.UpdateAPIView):
 
         return Response({"message": "Availability updated successfully"},
                         status=status.HTTP_201_CREATED)
+
+
+class ServiceIndividualView(generics.RetrieveAPIView):
+    queryset = Service.objects.all()
+    serializer_class = ServiceDeatilSerializer

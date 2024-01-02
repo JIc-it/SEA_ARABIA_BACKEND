@@ -188,8 +188,8 @@ class ServiceSerializer(serializers.ModelSerializer):
         return None
 
 
-class ExploreMoreSerializer(serializers.ModelSerializer):
-    """serializer for showing the data in explore more section"""
+class ServiceDeatilSerializer(serializers.ModelSerializer):
+    """serializer for showing deatil service"""
 
     price = PriceSerializer(required=False, allow_null=True)
     service_image = ServiceImageSerializer(many=True)
@@ -198,13 +198,13 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
     company = serializers.CharField(source="company.name")
     category = CategorySerializer(many=True, required=False, allow_null=True)
     amenities = AmenitySerializer(many=True, required=False, allow_null=True)
+    
 
     class Meta:
         model = Service
         fields = [
             "id",
             "name",
-            "pickup_point",
             "price",
             "capacity",
             "service_image",
@@ -213,6 +213,13 @@ class ExploreMoreSerializer(serializers.ModelSerializer):
             "amenities",
             "description",
             "category",
+            "lounge",
+            "bedroom",
+            "toilet",
+            "capacity",
+            "cancellation_policy",
+            "refund_policy",
+            'type',
         ]
 
     extra_kwargs = {

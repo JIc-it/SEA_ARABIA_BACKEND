@@ -194,5 +194,7 @@ urlpatterns = [
 
     path('profit-method-list',
          ProfitMethodList.as_view(), name='profit-method-list'),
+    
+    path('service/<uuid:pk>/', ServiceIndividualView.as_view(), name='service-detail'),
 
 ]

@@ -340,14 +340,14 @@ class UserSignUpSerializer(serializers.ModelSerializer):
 
 # bookmark
 
-class BookMarkSerializer(serializers.ModelSerializer):
+class BookmarkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Bookmark
         fields = "__all__"
 
 
-class BookMarkListSerializer(serializers.ModelSerializer):
+class BookmarkListSerializer(serializers.ModelSerializer):
     service = ServiceSerializer()
 
     class Meta:
