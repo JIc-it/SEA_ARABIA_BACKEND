@@ -24,7 +24,6 @@ today = datetime.date.today()
 
 
 class BookingListView(generics.ListAPIView):
-    queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
@@ -35,6 +34,10 @@ class BookingListView(generics.ListAPIView):
         "user__last_name"
     ]
     filterset_class = BookingFilter
+
+    def get_queryset(self):
+        # Return only bookings for the authenticated user
+        return Booking.objects.filter(user=self.request.user)
 
 
 class BookingCreateView(generics.CreateAPIView):
