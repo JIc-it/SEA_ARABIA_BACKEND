@@ -86,8 +86,6 @@ class Booking(Main):
     last_name=models.CharField(max_length=255, blank=True, null=True)
     phone_number=models.CharField(max_length=255, blank=True, null=True)
     email=models.EmailField(null=True,blank=True)
-    for_myself=models.BooleanField(blank=True, null=True)
-    for_someone_else=models.BooleanField(default=False,blank=True, null=True)
     destination = models.CharField(max_length=255, blank=True, null=True)
     booking_for = models.CharField(choices=BOOKING_FOR_TYPE, default='My Self', max_length=255)
     booking_item = models.CharField(choices=BOOKING_ITEM_TYPE, default='Service', max_length=255)
@@ -166,7 +164,7 @@ class Booking(Main):
                     redeem_temp=True
                 else:
                     raise ValidationError("This Offer has expired")
-            if self.offer.services == self.service:
+            if self.service in self.offer.services.all():
                 redeem_temp=True
             else:
                 raise ValidationError("The service provided does not match the service of this Offer.")
@@ -184,6 +182,7 @@ class Booking(Main):
 
         if self.offer:
             self.offer.redeem_count = self.offer.redeem_count + 1
+
             self.offer.save()
 
         super(Booking, self).save(*args, **kwargs)

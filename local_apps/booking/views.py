@@ -68,8 +68,6 @@ class BookingCreateView(generics.CreateAPIView):
                 offer=offer,
                 service=service,
                 payment=payment,
-                for_myself=request.data.get('for_myself'),
-                for_someone_else=request.data.get('for_someone_else'),
                 first_name=request.data.get('first_name'),
                 last_name=request.data.get('last_name'),
                 phone_number=request.data.get('phone_number'),

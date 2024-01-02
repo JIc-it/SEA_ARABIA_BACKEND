@@ -38,7 +38,7 @@ class Offer(Main):
     on_home_screen = models.BooleanField(default=False)
     on_checkout = models.BooleanField(default=True)
     start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    end_date = models.DateTimeField(blank=True, null=True)
     is_lifetime = models.BooleanField(default=False)
     services = models.ManyToManyField(Service, blank=True, related_name='offer_offer_services')
     companies = models.ManyToManyField(Company, blank=True, related_name='offer_offer_companies')
