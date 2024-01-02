@@ -188,8 +188,8 @@ class ServiceSerializer(serializers.ModelSerializer):
         return None
 
 
-class ServiceDeatilSerializer(serializers.ModelSerializer):
-    """serializer for showing deatil service"""
+class ExploreMoreSerializer(serializers.ModelSerializer):
+    """serializer for showing the data in explore more section"""
 
     price = PriceSerializer(required=False, allow_null=True)
     service_image = ServiceImageSerializer(many=True)
@@ -198,13 +198,13 @@ class ServiceDeatilSerializer(serializers.ModelSerializer):
     company = serializers.CharField(source="company.name")
     category = CategorySerializer(many=True, required=False, allow_null=True)
     amenities = AmenitySerializer(many=True, required=False, allow_null=True)
-    
 
     class Meta:
         model = Service
         fields = [
             "id",
             "name",
+            "pickup_point",
             "price",
             "capacity",
             "service_image",
@@ -213,13 +213,6 @@ class ServiceDeatilSerializer(serializers.ModelSerializer):
             "amenities",
             "description",
             "category",
-            "lounge",
-            "bedroom",
-            "toilet",
-            "capacity",
-            "cancellation_policy",
-            "refund_policy",
-            'type',
         ]
 
     extra_kwargs = {
@@ -260,7 +253,6 @@ class ServiceReviewListSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
     star_rating = serializers.SerializerMethodField()
 
-
     class Meta:
         model = ServiceReview
         fields = [
@@ -269,7 +261,7 @@ class ServiceReviewListSerializer(serializers.ModelSerializer):
             "review_title",
             "review_summary",
             "rating",
-            "created_at"
+            "created_at",
             "star_rating",
         ]
 
