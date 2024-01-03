@@ -22,6 +22,8 @@ class UserFilter(django_filters.FilterSet):
     role = django_filters.CharFilter(lookup_expr="icontains")
     location = django_filters.CharFilter(method="get_location")
     created_at = django_filters.CharFilter(method="get_created_at")
+    company_company_user = django_filters.BooleanFilter(
+        method='get_company_company_user')
 
     def get_location(self, queryset, name, value):
         """ function returns the result with multiple location selected """
@@ -35,10 +37,14 @@ class UserFilter(django_filters.FilterSet):
         start_date, end_date = value.split(',')
         return queryset.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
 
+    def get_company_company_user(self, queryset, name, value):
+        if value:
+            return queryset.filter(company_company_user__is_active=True)
+
     class Meta:
         model = User
         fields = [
             "role",
             "location",
-            "updated_at"
+            "created_at"
         ]
