@@ -34,8 +34,6 @@ class BookingSerializer(serializers.ModelSerializer):
                   'last_name',
                   'phone_number',
                   'email',
-                  'for_myself',
-                  'for_someone_else',
                   'booking_for',
                   'booking_item',
                   'starting_point',
