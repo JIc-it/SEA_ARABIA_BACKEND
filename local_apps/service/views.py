@@ -395,6 +395,7 @@ class ServiceUpdate(generics.UpdateAPIView):
                         price_instance.end_date = end_date
 
                     price_instance.save()
+
                 else:
                     if location:
                         location_instance = Destination.objects.get(
@@ -1134,3 +1135,13 @@ class UpdateAvailabilityView(generics.UpdateAPIView):
 class ServiceIndividualView(generics.RetrieveAPIView):
     queryset = Service.objects.all()
     serializer_class = ServiceIndividualSerializer
+
+
+class ServicePriceDelete(generics.DestroyAPIView):
+    serializer_class = PriceSerializer
+    queryset = Price.objects.all()
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({"message": "Price object deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
