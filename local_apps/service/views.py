@@ -295,7 +295,7 @@ class ServiceUpdate(generics.UpdateAPIView):
             if capacity:
                 service_instance.capacity = capacity
             if pickup_point_or_location:
-                service_instance.pickup_point = pickup_point_or_location
+                service_instance.pickup_point_or_location = pickup_point_or_location
             if cancellation_policy:
                 service_instance.cancellation_policy = cancellation_policy
             if refund_policy:
