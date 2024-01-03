@@ -40,7 +40,7 @@ class BeastDealsOfferListView(generics.ListAPIView):
             current_datetime = timezone.now()
 
            
-            queryset = Offer.objects.filter(is_enable=True, start_date__lte=current_datetime)
+            queryset = Offer.objects.filter(is_enable=True, start_date__lte=current_datetime,on_home_screen=True)
 
            
             queryset = queryset.exclude(end_date__lt=current_datetime)

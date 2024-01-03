@@ -198,7 +198,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 
 class ServiceIndividualSerializer(serializers.ModelSerializer):
-    """serializer for showing the data in explore more section"""
+    """serializer for showing the service individual view"""
 
     service_price_service = PriceSerializer(required=False, allow_null=True,many=True)
     service_image = ServiceImageSerializer(many=True)

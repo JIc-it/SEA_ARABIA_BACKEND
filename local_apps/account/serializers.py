@@ -217,6 +217,8 @@ class UserListSerializer(serializers.ModelSerializer):
     total_booking = serializers.SerializerMethodField()
     company_id = serializers.CharField(
         source='company_company_user.id', allow_null=True)
+    company_status = serializers.CharField(
+        source='company_company_user.is_active', allow_null=True)
 
     class Meta:
         model = User
@@ -231,7 +233,8 @@ class UserListSerializer(serializers.ModelSerializer):
             "is_active",
             "total_booking",
             "role",
-            "company_id"
+            "company_id",
+            "company_status"
         ]
 
     def get_total_booking(self, instance):
