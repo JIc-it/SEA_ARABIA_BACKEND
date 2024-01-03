@@ -182,22 +182,18 @@ class UserCreate(generics.CreateAPIView):
             password = request.data.get("password")
             role = request.data.get("role")
 
-            if location:
-                location_instance = GCCLocations.objects.get(id=location)
-
             user = User.objects.create_user(first_name=first_name,
                                             last_name=last_name,
                                             email=email,
                                             role=role,
                                             mobile=mobile,
                                             password=password)
-
-            # Serialize the data after the user creation
             value_after = serialize('json', [user])
+            if location:
+                location_instance = GCCLocations.objects.get(id=location)
 
-            ProfileExtra.objects.create(
-                user=user, location=location_instance, gender=gender.title(), dob=dob)
-
+                ProfileExtra.objects.create(
+                    user=user, location=location_instance, gender=gender.title(), dob=dob)
             data = UserCreateSerializer(user)
 
             # Log the user creation action

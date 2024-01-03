@@ -235,7 +235,8 @@ class ServiceUpdate(generics.UpdateAPIView):
             bedroom = request.data.get('bedroom', None)
             toilet = request.data.get('toilet', None)
             capacity = request.data.get('capacity', None)
-            pickup_point = request.data.get('pickup_point', None)
+            pickup_point_or_location = request.data.get(
+                'pickup_point_or_location', None)
             cancellation_policy = request.data.get('cancellation_policy', None)
             refund_policy = request.data.get('refund_policy', None)
             is_duration = request.data.get('is_duration', None)
@@ -261,6 +262,12 @@ class ServiceUpdate(generics.UpdateAPIView):
 
             service_id = kwargs.get('pk')
             service_instance = Service.objects.get(id=service_id)
+
+            temp_is_duration = service_instance.is_duration
+            temp_is_time = service_instance.is_time
+            temp_is_date = service_instance.is_date
+            temp_is_day = service_instance.is_day
+            temp_is_destination = service_instance.is_destination
 
             if is_verified is not None:
                 service_instance.is_verified = True if is_verified == 'true' or is_verified == 'True' or is_verified == True else False
@@ -314,8 +321,8 @@ class ServiceUpdate(generics.UpdateAPIView):
                 service_instance.toilet = toilet
             if capacity:
                 service_instance.capacity = capacity
-            if pickup_point:
-                service_instance.pickup_point = pickup_point
+            if pickup_point_or_location:
+                service_instance.pickup_point_or_location = pickup_point_or_location
             if cancellation_policy:
                 service_instance.cancellation_policy = cancellation_policy
             if refund_policy:
@@ -1273,6 +1280,7 @@ class ServiceIndividualView(generics.RetrieveAPIView):
 
 
 class ServicePriceDelete(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = PriceSerializer
     queryset = Price.objects.all()
 
