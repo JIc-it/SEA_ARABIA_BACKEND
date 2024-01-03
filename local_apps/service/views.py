@@ -1276,7 +1276,7 @@ class PackageListAPIView(generics.ListAPIView):
 
 class ServiceIndividualView(generics.RetrieveAPIView):
     queryset = Service.objects.all()
-    serializer_class = ServiceIndividualSerializer
+    serializer_class = ServiceSerializer
 
 
 class ServicePriceDelete(generics.DestroyAPIView):
