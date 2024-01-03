@@ -67,8 +67,27 @@ class User(AbstractUser):
         )
 
     def save(self, *args, **kwargs):
-        # Check if the instance already exists
-        if self.pk:
+        if not self.account_id:
+            last_usr_instance = User.objects.order_by('-account_id_count').first()
+            if last_usr_instance:
+                self.account_id_count = last_usr_instance.account_id_count + 1
+            else:
+                self.account_id_count = 1
+            if self.role == 'Admin':
+                self.account_id = 'SA-ADM-00' + str(self.account_id_count)
+            elif self.role == 'Staff':
+                self.account_id = 'SA-STF-00' + str(self.account_id_count)
+            elif self.role == 'Vendor':
+                self.account_id = 'SA-VDR-00' + str(self.account_id_count)
+            elif self.role == 'User':
+                self.account_id = 'SA-USR-00' + str(self.account_id_count)
+            else:
+                self.account_id = 'SA-OTH-00' + str(self.account_id_count)
+
+        if not self.pk:
+            # Only call the original save method if the instance is new
+            super(User, self).save(*args, **kwargs)
+        else:
             # Get the data before the update
             data_before = serialize('json', [self] or None)
 
@@ -80,29 +99,6 @@ class User(AbstractUser):
 
             # Create a log entry
             self.create_update_log(data_before, data_after)
-
-        else:
-            # Call the original save method to save the instance
-            super(User, self).save(*args, **kwargs)
-
-            if not self.account_id:
-                last_usr_instance = User.objects.order_by(
-                    '-account_id_count').first()
-                if last_usr_instance:
-                    self.account_id_count = last_usr_instance.account_id_count + 1
-                else:
-                    self.account_id_count = 1
-                if self.role == 'Admin':
-                    self.account_id = 'SA-ADM-00' + str(self.account_id_count)
-                elif self.role == 'Staff':
-                    self.account_id = 'SA-STF-00' + str(self.account_id_count)
-                elif self.role == 'Vendor':
-                    self.account_id = 'SA-VDR-00' + str(self.account_id_count)
-                elif self.role == 'User':
-                    self.account_id = 'SA-USR-00' + str(self.account_id_count)
-                else:
-                    self.account_id = 'SA-OTH-00' + str(self.account_id_count)
-            super(User, self).save(*args, **kwargs)
 
 
 class GCCLocations(Main):
