@@ -200,7 +200,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 class ServiceIndividualSerializer(serializers.ModelSerializer):
     """serializer for showing the data in explore more section"""
 
-    price = PriceSerializer(required=False, allow_null=True)
+    service_price_service = PriceSerializer(required=False, allow_null=True)
     service_image = ServiceImageSerializer(many=True)
     # destination = serializers.CharField(
     #     source="location.name", required=False, allow_null=True)
@@ -213,7 +213,7 @@ class ServiceIndividualSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
-            "price",
+            "service_price_service",
             "capacity",
             "service_image",
             "pickup_point_or_location",
