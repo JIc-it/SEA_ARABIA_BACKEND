@@ -208,7 +208,8 @@ class ServiceUpdate(generics.UpdateAPIView):
             bedroom = request.data.get('bedroom', None)
             toilet = request.data.get('toilet', None)
             capacity = request.data.get('capacity', None)
-            pickup_point = request.data.get('pickup_point', None)
+            pickup_point_or_location = request.data.get(
+                'pickup_point_or_location', None)
             cancellation_policy = request.data.get('cancellation_policy', None)
             refund_policy = request.data.get('refund_policy', None)
             is_duration = request.data.get('is_duration', None)
@@ -293,8 +294,8 @@ class ServiceUpdate(generics.UpdateAPIView):
                 service_instance.toilet = toilet
             if capacity:
                 service_instance.capacity = capacity
-            if pickup_point:
-                service_instance.pickup_point = pickup_point
+            if pickup_point_or_location:
+                service_instance.pickup_point = pickup_point_or_location
             if cancellation_policy:
                 service_instance.cancellation_policy = cancellation_policy
             if refund_policy:
