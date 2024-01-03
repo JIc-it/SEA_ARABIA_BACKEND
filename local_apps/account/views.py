@@ -351,7 +351,7 @@ class VendorAdd(generics.CreateAPIView):
 
             if location_data:
                 location_instance = GCCLocations.objects.get(id=location_data)
-                profile_extra = ProfileExtra.objects.create(
+                ProfileExtra.objects.create(
                     user=user, location=location_instance
                 )
 
