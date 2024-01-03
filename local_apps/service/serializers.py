@@ -228,6 +228,13 @@ class ServiceIndividualSerializer(serializers.ModelSerializer):
             "capacity",
             "cancellation_policy",
             "refund_policy",
+            "is_duration",
+            "is_date",
+            "is_day",
+            "is_time",
+            "is_destination",
+          
+            
         ]
 
     extra_kwargs = {
