@@ -201,4 +201,7 @@ urlpatterns = [
     path('price/delete/<uuid:pk>', ServicePriceDelete.as_view(),
          name='service-price-delete'),
 
+    path('serviceimage/create', ServiceImageCreateMethod.as_view(),
+         name='serviceimagecreate'),
+
 ]

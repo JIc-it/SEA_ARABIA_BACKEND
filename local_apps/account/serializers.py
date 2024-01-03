@@ -215,6 +215,8 @@ class UserListSerializer(serializers.ModelSerializer):
     location = serializers.CharField(source="profileextra.location")
     created_at = serializers.DateTimeField(format="%d-%m-%Y")
     total_booking = serializers.SerializerMethodField()
+    company_id = serializers.CharField(
+        source='company_company_user.id', allow_null=True)
 
     class Meta:
         model = User
@@ -229,6 +231,7 @@ class UserListSerializer(serializers.ModelSerializer):
             "is_active",
             "total_booking",
             "role",
+            "company_id"
         ]
 
     def get_total_booking(self, instance):
@@ -278,8 +281,10 @@ class AllUserDetailsSerializer(serializers.ModelSerializer):
     useridentificationdata = UserIdentificationDataSerializer(read_only=True)
     company_company_user = CompanyAddSerializer(read_only=True)
     profileextra = ProfileExtraSerializer(read_only=True)
-    status = serializers.CharField(
-        source="company_company_user.status", default=None)
+    company_status = serializers.BooleanField(
+        source="company_company_user.is_active", default=None, allow_null=True)
+    company_onboard_status = serializers.CharField(
+        source="company_company_user.status", default=None, allow_null=True)
 
     class Meta:
         model = User
@@ -294,7 +299,8 @@ class AllUserDetailsSerializer(serializers.ModelSerializer):
             "useridentificationdata",
             "company_company_user",
             "profileextra",
-            "status",
+            "company_status",
+            "company_onboard_status",
             "is_active"
         ]
 # ----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
