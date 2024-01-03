@@ -1,5 +1,5 @@
 import uuid
-
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import serialize
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -84,12 +84,14 @@ class User(AbstractUser):
             else:
                 self.account_id = 'SA-OTH-00' + str(self.account_id_count)
 
-        if not self.pk:
-            # Only call the original save method if the instance is new
-            super(User, self).save(*args, **kwargs)
-        else:
-            # Get the data before the update
-            data_before = serialize('json', [self] or None)
+        # Check if the instance already exists
+        if self.pk:
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [User.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
 
             # Call the original save method to save the instance
             super(User, self).save(*args, **kwargs)
@@ -99,6 +101,9 @@ class User(AbstractUser):
 
             # Create a log entry
             self.create_update_log(data_before, data_after)
+        else:
+            # Call the original save method to save the instance
+            super(User, self).save(*args, **kwargs)
 
 
 class GCCLocations(Main):
@@ -122,8 +127,12 @@ class GCCLocations(Main):
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
-            # Get the data before the update
-            data_before = serialize('json', [self] or None)
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [GCCLocations.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
 
             # Call the original save method to save the instance
             super(GCCLocations, self).save(*args, **kwargs)
@@ -133,7 +142,6 @@ class GCCLocations(Main):
 
             # Create a log entry
             self.create_update_log(data_before, data_after)
-
         else:
             # Call the original save method to save the instance
             super(GCCLocations, self).save(*args, **kwargs)
@@ -164,8 +172,12 @@ class ProfileExtra(Main):
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
-            # Get the data before the update
-            data_before = serialize('json', [self] or None)
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [ProfileExtra.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
 
             # Call the original save method to save the instance
             super(ProfileExtra, self).save(*args, **kwargs)
@@ -175,7 +187,6 @@ class ProfileExtra(Main):
 
             # Create a log entry
             self.create_update_log(data_before, data_after)
-
         else:
             # Call the original save method to save the instance
             super(ProfileExtra, self).save(*args, **kwargs)
@@ -218,8 +229,12 @@ class UserIdentificationType(Main):
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
-            # Get the data before the update
-            data_before = serialize('json', [self] or None)
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [UserIdentificationType.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
 
             # Call the original save method to save the instance
             super(UserIdentificationType, self).save(*args, **kwargs)
@@ -229,7 +244,6 @@ class UserIdentificationType(Main):
 
             # Create a log entry
             self.create_update_log(data_before, data_after)
-
         else:
             # Call the original save method to save the instance
             super(UserIdentificationType, self).save(*args, **kwargs)
@@ -265,8 +279,12 @@ class UserIdentificationData(Main):
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
-            # Get the data before the update
-            data_before = serialize('json', [self] or None)
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [UserIdentificationData.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
 
             # Call the original save method to save the instance
             super(UserIdentificationData, self).save(*args, **kwargs)
@@ -276,7 +294,6 @@ class UserIdentificationData(Main):
 
             # Create a log entry
             self.create_update_log(data_before, data_after)
-
         else:
             # Call the original save method to save the instance
             super(UserIdentificationData, self).save(*args, **kwargs)
@@ -319,8 +336,12 @@ class PasswordReset(models.Model):
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
-            # Get the data before the update
-            data_before = serialize('json', [self] or None)
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [PasswordReset.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
 
             # Call the original save method to save the instance
             super(PasswordReset, self).save(*args, **kwargs)
@@ -330,7 +351,6 @@ class PasswordReset(models.Model):
 
             # Create a log entry
             self.create_update_log(data_before, data_after)
-
         else:
             # Call the original save method to save the instance
             super(PasswordReset, self).save(*args, **kwargs)
@@ -364,8 +384,12 @@ class Bookmark(Main):
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
-            # Get the data before the update
-            data_before = serialize('json', [self] or None)
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [Bookmark.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
 
             # Call the original save method to save the instance
             super(Bookmark, self).save(*args, **kwargs)
@@ -376,7 +400,7 @@ class Bookmark(Main):
             # Create a log entry
             self.create_update_log(data_before, data_after)
         else:
-            # Call the original save method for creating a new instance
+            # Call the original save method to save the instance
             super(Bookmark, self).save(*args, **kwargs)
 
 
@@ -408,8 +432,12 @@ class Guest(Main):
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
-            # Get the data before the update
-            data_before = serialize('json', [self] or None)
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [Guest.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
 
             # Call the original save method to save the instance
             super(Guest, self).save(*args, **kwargs)
@@ -420,7 +448,7 @@ class Guest(Main):
             # Create a log entry
             self.create_update_log(data_before, data_after)
         else:
-            # Call the original save method for creating a new instance
+            # Call the original save method to save the instance
             super(Guest, self).save(*args, **kwargs)
 
     class Meta:
