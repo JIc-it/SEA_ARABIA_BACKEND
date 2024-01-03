@@ -1,11 +1,12 @@
 from django.db import models
-from local_apps.account.models import User
+# from local_apps.account.models import User
 from ckeditor.fields import RichTextField
 from local_apps.core.models import Main
+from settings import settings
 
 
 class APILog(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
                              null=True, blank=True,
                              related_name='api_log_api_log_user')
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -26,11 +27,12 @@ class APILog(models.Model):
 
 
 class ModelUpdateLog(models.Model):
-    model_name = models.CharField(max_length=255)
-    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
-    timestamp = models.DateTimeField(auto_now_add=True)
-    data_before = models.TextField()
-    data_after = models.TextField()
+    model_name = models.CharField(max_length=255, null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             null=True, blank=True, on_delete=models.SET_NULL)
+    timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    data_before = models.TextField(null=True, blank=True)
+    data_after = models.TextField(null=True, blank=True)
 
     class Meta:
         ordering = ["-timestamp"]
@@ -42,7 +44,7 @@ class ModelUpdateLog(models.Model):
 
 
 class ActionLog(Main):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     model_name = models.CharField(max_length=255, null=True, blank=True)
     action = models.CharField(max_length=255, null=True, blank=True)
     title = models.TextField(blank=True, null=True)
