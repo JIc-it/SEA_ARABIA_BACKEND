@@ -217,7 +217,7 @@ class UserListSerializer(serializers.ModelSerializer):
     total_booking = serializers.SerializerMethodField()
     company_id = serializers.CharField(
         source='company_company_user.id', allow_null=True)
-    company_status = serializers.CharField(
+    company_status = serializers.BooleanField(
         source='company_company_user.is_active', allow_null=True)
 
     class Meta:
