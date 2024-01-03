@@ -9,10 +9,10 @@ from rest_framework.filters import SearchFilter
 class ActionLogListAPIView(generics.ListAPIView):
     queryset = ActionLog.objects.all()
     serializer_class = ActionLogSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     filter_backends = [SearchFilter]
-    search_fields = ['user__name',
-                     'user__user_id',
+    search_fields = [
+                     'user__account_id',
                      'user__role',
                      'user__email',
                      'model_name',
