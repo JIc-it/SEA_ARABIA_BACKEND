@@ -282,7 +282,9 @@ class AllUserDetailsSerializer(serializers.ModelSerializer):
     company_company_user = CompanyAddSerializer(read_only=True)
     profileextra = ProfileExtraSerializer(read_only=True)
     company_status = serializers.CharField(
-        source="company_company_user.status", default=None)
+        source="company_company_user.is_active", default=None, allow_null=True)
+    company_onboard_status = serializers.CharField(
+        source="company_company_user.status", default=None, allow_null=True)
 
     class Meta:
         model = User
@@ -298,6 +300,7 @@ class AllUserDetailsSerializer(serializers.ModelSerializer):
             "company_company_user",
             "profileextra",
             "company_status",
+            "company_onboard_status",
             "is_active"
         ]
 # ----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
