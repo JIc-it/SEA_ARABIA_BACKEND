@@ -281,7 +281,7 @@ class AllUserDetailsSerializer(serializers.ModelSerializer):
     useridentificationdata = UserIdentificationDataSerializer(read_only=True)
     company_company_user = CompanyAddSerializer(read_only=True)
     profileextra = ProfileExtraSerializer(read_only=True)
-    company_status = serializers.CharField(
+    company_status = serializers.BooleanField(
         source="company_company_user.is_active", default=None, allow_null=True)
     company_onboard_status = serializers.CharField(
         source="company_company_user.status", default=None, allow_null=True)
