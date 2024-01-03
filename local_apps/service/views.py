@@ -1361,3 +1361,24 @@ class ServicePriceDelete(generics.DestroyAPIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ServiceImageCreateMethod(generics.CreateAPIView):
+    """ api view for creating multiple images in service create """
+    serializer_class = ServiceImageSerializer
+    queryset = ServiceImage.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        try:
+            for images in request.data:
+                image = images.get('image', None)
+                service_id = images.get('service')
+                thumbnail = images.get('thumbnail')
+                if service_id:
+                    service_instance = Service.objects.get(id=service_id)
+                    ServiceImage.objects.create(
+                        service=service_instance, image=image, thumbnail=thumbnail)
+
+            return Response("Service Image Creation Successfull", status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
