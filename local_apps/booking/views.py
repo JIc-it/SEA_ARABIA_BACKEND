@@ -302,11 +302,3 @@ class ExportBookingCSVView(generics.ListAPIView):
         response['Content-Disposition'] = 'attachment; filename="bookings_list.csv"'
 
         return response
-
-
-# Payment Section
-
-
-class PaymentInitiate(generics.CreateAPIView):
-    serializer_class = ""
-    pass

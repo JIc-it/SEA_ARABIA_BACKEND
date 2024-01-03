@@ -235,6 +235,12 @@ class ServiceUpdate(generics.UpdateAPIView):
             service_id = kwargs.get('pk')
             service_instance = Service.objects.get(id=service_id)
 
+            temp_is_duration = service_instance.is_duration
+            temp_is_time = service_instance.is_time
+            temp_is_date = service_instance.is_date
+            temp_is_day = service_instance.is_day
+            temp_is_destination = service_instance.is_destination
+
             if is_verified is not None:
                 service_instance.is_verified = True if is_verified == 'true' or is_verified == 'True' or is_verified == True else False
 
@@ -1138,6 +1144,7 @@ class ServiceIndividualView(generics.RetrieveAPIView):
 
 
 class ServicePriceDelete(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = PriceSerializer
     queryset = Price.objects.all()
 
