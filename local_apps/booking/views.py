@@ -1,6 +1,10 @@
 import requests
 import json
+
+from django.core.serializers import serialize
 from rest_framework import generics, status
+
+from utils.action_logs import create_log
 from .models import Booking, Payment
 from .serializers import *
 from rest_framework.response import Response
@@ -24,6 +28,7 @@ today = datetime.date.today()
 
 
 class BookingListView(generics.ListAPIView):
+    queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
@@ -35,10 +40,6 @@ class BookingListView(generics.ListAPIView):
     ]
     filterset_class = BookingFilter
 
-    def get_queryset(self):
-        # Return only bookings for the authenticated user
-        return Booking.objects.filter(user=self.request.user)
-
 
 class BookingCreateView(generics.CreateAPIView):
     queryset = Booking.objects.all()
@@ -47,6 +48,9 @@ class BookingCreateView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
+            # Serialize the data before the booking creation
+            value_before = serialize('json', [Booking()])
+
             offer_id = request.data.get('offer')
             service_id = request.data.get('service')
             payment_id = request.data.get('payment')
@@ -101,58 +105,74 @@ class BookingCreateView(generics.CreateAPIView):
                 offer_details=offer_details
             )
 
-            # booking.save()
+            booking.save()
+
+            # Serialize the data after the booking creation
+            value_after = serialize('json', [booking])
+
+            # Log the booking creation action
+            log_user = request.user if request.user else 'Unknown User'
+            log_title = "{model} entry {action} by {user}".format(
+                model="Booking",
+                action='Created',
+                user=log_user
+            )
+
+            create_log(
+                user=request.user,
+                model_name='Booking',
+                action_value='Create',
+                title=log_title,
+                value_before=value_before,
+                value_after=value_after
+            )
 
             # payment initialization
 
-            api_key = settings.TAP_API_KEY
-            base_url = settings.TAP_BASE_URL
-            secret_key = settings.TAP_SECRET_KEY
+            # api_key = settings.TAP_API_KEY
+            # base_url = settings.TAP_BASE_URL
+            # secret_key = settings.TAP_SECRET_KEY
 
-            url = base_url + "authorize/"
-            total_amount = booking.price_total
-            payload = {
-                "amount": 2,
-                "currency": "KWD",
-                "metadata": {
-                    "udf1": "Sea Arabia TXN ID",
-                    "udf2": "Service Name",
-                    "udf3": "Service Category",
-                },
-                "customer": {
-                    "first_name": "Sea",
-                    "middle_name": "Arabia",
-                    "last_name": "User",
-                    "email": "prince@jicitsolution.com",
-                    "phone": {
-                        "country_code": "91",
-                        "number": "9999999999"
-                    }
-                },
-                "merchant": {"id": "1234"},
-                "source": {"id": "src_all"},
-                "redirect": {"url": "http://your_website.com/redirecturl"}
-            }
+            # url = base_url + "authorize/"
 
-            headers = {
-                "accept": "application/json",
-                "content-type": "application/json",
-                "Authorization": "Bearer "+secret_key
-            }
+            # payload = {
+            #     "amount": 2,  # mandatory
+            #     "currency": "KWD",  # mandatory
+            #     "metadata": {  # not  mandatory
+            #         "udf1": "Sea Arabia TXN ID",
+            #         "udf2": "Service Name",
+            #         "udf3": "Service Category",
+            #     },
+            #     "customer": {  # mandatory
+            #         "first_name": "Sea",
+            #         "middle_name": "Arabia",
+            #         "last_name": "User",
+            #         "email": "prince@jicitsolution.com",
+            #         "phone": {
+            #             "country_code": "91",
+            #             "number": "9999999999"
+            #         }
+            #     },
+            #     "merchant": {"id": "1234"},
+            #     "source": {"id": "src_all"},  # mandatory
+            #     # mandatory
+            #     "redirect": {"url": "http://your_website.com/redirecturl"}
+            # }
+            # headers = {
+            #     "accept": "application/json",
+            #     "content-type": "application/json",
+            #     "Authorization": "Bearer "+secret_key
+            # }
 
-            response = requests.post(url, json=payload, headers=headers)
-
-            payment_response = response.json()
-
-            # get the url for checkout from the json response
-
-            payment_url = payment_response.get("transaction")['url']
+            # response = requests.post(url, json=payload, headers=headers)
+            # try:
+            #     json_response = response.json()
+            #     print('>>>', json.dumps(json_response, indent=2))
+            # except json.JSONDecodeError:
+            #     print(response.text)
 
             serializer = BookingSerializer(booking)
-            serialized_data = serializer.data
-            serialized_data['payment_response'] = payment_url
-
-            return Response(serialized_data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -205,13 +225,44 @@ class BookingStatusUpdate(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         try:
+            # Get the booking instance before the update
+            booking_before_update = self.get_object()
+
+            # Serialize the data before the update
+            value_before = serialize('json', [booking_before_update])
+
             booking_status = request.data.get('status')
             booking_id = kwargs.get('pk', None)
 
+            # Update booking status
             booking_instance = get_object_or_404(Booking, id=booking_id)
             if booking_status:
                 booking_instance.status = booking_status.title()
                 booking_instance.save()
+
+            # Get the updated booking instance
+            booking_after_update = self.get_object()
+
+            # Serialize the data after the update
+            value_after = serialize('json', [booking_after_update])
+
+            # Log the booking update action
+            log_user = request.user if request.user else 'Unknown User'
+            log_title = "{model} entry {action} by {user}".format(
+                model="Booking",
+                action='Updated',
+                user=log_user
+            )
+
+            create_log(
+                user=request.user,
+                model_name='Booking',
+                action_value='Update',
+                title=log_title,
+                value_before=value_before,
+                value_after=value_after
+            )
+
             return Response({"Booking Status": booking_instance.status}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error : {str(e)}", status=status.HTTP_400_BAD_REQUEST)

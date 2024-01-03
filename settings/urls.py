@@ -12,6 +12,7 @@ from local_apps.account.views import LoginView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('report/', include('local_apps.api_report.urls', namespace='report')),
     path("__debug__/", include("debug_toolbar.urls")),
     path("company/", include("local_apps.company.urls")),
     path("service/", include("local_apps.service.urls")),

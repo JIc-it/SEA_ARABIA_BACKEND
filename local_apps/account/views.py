@@ -1,4 +1,5 @@
 import re
+from django.core.serializers import serialize
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -28,6 +29,7 @@ import requests
 from urllib.parse import unquote, quote
 import secrets
 import string
+from utils.action_logs import create_log
 
 # Google OAuth 2.0 configuration
 GOOGLE_CLIENT_ID = '28175996828-ls8r9c9l27r7kfvj28tv0ijrhgujt296.apps.googleusercontent.com'
@@ -167,6 +169,9 @@ class UserCreate(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
+            # Serialize the data before the user creation
+            value_before = serialize('json', [User()])
+
             first_name = request.data.get("first_name")
             last_name = request.data.get("last_name")
             email = request.data.get("email")
@@ -187,10 +192,31 @@ class UserCreate(generics.CreateAPIView):
                                             mobile=mobile,
                                             password=password)
 
+            # Serialize the data after the user creation
+            value_after = serialize('json', [user])
+
             ProfileExtra.objects.create(
                 user=user, location=location_instance, gender=gender.title(), dob=dob)
 
             data = UserCreateSerializer(user)
+
+            # Log the user creation action
+            log_user = request.user if request.user else 'Unknown User'
+            log_title = "{model} entry {action} by {user}".format(
+                model="User",
+                action='Created',
+                user=log_user
+            )
+
+            create_log(
+                user=request.user,
+                model_name='User',
+                action_value='Create',
+                title=log_title,
+                value_before=value_before,
+                value_after=value_after
+            )
+
             return Response(data.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
@@ -206,7 +232,7 @@ class UserList(generics.ListAPIView):
     search_fields = [
         "first_name",
         "last_name",
-        "profileextra__location__location",
+        "profileextra__location",
         "email",
         "mobile"
     ]
@@ -218,6 +244,43 @@ class UserUpdate(generics.UpdateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def update(self, request, *args, **kwargs):
+        try:
+            # Get the user instance before the update
+            user_before_update = self.get_object()
+
+            # Serialize the data before the update
+            value_before = serialize('json', [user_before_update])
+
+            response = super().update(request, *args, **kwargs)
+
+            # Get the updated user instance
+            user_after_update = self.get_object()
+
+            # Serialize the data after the update
+            value_after = serialize('json', [user_after_update])
+
+            # Log the user update action
+            log_user = request.user if request.user else 'Unknown User'
+            log_title = "{model} entry {action} by {user}".format(
+                model="User",
+                action='Updated',
+                user=log_user
+            )
+
+            create_log(
+                user=request.user,
+                model_name='User',
+                action_value='Update',
+                title=log_title,
+                value_before=value_before,
+                value_after=value_after
+            )
+
+            return response
+        except Exception as e:
+            return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
 
 
 #   Profile extra views
@@ -241,13 +304,13 @@ class VendorList(generics.ListAPIView):
         "email",
         "first_name",
         "last_name",
-        "profileextra__location__location",
+        "profileextra__location",
     ]
     ordering_fields = [
         "first_name",
         "last_name",
         "created_at",
-        "profileextra__location__location",
+        "profileextra__location",
     ]
     filterset_class = VendorFilter
 
@@ -257,24 +320,70 @@ class VendorDetailsList(generics.RetrieveAPIView):
     serializer_class = VendorDetailsSerializer
 
 
+# class VendorAdd(generics.CreateAPIView):
+#     """view for creating new vendor"""
+#
+#     serializer_class = VendorAddSerializer
+#
+#     def perform_create(self, serializer):
+#         location_data = self.request.data.get("location")
+#         created_by = self.request.user
+#         user = serializer.save()
+#
+#         if location_data:
+#             location_instance = GCCLocations.objects.get(id=location_data)
+#             profile_extra = ProfileExtra.objects.create(
+#                 user=user, location=location_instance
+#             )
+#         new_lead = OnboardStatus.objects.get(order=1)
+#         Company.objects.create(
+#             user=user, created_by=created_by, status=new_lead)
+
 class VendorAdd(generics.CreateAPIView):
-    """view for creating new vendor"""
+    """View for creating a new vendor"""
 
     serializer_class = VendorAddSerializer
 
     def perform_create(self, serializer):
-        location_data = self.request.data.get("location")
-        created_by = self.request.user
-        user = serializer.save()
+        try:
+            # Serialize the data before the vendor creation
+            value_before = serialize('json', [Company()])
 
-        if location_data:
-            location_instance = GCCLocations.objects.get(id=location_data)
-            profile_extra = ProfileExtra.objects.create(
-                user=user, location=location_instance
+            location_data = self.request.data.get("location")
+            created_by = self.request.user
+            user = serializer.save()
+
+            if location_data:
+                location_instance = GCCLocations.objects.get(id=location_data)
+                profile_extra = ProfileExtra.objects.create(
+                    user=user, location=location_instance
+                )
+
+            new_lead = OnboardStatus.objects.get(order=1)
+            company = Company.objects.create(
+                user=user, created_by=created_by, status=new_lead)
+
+            # Serialize the data after the vendor creation
+            value_after = serialize('json', [company])
+
+            # Log the vendor creation action
+            log_user = self.request.user if self.request.user else 'Unknown User'
+            log_title = "{model} entry {action} by {user}".format(
+                model="Company",
+                action='Created',
+                user=log_user
             )
-        new_lead = OnboardStatus.objects.get(order=1)
-        Company.objects.create(
-            user=user, created_by=created_by, status=new_lead)
+
+            create_log(
+                user=self.request.user,
+                model_name='Company',
+                action_value='Create',
+                title=log_title,
+                value_before=value_before,
+                value_after=value_after
+            )
+        except Exception as e:
+            return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
 
 
 class VendorDetailsAdd(generics.UpdateAPIView):
@@ -283,6 +392,12 @@ class VendorDetailsAdd(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         try:
+
+            # Get the user instance before the update
+            user_before_update = self.get_object()
+
+            # Serialize the data before the update
+            value_before = serialize('json', [user_before_update])
 
             # taking the data
             location_data = request.data.get("location", {})
@@ -348,7 +463,31 @@ class VendorDetailsAdd(generics.UpdateAPIView):
                 useridentification_instance.id_number = user_id_number
                 useridentification_instance.save()
 
+            # Get the updated user instance
+            user_after_update = self.get_object()
+
+            # Serialize the data after the update
+            value_after = serialize('json', [user_after_update])
+
+            # Log the user update action
+            log_user = request.user if request.user else 'Unknown User'
+            log_title = "{model} entry {action} by {user}".format(
+                model="User",
+                action='Updated',
+                user=log_user
+            )
+
+            create_log(
+                user=request.user,
+                model_name='User',
+                action_value='Update',
+                title=log_title,
+                value_before=value_before,
+                value_after=value_after
+            )
+
             serializer = VendorAddDetailsSerialzier(user)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
