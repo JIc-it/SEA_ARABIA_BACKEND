@@ -72,32 +72,37 @@ class User(AbstractUser):
             # Get the data before the update
             data_before = serialize('json', [self] or None)
 
-        # Call the original save method to save the instance
-        super(User, self).save(*args, **kwargs)
+            # Call the original save method to save the instance
+            super(User, self).save(*args, **kwargs)
 
-        # Get the data after the update
-        data_after = serialize('json', [self])
+            # Get the data after the update
+            data_after = serialize('json', [self])
 
-        # Create a log entry
-        self.create_update_log(data_before, data_after)
-        if not self.account_id:
-            last_usr_instance = User.objects.order_by(
-                '-account_id_count').first()
-            if last_usr_instance:
-                self.account_id_count = last_usr_instance.account_id_count + 1
-            else:
-                self.account_id_count = 1
-            if self.role == 'Admin':
-                self.account_id = 'SA-ADM-00' + str(self.account_id_count)
-            elif self.role == 'Staff':
-                self.account_id = 'SA-STF-00' + str(self.account_id_count)
-            elif self.role == 'Vendor':
-                self.account_id = 'SA-VDR-00' + str(self.account_id_count)
-            elif self.role == 'User':
-                self.account_id = 'SA-USR-00' + str(self.account_id_count)
-            else:
-                self.account_id = 'SA-OTH-00' + str(self.account_id_count)
-        super(User, self).save(*args, **kwargs)
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+
+        else:
+            # Call the original save method to save the instance
+            super(User, self).save(*args, **kwargs)
+
+            if not self.account_id:
+                last_usr_instance = User.objects.order_by(
+                    '-account_id_count').first()
+                if last_usr_instance:
+                    self.account_id_count = last_usr_instance.account_id_count + 1
+                else:
+                    self.account_id_count = 1
+                if self.role == 'Admin':
+                    self.account_id = 'SA-ADM-00' + str(self.account_id_count)
+                elif self.role == 'Staff':
+                    self.account_id = 'SA-STF-00' + str(self.account_id_count)
+                elif self.role == 'Vendor':
+                    self.account_id = 'SA-VDR-00' + str(self.account_id_count)
+                elif self.role == 'User':
+                    self.account_id = 'SA-USR-00' + str(self.account_id_count)
+                else:
+                    self.account_id = 'SA-OTH-00' + str(self.account_id_count)
+            super(User, self).save(*args, **kwargs)
 
 
 class GCCLocations(Main):
@@ -124,14 +129,18 @@ class GCCLocations(Main):
             # Get the data before the update
             data_before = serialize('json', [self] or None)
 
-        # Call the original save method to save the instance
-        super(GCCLocations, self).save(*args, **kwargs)
+            # Call the original save method to save the instance
+            super(GCCLocations, self).save(*args, **kwargs)
 
-        # Get the data after the update
-        data_after = serialize('json', [self])
+            # Get the data after the update
+            data_after = serialize('json', [self])
 
-        # Create a log entry
-        self.create_update_log(data_before, data_after)
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+
+        else:
+            # Call the original save method to save the instance
+            super(GCCLocations, self).save(*args, **kwargs)
 
 
 class ProfileExtra(Main):
@@ -162,14 +171,18 @@ class ProfileExtra(Main):
             # Get the data before the update
             data_before = serialize('json', [self] or None)
 
-        # Call the original save method to save the instance
-        super(ProfileExtra, self).save(*args, **kwargs)
+            # Call the original save method to save the instance
+            super(ProfileExtra, self).save(*args, **kwargs)
 
-        # Get the data after the update
-        data_after = serialize('json', [self])
+            # Get the data after the update
+            data_after = serialize('json', [self])
 
-        # Create a log entry
-        self.create_update_log(data_before, data_after)
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+
+        else:
+            # Call the original save method to save the instance
+            super(ProfileExtra, self).save(*args, **kwargs)
 
         # Remove old image if it has changed
         try:
@@ -212,14 +225,18 @@ class UserIdentificationType(Main):
             # Get the data before the update
             data_before = serialize('json', [self] or None)
 
-        # Call the original save method to save the instance
-        super(UserIdentificationType, self).save(*args, **kwargs)
+            # Call the original save method to save the instance
+            super(UserIdentificationType, self).save(*args, **kwargs)
 
-        # Get the data after the update
-        data_after = serialize('json', [self])
+            # Get the data after the update
+            data_after = serialize('json', [self])
 
-        # Create a log entry
-        self.create_update_log(data_before, data_after)
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+
+        else:
+            # Call the original save method to save the instance
+            super(UserIdentificationType, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -255,14 +272,18 @@ class UserIdentificationData(Main):
             # Get the data before the update
             data_before = serialize('json', [self] or None)
 
-        # Call the original save method to save the instance
-        super(UserIdentificationData, self).save(*args, **kwargs)
+            # Call the original save method to save the instance
+            super(UserIdentificationData, self).save(*args, **kwargs)
 
-        # Get the data after the update
-        data_after = serialize('json', [self])
+            # Get the data after the update
+            data_after = serialize('json', [self])
 
-        # Create a log entry
-        self.create_update_log(data_before, data_after)
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+
+        else:
+            # Call the original save method to save the instance
+            super(UserIdentificationData, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         if self.image:
@@ -305,14 +326,18 @@ class PasswordReset(models.Model):
             # Get the data before the update
             data_before = serialize('json', [self] or None)
 
-        # Call the original save method to save the instance
-        super(PasswordReset, self).save(*args, **kwargs)
+            # Call the original save method to save the instance
+            super(PasswordReset, self).save(*args, **kwargs)
 
-        # Get the data after the update
-        data_after = serialize('json', [self])
+            # Get the data after the update
+            data_after = serialize('json', [self])
 
-        # Create a log entry
-        self.create_update_log(data_before, data_after)
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+
+        else:
+            # Call the original save method to save the instance
+            super(PasswordReset, self).save(*args, **kwargs)
 
     def __str__(self):
         return f"PasswordReset for {self.user.email}"
