@@ -8,7 +8,8 @@ from rest_framework import status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.parsers import MultiPartParser, FormParser
-
+from django.http import JsonResponse
+from django.http import Http404
 from utils.action_logs import create_log
 from .models import *
 from .serializers import *
@@ -963,7 +964,7 @@ class UpdateAvailabilityView(generics.UpdateAPIView):
 
 
 class ServiceTopSuggestion(generics.ListAPIView):
-    """ views for top suggestions & top activites   """
+    """ Views for top suggestions & top activities """
 
     queryset = Service.objects.filter(is_top_suggestion=True)
     serializer_class = ServiceSerializer
@@ -971,13 +972,16 @@ class ServiceTopSuggestion(generics.ListAPIView):
     filterset_class = ServiceFilter
 
     def get_queryset(self):
-        queryset = Service.objects.all()
+        try:
+            queryset = Service.objects.all()
 
-        service_type = self.request.query_params.get('type', None)
-        if service_type:
-            queryset = queryset.filter(type=service_type)
+            service_type = self.request.query_params.get('type', None)
+            if service_type:
+                queryset = queryset.filter(type=service_type)
 
-        return queryset
+            return queryset
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
 
 class ExploreMore(generics.ListAPIView):
@@ -989,6 +993,13 @@ class ExploreMore(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ServiceFilter
 
+    def list(self, request, *args, **kwargs):
+        try:
+            queryset = self.filter_queryset(self.get_queryset())
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # class NearByActivities(generics.ListAPIView):
 #     queryset = Service.objects.all()
@@ -1015,7 +1026,6 @@ class ExploreMore(generics.ListAPIView):
 #     except:
 #         pass
 
-
 class CategoryBasedListing(generics.ListAPIView):
     """views for category based listing"""
 
@@ -1025,9 +1035,15 @@ class CategoryBasedListing(generics.ListAPIView):
     filterset_class = ServiceFilter
 
     def get_queryset(self):
-        category_name = self.kwargs.get("category_name")
-        category = get_object_or_404(Category, name=category_name)
-        return Service.objects.filter(category=category)
+        try:
+            category_name = self.kwargs.get("category_name")
+            category = get_object_or_404(Category, name=category_name)
+            return Service.objects.filter(category=category)
+        except Category.DoesNotExist:
+            raise Http404("Category does not exist")
+        except Exception as e:
+          
+            raise e  
 
 
 class ComboPackageListing(generics.ListAPIView):
