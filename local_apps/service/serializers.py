@@ -62,8 +62,7 @@ class PriceSerializer(serializers.ModelSerializer):
     # duration = DurationSerializer(required=False, allow_null=True)
     # price_list = PriceListForPriceSerializer(required=False, allow_null=True)
     # location = serializers.SerializerMethodField()
-    location = DestinationSerializer(
-        many=True, allow_null=True, required=False)
+    location = DestinationSerializer(allow_null=True, required=False)
 
     class Meta:
         model = Price
