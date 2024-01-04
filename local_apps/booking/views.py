@@ -104,58 +104,60 @@ class BookingCreateView(generics.CreateAPIView):
                 offer_details=offer_details
             )
 
-            booking.save()
+            # booking.save()
 
             # payment initialization
 
-            # api_key = settings.TAP_API_KEY
-            # base_url = settings.TAP_BASE_URL
-            # secret_key = settings.TAP_SECRET_KEY
+            api_key = settings.TAP_API_KEY
+            base_url = settings.TAP_BASE_URL
+            secret_key = settings.TAP_SECRET_KEY
 
-            # url = base_url + "authorize/"
-            # total_amount = booking.price_total
-            # payload = {
-            #     "amount": 2,
-            #     "currency": "KWD",
-            #     "metadata": {
-            #         "udf1": "Sea Arabia TXN ID",
-            #         "udf2": "Service Name",
-            #         "udf3": "Service Category",
-            #     },
-            #     "customer": {
-            #         "first_name": "Sea",
-            #         "middle_name": "Arabia",
-            #         "last_name": "User",
-            #         "email": "prince@jicitsolution.com",
-            #         "phone": {
-            #             "country_code": "91",
-            #             "number": "9999999999"
-            #         }
-            #     },
-            #     "merchant": {"id": "1234"},
-            #     "source": {"id": "src_all"},
-            #     "redirect": {"url": "http://your_website.com/redirecturl"}
-            # }
+            url = base_url + "authorize/"
+            total_amount = booking.price_total
+            payload = {
+                "amount": 2,
+                "currency": "KWD",
+                "metadata": {
+                    "udf1": "Sea Arabia TXN ID",
+                    "udf2": "Service Name",
+                    "udf3": "Service Category",
+                },
+                "customer": {
+                    "first_name": "Sea",
+                    "middle_name": "Arabia",
+                    "last_name": "User",
+                    "email": "prince@jicitsolution.com",
+                    "phone": {
+                        "country_code": "91",
+                        "number": "9999999999"
+                    }
+                },
+                "merchant": {"id": "1234"},
+                "source": {"id": "src_all"},
+                "redirect": {"url": "http://your_website.com/redirecturl"}
+            }
 
-            # headers = {
-            #     "accept": "application/json",
-            #     "content-type": "application/json",
-            #     "Authorization": "Bearer "+secret_key
-            # }
+            headers = {
+                "accept": "application/json",
+                "content-type": "application/json",
+                "Authorization": "Bearer "+secret_key
+            }
 
-            # response = requests.post(url, json=payload, headers=headers)
+            response = requests.post(url, json=payload, headers=headers)
 
-            # payment_response = response.json()
+            authorize_response = response.json()
 
-            # # get the url for checkout from the json response
+            Payment.objects.create(initial_response=authorize_response)
 
-            # payment_url = payment_response.get("transaction")['url']
+            # get the url for checkout from the json response
 
-            # serializer = BookingSerializer(booking)
-            # serialized_data = serializer.data
-            # serialized_data['payment_response'] = payment_url
+            payment_url = authorize_response.get("transaction")['url']
 
-            return Response("serialized_data", status=status.HTTP_201_CREATED)
+            serializer = BookingSerializer(booking)
+            serialized_data = serializer.data
+            serialized_data['payment_response'] = payment_url
+
+            return Response(serialized_data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
