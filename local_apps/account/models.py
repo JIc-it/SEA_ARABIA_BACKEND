@@ -123,7 +123,7 @@ class GCCLocations(Main):
         return self.location if self.location else "No Location"
 
     def create_update_log(self, data_before, data_after):
-        request = get_current_request()
+        request = get_current_request() or None
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
             user=request.user if request and hasattr(request, 'user') else None,
@@ -169,7 +169,7 @@ class ProfileExtra(Main):
         return self.user.email if self.user and self.user.email else 'No user'
 
     def create_update_log(self, data_before, data_after):
-        request = get_current_request()
+        request = get_current_request() or None
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
             user=request.user if request and hasattr(request, 'user') else None,

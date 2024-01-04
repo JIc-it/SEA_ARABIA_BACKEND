@@ -836,8 +836,8 @@ def emilres(request):
 
 class UserSignUp(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserUpdatedSerializer
-    permission_classes = [IsAuthenticated]
+    serializer_class = UserSignUpSerializer
+    # permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         try:
