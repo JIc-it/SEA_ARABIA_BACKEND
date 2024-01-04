@@ -11,6 +11,18 @@ from import_export import resources
 # user cms serializers
 
 
+class GccLocationSerializer(serializers.ModelSerializer):
+    """ Serialize GCC Locations """
+
+    class Meta:
+        model = GCCLocations
+        fields = [
+            "id",
+            "location",
+            "country_flag"
+        ]
+
+
 class VendorSerializer(serializers.ModelSerializer):
     """vendor listing serializer"""
 
@@ -138,8 +150,7 @@ class VendorAddDetailsSerialzier(serializers.ModelSerializer):
 
 class ProfileExtraSerializer(serializers.ModelSerializer):
 
-    location = serializers.CharField(
-        source="location.location", allow_null=True)
+    location = GccLocationSerializer(allow_null=True, required=False)
 
     class Meta:
         model = ProfileExtra
@@ -509,15 +520,3 @@ class OnboardVendorsListExport(resources.ModelResource):
 
     def calculate_booking_count(self, user):
         return Booking.objects.filter(user=user).count()
-
-
-class GccLocationSerializer(serializers.ModelSerializer):
-    """ Serialize GCC Locations """
-
-    class Meta:
-        model = GCCLocations
-        fields = [
-            "id",
-            "location",
-            "country_flag"
-        ]

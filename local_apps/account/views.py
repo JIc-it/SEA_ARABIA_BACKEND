@@ -228,7 +228,7 @@ class UserList(generics.ListAPIView):
     search_fields = [
         "first_name",
         "last_name",
-        "profileextra__location",
+        "profileextra__location__location",
         "email",
         "mobile"
     ]
@@ -756,12 +756,7 @@ class ProfileResetPasswordView(APIView):
             )
 
 
-
-
-
-
-
-# ALL USER RESET PASSWORD FOR ADMIN CMS 
+# ALL USER RESET PASSWORD FOR ADMIN CMS
 class AllUserResetPasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -795,8 +790,6 @@ class AllUserResetPasswordView(APIView):
             return Response(
                 {"error": "Empty passwords "}, status=status.HTTP_400_BAD_REQUEST
             )
-
-
 
 
 class UserListView(generics.ListAPIView):

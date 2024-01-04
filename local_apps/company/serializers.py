@@ -19,15 +19,17 @@ class QualificationSerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Company
-        exclude = ["created_at", "updated_at"]
+        exclude = ["created_at", "updated_at", "prefix",
+                   "first_two_letters", "first_two_numbers", "last_one_letter", "last_two_numbers"]
 
 
 class CompanyAddSerializer(serializers.ModelSerializer):
     """serializer for adding and updating the company details in vendor"""
 
-    service_summary = CategorySerializer(many=True,read_only=True)
+    service_summary = CategorySerializer(many=True, read_only=True)
 
     class Meta:
         model = Company
@@ -48,10 +50,11 @@ class CompanyCmsSerializer(serializers.ModelSerializer):
         model = Company
         fields = [
             "id",
+            "company_id",
             "name"
         ]
-        
-        
+
+
 class CompanyListSerializer(serializers.ModelSerializer):
     service_summary = serializers.SlugRelatedField(
         many=True, slug_field="name", queryset=ServiceTag.objects.all()
@@ -61,10 +64,24 @@ class CompanyListSerializer(serializers.ModelSerializer):
         slug_field="id",
         queryset=User.objects.all(),
     )
+    user_first_name = serializers.CharField(
+        source="user.first_name", allow_null=True)
+
+    user_last_name = serializers.CharField(
+        source="user.last_name", allow_null=True)
+    created_by = serializers.SerializerMethodField(allow_null=True)\
+
 
     class Meta:
         model = Company
-        exclude = ["created_at", "updated_at"]
+        exclude = ["created_at", "updated_at", "prefix",
+                   "first_two_letters", "first_two_numbers", "last_one_letter", "last_two_numbers"]
+
+    def get_created_by(self, instance):
+        try:
+            return f"{instance.user.first_name} {instance.user.last_name}"
+        except:
+            return "No Name"
 
 
 class MiscellaneousSerializer(serializers.ModelSerializer):
@@ -91,7 +108,7 @@ class MiscellaneousTypeSerializer(serializers.ModelSerializer):
 
 class SiteVisitSerializer(serializers.ModelSerializer):
     attachment = serializers.FileField(required=True)
-    qualifications = serializers.ListField(required=True,write_only=True)
+    qualifications = serializers.ListField(required=True, write_only=True)
     status = serializers.CharField(
         source="company.status", default=None)
 
@@ -139,10 +156,10 @@ class MOUorCharterSerializer(serializers.ModelSerializer):
 class OnboardStatusSerializer(serializers.ModelSerializer):
     status = serializers.CharField(
         source="company.status", default=None)
-    
+
     class Meta:
         model = OnboardStatus
-        fields = ["name"]
+        fields = ["name", "status"]
 
 
 class CompanyOnboardSerializer(serializers.Serializer):
