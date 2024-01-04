@@ -95,6 +95,7 @@ class Booking(Main):
         choices=BOOKING_ITEM_TYPE, default='Service', max_length=255)
     starting_point = models.CharField(max_length=255, blank=True, null=True)
     destination = models.CharField(max_length=255, blank=True, null=True)
+    selected_slots=models.CharField(max_length=255, blank=True, null=True)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     slot_details = models.CharField(max_length=255, blank=True, null=True)

@@ -32,6 +32,8 @@ urlpatterns = [
     path("reset-password/", ResetPasswordView.as_view(), name="reset-password"),
     path("profile-reset-password/", ProfileResetPasswordView.as_view(),
          name="profile-reset-password", ),
+#admin Cms
+    path("user-reset-password/", AllUserResetPasswordView.as_view(), name="all-user-reset-password"),     
 
     #   password reset url
     path("user-list/", UserListView.as_view(), name="user-list"),
