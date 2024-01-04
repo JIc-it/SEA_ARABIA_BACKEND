@@ -159,7 +159,7 @@ class OnboardStatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OnboardStatus
-        fields = ["name"]
+        fields = ["name", "status"]
 
 
 class CompanyOnboardSerializer(serializers.Serializer):
