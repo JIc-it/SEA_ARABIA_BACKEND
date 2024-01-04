@@ -405,3 +405,18 @@ class ServiceListExportResource(resources.ModelResource):
         ]
 
         export_order = fields
+
+
+class ServiceImageMultipleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceImage
+        fields = ['id',
+                  "image",
+                  "service",
+                  "is_thumbnail"
+                  ]
+
+    def create(self, validated_data):
+        # Handling multiple instances by allowing bulk creation
+        instances = [ServiceImage(**item) for item in validated_data]
+        return ServiceImage.objects.bulk_create(instances)

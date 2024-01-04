@@ -121,7 +121,7 @@ class BookingCreateView(generics.CreateAPIView):
                 offer_details=offer_details
             )
 
-            # booking.save()
+            booking.save()
 
             # payment initialization
 
@@ -129,10 +129,17 @@ class BookingCreateView(generics.CreateAPIView):
             base_url = settings.TAP_BASE_URL
             secret_key = settings.TAP_SECRET_KEY
 
+            total_amount = getattr(booking, "price_total", 0)
+            user_first_name = getattr(
+                booking.user, "first_name", "No First Name")
+            user_last_name = getattr(booking.user, "last_name", "No Last Name")
+            user_email = getattr(booking.user, "email", "default_email")
+            user_mobile = getattr(booking.user, "mobile", 0000000000)
+
             url = base_url + "authorize/"
             total_amount = booking.price_total
             payload = {
-                "amount": 2,
+                "amount": total_amount,
                 "currency": "KWD",
                 "metadata": {
                     "udf1": "Sea Arabia TXN ID",
@@ -140,13 +147,13 @@ class BookingCreateView(generics.CreateAPIView):
                     "udf3": "Service Category",
                 },
                 "customer": {
-                    "first_name": "Sea",
-                    "middle_name": "Arabia",
-                    "last_name": "User",
-                    "email": "prince@jicitsolution.com",
+                    "first_name": user_first_name,
+                    "middle_name": "",
+                    "last_name": user_last_name,
+                    "email": user_email,
                     "phone": {
-                        "country_code": "91",
-                        "number": "9999999999"
+                        "country_code": "+965",
+                        "number": user_mobile
                     }
                 },
                 "merchant": {"id": "1234"},
@@ -164,11 +171,17 @@ class BookingCreateView(generics.CreateAPIView):
 
             authorize_response = response.json()
 
-            Payment.objects.create(initial_response=authorize_response)
-
             # get the url for checkout from the json response
 
             payment_url = authorize_response.get("transaction")['url']
+            tap_id = authorize_response.get("id", None)
+            payment_status = authorize_response.get("status", None)
+
+            payment_instance = Payment.objects.create(tap_pay_id=tap_id,
+                                                      initial_response=authorize_response, amount=total_amount, status=payment_status)
+
+            booking.payment = payment_instance
+            booking.save()
 
             serializer = BookingSerializer(booking)
             serialized_data = serializer.data
@@ -308,3 +321,14 @@ class BookingCancellation(generics.UpdateAPIView):
             return Response({"Booking Status": booking_instance.status}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PaymentFinalization(generics.UpdateAPIView):
+    serializer_class = PaymentSerializer
+    queryset = Payment.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        try:
+            pass
+        except Exception as e:
+            return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)

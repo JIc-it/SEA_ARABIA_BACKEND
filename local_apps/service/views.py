@@ -1408,26 +1408,26 @@ class ServicePriceDelete(generics.DestroyAPIView):
 
 class ServiceImageCreateMethod(generics.CreateAPIView):
     """ API view for creating multiple images in service create """
-    serializer_class = ServiceImageSerializer
+    serializer_class = ServiceImageMultipleSerializer
     queryset = ServiceImage.objects.all()
     parser_classes = (MultiPartParser, FormParser)
 
-    def create(self, request, *args, **kwargs):
-        try:
-            images_data = request.data
-            for image_data in request.FILES.get('image'):
-                service_id = request.data.get('service')
-                thumbnail = request.data.get('thumbnail')
+    # def create(self, request, *args, **kwargs):
+    #     try:
+    #         # images_data = request.data
+    #         # for image_data in request.FILES.get('image'):
+    #         #     service_id = request.data.get('service')
+    #         #     thumbnail = request.data.get('thumbnail')
 
-                if service_id:
-                    # Assuming 'id' is the UUIDField in the Service model
-                    service_instance, _ = Service.objects.get_or_create(
-                        id=service_id)
+    #         #     if service_id:
+    #         #         # Assuming 'id' is the UUIDField in the Service model
+    #         #         service_instance, _ = Service.objects.get_or_create(
+    #         #             id=service_id)
 
-                    # Assuming 'image' and 'thumbnail' are FileFields in the ServiceImage model
-                    ServiceImage.objects.create(
-                        service=service_instance, image=image_data, thumbnail=thumbnail)
+    #         #         # Assuming 'image' and 'thumbnail' are FileFields in the ServiceImage model
+    #         #         ServiceImage.objects.create(
+    #         #             service=service_instance, image=image_data, thumbnail=thumbnail)
 
-            return Response("Service Image Creation Successful", status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
+    #         return Response("Service Image Creation Successful", status=status.HTTP_200_OK)
+    #     except Exception as e:
+    #         return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
