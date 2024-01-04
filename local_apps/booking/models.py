@@ -5,10 +5,12 @@ from local_apps.core.models import Main
 from local_apps.service.models import Service, Package, Price
 from local_apps.offer.models import Offer
 from local_apps.account.models import Guest
+from django.core.serializers import serialize
 from django.core.exceptions import ValidationError
 from utils.id_handle import increment_two_digits, increment_two_letters, increment_one_letter
 
 BOOKING_STATUS = (
+    (None, 'Default'),
     ('Opened', 'Opened'),
     ('Upcoming', 'Upcoming'),
     ('Unsuccessful', 'Unsuccessful'),
@@ -29,22 +31,26 @@ REFUND_TYPE = (
 )
 
 USER_TYPE = (
+    (None, 'Default'),
     ('Registered', 'Registered'),
     ('Guest', 'Guest'),
     ('Premium', 'Premium'),
 )
 
 BOOKING_FOR_TYPE = (
+    (None, 'Default'),
     ('My Self', 'My Self'),
     ('Someone Else', 'Someone Else'),
 )
 
 BOOKING_CHOICE = (
+    (None, 'Default'),
     ("Booking", "Booking"),
     ("Enquiry", "Enquiry")
 )
 
 BOOKING_ITEM_TYPE = (
+    (None, 'Default'),
     ("Service", "Service"),
     ("Activity", "Activity"),
     ("Package", "Package"),
@@ -58,11 +64,11 @@ class Payment(Main):
     first_two_numbers = models.IntegerField(default=0)
     last_one_letter = models.CharField(max_length=1, default="A")
     last_two_numbers = models.IntegerField(default=0)
-    payment_id = models.CharField(max_length=255)
-    tap_pay_id = models.CharField(max_length=255)
-    amount = models.CharField(max_length=255)
-    status = models.CharField(max_length=255)
-    payment_method = models.CharField(max_length=255)
+    payment_id = models.CharField(max_length=255, blank=True, null=True)
+    tap_pay_id = models.CharField(max_length=255, blank=True, null=True)
+    amount = models.CharField(max_length=255, blank=True, null=True)
+    status = models.CharField(max_length=255, blank=True, null=True)
+    payment_method = models.CharField(max_length=255, blank=True, null=True)
     response = models.JSONField(blank=True, null=True)
 
     def __str__(self):
@@ -105,12 +111,15 @@ class Payment(Main):
 
 
 class Booking(Main):
+    # ID handling section
     prefix = models.CharField(max_length=10, default="SA-BKG-")
     first_two_letters = models.CharField(max_length=2, default="AA")
     first_two_numbers = models.IntegerField(default=0)
     last_one_letter = models.CharField(max_length=1, default="A")
     last_two_numbers = models.IntegerField(default=0)
-    booking_id = models.CharField(max_length=255, unique=True)
+    booking_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
+
+    # Mapping actual data
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
                              related_name='booking_booking_user')
     guest = models.ForeignKey(Guest, on_delete=models.SET_NULL, null=True, blank=True,
@@ -125,35 +134,47 @@ class Booking(Main):
                                 related_name='booking_booking_package')
     price = models.ForeignKey(Price, blank=True, null=True, on_delete=models.SET_NULL,
                               related_name='booking_booking_price')
-    user_type = models.CharField(choices=USER_TYPE, default='Registered', max_length=255)
+
+    # User / customer info
+    user_type = models.CharField(choices=USER_TYPE, default='Registered', max_length=255, blank=True, null=True)
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     phone_number = models.CharField(max_length=255, blank=True, null=True)
-    email = models.EmailField(null=True, blank=True)
+    email = models.EmailField(max_length=255, null=True, blank=True)
+
+    # Booking info
     destination = models.CharField(max_length=255, blank=True, null=True)
-    booking_for = models.CharField(choices=BOOKING_FOR_TYPE, default='My Self', max_length=255)
-    booking_item = models.CharField(choices=BOOKING_ITEM_TYPE, default='Service', max_length=255)
+    booking_for = models.CharField(choices=BOOKING_FOR_TYPE, default='My Self', max_length=255, blank=True, null=True)
+    booking_item = models.CharField(choices=BOOKING_ITEM_TYPE, default='Service', max_length=255, blank=True, null=True)
     starting_point = models.CharField(max_length=255, blank=True, null=True)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    start_date = models.DateTimeField(blank=True, null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
     slot_details = models.CharField(max_length=255, blank=True, null=True)
-    additional_hours = models.PositiveIntegerField(default=0)
-    additional_hours_amount = models.PositiveIntegerField(default=0)
-    number_of_people = models.PositiveIntegerField(default=1)
-    status = models.CharField(choices=BOOKING_STATUS, default='Opened', max_length=255, blank=True, null=True)
+    additional_hours = models.PositiveIntegerField(default=0, blank=True, null=True)
+    additional_hours_amount = models.PositiveIntegerField(default=0, blank=True, null=True)
+    number_of_people = models.PositiveIntegerField(default=1, blank=True, null=True)
     booking_type = models.CharField(choices=BOOKING_CHOICE, default='Booking', max_length=255, blank=True, null=True)
+    status = models.CharField(choices=BOOKING_STATUS, default='Opened', max_length=255, blank=True, null=True)
+
+    # Cancellation & refund
     cancellation_reason = models.TextField(blank=True, null=True)
+    cancelled_by = models.JSONField(null=True, blank=True)
     refund_status = models.CharField(choices=REFUND_STATUS, default='Default', max_length=255, blank=True, null=True)
     refund_type = models.CharField(choices=REFUND_TYPE, default='Default', max_length=255, blank=True, null=True)
     refund_amount = models.PositiveIntegerField(blank=True, null=True)
     refund_details = models.TextField(blank=True, null=True)
-    price_total = models.PositiveIntegerField(default=0)
+
+    # Actual price
+    price_total = models.PositiveIntegerField(default=0, blank=True, null=True)
+
+    # Mapping data hard storing
     user_details = models.JSONField(blank=True, null=True)
     guest_details = models.JSONField(blank=True, null=True)
     service_details = models.JSONField(blank=True, null=True)
     price_details = models.JSONField(blank=True, null=True)
     package_details = models.JSONField(blank=True, null=True)
     offer_details = models.JSONField(blank=True, null=True)
+    payment_details = models.JSONField(blank=True, null=True)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -176,7 +197,8 @@ class Booking(Main):
             else:
                 self.first_two_numbers = last_entry.first_two_numbers
 
-            if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
+            if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
+                                                                                     'z'] and last_entry.last_two_numbers == 99:
                 self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
             else:
                 self.first_two_letters = last_entry.first_two_letters
@@ -189,6 +211,22 @@ class Booking(Main):
 
     def save(self, *args, **kwargs):
         try:
+            # Hard storing mapping datas
+            if not self.user_details and self.user:
+                self.user_details = serialize('json', [self.user])
+            if not self.guest_details and self.guest:
+                self.guest_details = serialize('json', [self.guest])
+            if not self.offer_details and self.offer:
+                self.offer_details = serialize('json', [self.offer])
+            if not self.service_details and self.service:
+                self.service_details = serialize('json', [self.service])
+            if not self.payment_details and self.payment:
+                self.payment_details = serialize('json', [self.payment])
+            if not self.package_details and self.package:
+                self.package_details = serialize('json', [self.package])
+            if not self.price_details and self.price:
+                self.price_details = serialize('json', [self.price])
+
             # Automating booking_item
             if self.service and self.service.type:
                 self.booking_item = self.service.type
