@@ -5,7 +5,6 @@ from local_apps.offer.serializers import OfferSerializer
 from local_apps.account.serializers import UserSerializer, GuestSerializer
 
 
-
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
@@ -90,7 +89,8 @@ class BookingSerializer(serializers.ModelSerializer):
     def validate_user_type(self, value):
         allowed_user_types = [data[0] for data in Booking.USER_TYPE]
         if value not in allowed_user_types:
-            raise serializers.ValidationError(f"Invalid user type. Allowed types are: {', '.join(allowed_user_types)}")
+            raise serializers.ValidationError(
+                f"Invalid user type. Allowed types are: {', '.join(allowed_user_types)}")
         return value
 
     @staticmethod

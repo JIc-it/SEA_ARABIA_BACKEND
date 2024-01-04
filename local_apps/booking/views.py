@@ -81,6 +81,20 @@ class BookingCreateView(generics.CreateAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
 
+    # def perform_create(self, serializer):
+    #     # Save the current booking
+    #     instance = serializer.save()
+    #     print('hello working')
+    #     # Perform additional actions after saving the booking
+    #     # For example, you can call a method on the instance or perform other operations
+    #     instance.your_custom_method()
+
+    #     # You can also perform actions on related models or any other logic you need
+    #     # ...
+
+    #     # Finally, return the instance
+    #     return instance
+
 
 class BookingView(generics.RetrieveAPIView):
     queryset = Booking.objects.all()
