@@ -52,10 +52,8 @@ class BookingSerializer(serializers.ModelSerializer):
                   'refund_amount',
                   'refund_details',
                   'price_total',
-                  'user_details',
-                  'guest_details',
-                  'service_details',
-                  'price_details',
+                  'canceld_by',
+                  'selected_slots',
                   ]
 
 

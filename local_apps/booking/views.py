@@ -31,7 +31,7 @@ class BookingListView(generics.ListAPIView):
         "booking_id",
         "service__name",
         "user__first_name",
-        "user__last_name"
+        "user__last_name",
     ]
     filterset_class = BookingFilter
 
@@ -74,7 +74,6 @@ class BookingCreateView(generics.CreateAPIView):
                 offer=offer,
                 service=service,
                 payment=payment,
-                price=price,
                 first_name=request.data.get('first_name'),
                 last_name=request.data.get('last_name'),
                 phone_number=request.data.get('phone_number'),
@@ -96,6 +95,7 @@ class BookingCreateView(generics.CreateAPIView):
                 refund_type=request.data.get('refund_type'),
                 refund_amount=request.data.get('refund_amount'),
                 refund_details=request.data.get('refund_details'),
+                price_total=request.data.get('price_total', 0),
                 user_details=user_details,
                 guest_details=guest_details,
                 service_details=service_details,

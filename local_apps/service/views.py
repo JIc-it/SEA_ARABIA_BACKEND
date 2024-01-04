@@ -1326,6 +1326,7 @@ class PackageListAPIView(generics.ListAPIView):
 
 
 class ServiceIndividualView(generics.RetrieveAPIView):
+    """view for individual service view"""
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
 
@@ -1392,7 +1393,6 @@ class ServicePriceDelete(generics.DestroyAPIView):
 
 #     def create(self, request, *args, **kwargs):
 #         try:
-#             sls = ServiceImageSerializer(data=request.data)
 #             for image in request.FILES.getlist('image'):
 #                 service_id = request.data.get('service')
 #                 thumbnail = request.data.get('thumbnail')
@@ -1415,11 +1415,9 @@ class ServiceImageCreateMethod(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         try:
             images_data = request.data
-
-            for image_data in images_data:
-                image = image_data.get('image')
-                service_id = image_data.get('service')
-                thumbnail = image_data.get('thumbnail')
+            for image_data in request.FILES.get('image'):
+                service_id = request.data.get('service')
+                thumbnail = request.data.get('thumbnail')
 
                 if service_id:
                     # Assuming 'id' is the UUIDField in the Service model
@@ -1428,7 +1426,7 @@ class ServiceImageCreateMethod(generics.CreateAPIView):
 
                     # Assuming 'image' and 'thumbnail' are FileFields in the ServiceImage model
                     ServiceImage.objects.create(
-                        service=service_instance, image=image, thumbnail=thumbnail)
+                        service=service_instance, image=image_data, thumbnail=thumbnail)
 
             return Response("Service Image Creation Successful", status=status.HTTP_200_OK)
         except Exception as e:
