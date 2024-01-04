@@ -22,7 +22,7 @@ from django.conf import settings
 
 today = datetime.date.today()
 
-
+#vendor Side List
 class BookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
@@ -38,6 +38,21 @@ class BookingListView(generics.ListAPIView):
     def get_queryset(self):
         # Return only bookings for the authenticated user
         return Booking.objects.filter(user=self.request.user)
+    
+
+
+#Admin Side Booking List View
+class AllBookingListView(generics.ListAPIView):
+    serializer_class = BookingSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = [
+        "booking_id",
+        "service__name",
+        "user__first_name",
+        "user__last_name",
+    ]
+    filterset_class = BookingFilter        
 
 
 class BookingCreateView(generics.CreateAPIView):

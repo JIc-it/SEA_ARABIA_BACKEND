@@ -12,5 +12,10 @@ urlpatterns = [
     path('booking-list-export/', ExportBookingCSVView.as_view(), name='booking-list-export'),
     path('booking-cancellation/<uuid:pk>', BookingCancellation.as_view(), name='booking-cancellation'),
 
+    #Admin Cms All Booking List
+    path('all-booking-list', AllBookingListView.as_view(), name='booking-List'),
+
+
+
 
 ]
