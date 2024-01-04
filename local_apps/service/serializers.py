@@ -200,7 +200,8 @@ class ServiceSerializer(serializers.ModelSerializer):
 class ServiceIndividualSerializer(serializers.ModelSerializer):
     """serializer for showing the service individual view"""
 
-    service_price_service = PriceSerializer(required=False, allow_null=True,many=True)
+    service_price_service = PriceSerializer(
+        required=False, allow_null=True, many=True)
     service_image = ServiceImageSerializer(many=True)
     # destination = serializers.CharField(
     #     source="location.name", required=False, allow_null=True)
@@ -233,8 +234,8 @@ class ServiceIndividualSerializer(serializers.ModelSerializer):
             "is_day",
             "is_time",
             "is_destination",
-          
-            
+
+
         ]
 
     extra_kwargs = {
@@ -364,7 +365,8 @@ class ServiceListSerializer(serializers.ModelSerializer):
             "category",
             "sub_category",
             "name",
-            "total_booking"
+            "total_booking",
+            "is_active"
         ]
 
 
