@@ -1,14 +1,10 @@
 import requests
 import json
-
-from django.core.serializers import serialize
 from rest_framework import generics, status
-
-from utils.action_logs import create_log
 from .models import Booking, Payment
 from .serializers import *
 from rest_framework.response import Response
-from local_apps.service.models import Service
+from local_apps.service.models import Service, Price
 from local_apps.offer.models import Offer
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
@@ -28,7 +24,6 @@ today = datetime.date.today()
 
 
 class BookingListView(generics.ListAPIView):
-    queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
@@ -40,6 +35,10 @@ class BookingListView(generics.ListAPIView):
     ]
     filterset_class = BookingFilter
 
+    def get_queryset(self):
+        # Return only bookings for the authenticated user
+        return Booking.objects.filter(user=self.request.user)
+
 
 class BookingCreateView(generics.CreateAPIView):
     queryset = Booking.objects.all()
@@ -48,12 +47,10 @@ class BookingCreateView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # Serialize the data before the booking creation
-            value_before = serialize('json', [Booking()])
-
             offer_id = request.data.get('offer')
             service_id = request.data.get('service')
             payment_id = request.data.get('payment')
+            price_id = request.data.get('price')
 
             # Get related objects
             offer = Offer.objects.get(id=offer_id) if offer_id else None
@@ -61,6 +58,8 @@ class BookingCreateView(generics.CreateAPIView):
                 id=service_id) if service_id else None
             payment = Payment.objects.get(
                 id=payment_id) if payment_id else None
+            price = Price.objects.get(
+                id=price_id) if price_id else None
 
             # Extract JSON fields
             user_details = request.data.get('user_details', {})
@@ -75,6 +74,7 @@ class BookingCreateView(generics.CreateAPIView):
                 offer=offer,
                 service=service,
                 payment=payment,
+                price=price,
                 first_name=request.data.get('first_name'),
                 last_name=request.data.get('last_name'),
                 phone_number=request.data.get('phone_number'),
@@ -96,7 +96,6 @@ class BookingCreateView(generics.CreateAPIView):
                 refund_type=request.data.get('refund_type'),
                 refund_amount=request.data.get('refund_amount'),
                 refund_details=request.data.get('refund_details'),
-                price_total=request.data.get('price_total', 0),
                 user_details=user_details,
                 guest_details=guest_details,
                 service_details=service_details,
@@ -105,74 +104,60 @@ class BookingCreateView(generics.CreateAPIView):
                 offer_details=offer_details
             )
 
-            booking.save()
-
-            # Serialize the data after the booking creation
-            value_after = serialize('json', [booking])
-
-            # Log the booking creation action
-            log_user = request.user if request.user else 'Unknown User'
-            log_title = "{model} entry {action} by {user}".format(
-                model="Booking",
-                action='Created',
-                user=log_user
-            )
-
-            create_log(
-                user=request.user,
-                model_name='Booking',
-                action_value='Create',
-                title=log_title,
-                value_before=value_before,
-                value_after=value_after
-            )
+            # booking.save()
 
             # payment initialization
 
-            # api_key = settings.TAP_API_KEY
-            # base_url = settings.TAP_BASE_URL
-            # secret_key = settings.TAP_SECRET_KEY
+            api_key = settings.TAP_API_KEY
+            base_url = settings.TAP_BASE_URL
+            secret_key = settings.TAP_SECRET_KEY
 
-            # url = base_url + "authorize/"
+            url = base_url + "authorize/"
+            total_amount = booking.price_total
+            payload = {
+                "amount": 2,
+                "currency": "KWD",
+                "metadata": {
+                    "udf1": "Sea Arabia TXN ID",
+                    "udf2": "Service Name",
+                    "udf3": "Service Category",
+                },
+                "customer": {
+                    "first_name": "Sea",
+                    "middle_name": "Arabia",
+                    "last_name": "User",
+                    "email": "prince@jicitsolution.com",
+                    "phone": {
+                        "country_code": "91",
+                        "number": "9999999999"
+                    }
+                },
+                "merchant": {"id": "1234"},
+                "source": {"id": "src_all"},
+                "redirect": {"url": "http://your_website.com/redirecturl"}
+            }
 
-            # payload = {
-            #     "amount": 2,  # mandatory
-            #     "currency": "KWD",  # mandatory
-            #     "metadata": {  # not  mandatory
-            #         "udf1": "Sea Arabia TXN ID",
-            #         "udf2": "Service Name",
-            #         "udf3": "Service Category",
-            #     },
-            #     "customer": {  # mandatory
-            #         "first_name": "Sea",
-            #         "middle_name": "Arabia",
-            #         "last_name": "User",
-            #         "email": "prince@jicitsolution.com",
-            #         "phone": {
-            #             "country_code": "91",
-            #             "number": "9999999999"
-            #         }
-            #     },
-            #     "merchant": {"id": "1234"},
-            #     "source": {"id": "src_all"},  # mandatory
-            #     # mandatory
-            #     "redirect": {"url": "http://your_website.com/redirecturl"}
-            # }
-            # headers = {
-            #     "accept": "application/json",
-            #     "content-type": "application/json",
-            #     "Authorization": "Bearer "+secret_key
-            # }
+            headers = {
+                "accept": "application/json",
+                "content-type": "application/json",
+                "Authorization": "Bearer "+secret_key
+            }
 
-            # response = requests.post(url, json=payload, headers=headers)
-            # try:
-            #     json_response = response.json()
-            #     print('>>>', json.dumps(json_response, indent=2))
-            # except json.JSONDecodeError:
-            #     print(response.text)
+            response = requests.post(url, json=payload, headers=headers)
+
+            authorize_response = response.json()
+
+            Payment.objects.create(initial_response=authorize_response)
+
+            # get the url for checkout from the json response
+
+            payment_url = authorize_response.get("transaction")['url']
 
             serializer = BookingSerializer(booking)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            serialized_data = serializer.data
+            serialized_data['payment_response'] = payment_url
+
+            return Response(serialized_data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -225,44 +210,13 @@ class BookingStatusUpdate(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         try:
-            # Get the booking instance before the update
-            booking_before_update = self.get_object()
-
-            # Serialize the data before the update
-            value_before = serialize('json', [booking_before_update])
-
             booking_status = request.data.get('status')
             booking_id = kwargs.get('pk', None)
 
-            # Update booking status
             booking_instance = get_object_or_404(Booking, id=booking_id)
             if booking_status:
                 booking_instance.status = booking_status.title()
                 booking_instance.save()
-
-            # Get the updated booking instance
-            booking_after_update = self.get_object()
-
-            # Serialize the data after the update
-            value_after = serialize('json', [booking_after_update])
-
-            # Log the booking update action
-            log_user = request.user if request.user else 'Unknown User'
-            log_title = "{model} entry {action} by {user}".format(
-                model="Booking",
-                action='Updated',
-                user=log_user
-            )
-
-            create_log(
-                user=request.user,
-                model_name='Booking',
-                action_value='Update',
-                title=log_title,
-                value_before=value_before,
-                value_after=value_after
-            )
-
             return Response({"Booking Status": booking_instance.status}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error : {str(e)}", status=status.HTTP_400_BAD_REQUEST)
@@ -302,3 +256,38 @@ class ExportBookingCSVView(generics.ListAPIView):
         response['Content-Disposition'] = 'attachment; filename="bookings_list.csv"'
 
         return response
+
+
+# Payment Section
+
+
+class PaymentInitiate(generics.CreateAPIView):
+    serializer_class = ""
+    pass
+
+
+# Booking Cancellation For Mobile Application And Vendor CMS And Admin CMS
+class BookingCancellation(generics.UpdateAPIView):
+    serializer_class = BookingStatusSerializer
+    queryset = Booking.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        try:
+            booking_id = kwargs.get('pk', None)
+            cancellation_reason = request.data.get('cancellation_reason')
+            booking_instance = Booking.objects.get(
+                id=booking_id) if Booking.objects.filter(id=booking_id).exists() else None
+
+            if booking_instance and booking_instance.status != 'Cancelled':
+                booking_instance.canceld_by = self.request.user
+                booking_instance.status = 'Cancelled'
+                booking_instance.cancellation_reason = cancellation_reason
+                booking_instance.refund_status = 'Pending'
+                booking_instance.save()
+            else:
+                return Response({"error": "Booking is already cancelled."}, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({"Booking Status": booking_instance.status}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

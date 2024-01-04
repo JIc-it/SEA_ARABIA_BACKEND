@@ -1363,22 +1363,73 @@ class ServicePriceDelete(generics.DestroyAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+# class ServiceImageCreateMethod(generics.CreateAPIView):
+#     """ api view for creating multiple images in service create """
+#     serializer_class = ServiceImageSerializer
+#     queryset = ServiceImage.objects.all()
+
+#     def create(self, request, *args, **kwargs):
+#         try:
+#             for images in request.data:
+#                 image = images.get('image', None)
+#                 service_id = images.get('service')
+#                 thumbnail = images.get('thumbnail')
+#                 if service_id:
+#                     service_instance = Service.objects.get(id=service_id)
+#                     ServiceImage.objects.create(
+#                         service=service_instance, image=image, thumbnail=thumbnail)
+
+#             return Response("Service Image Creation Successfull", status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
+
+
+# class ServiceImageCreateMethod(generics.CreateAPIView):
+#     """ API view for creating multiple images in service create """
+#     serializer_class = ServiceImageSerializer
+#     queryset = ServiceImage.objects.all()
+#     parser_classes = (MultiPartParser, FormParser)
+
+#     def create(self, request, *args, **kwargs):
+#         try:
+#             sls = ServiceImageSerializer(data=request.data)
+#             for image in request.FILES.getlist('image'):
+#                 service_id = request.data.get('service')
+#                 thumbnail = request.data.get('thumbnail')
+#                 if service_id:
+#                     service_instance = Service.objects.get(id=service_id)
+#                     ServiceImage.objects.create(
+#                         service=service_instance, image=image, thumbnail=thumbnail)
+
+#             return Response("Service Image Creation Successful", status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
+
+
 class ServiceImageCreateMethod(generics.CreateAPIView):
-    """ api view for creating multiple images in service create """
+    """ API view for creating multiple images in service create """
     serializer_class = ServiceImageSerializer
     queryset = ServiceImage.objects.all()
+    parser_classes = (MultiPartParser, FormParser)
 
     def create(self, request, *args, **kwargs):
         try:
-            for images in request.data:
-                image = images.get('image', None)
-                service_id = images.get('service')
-                thumbnail = images.get('thumbnail')
+            images_data = request.data
+
+            for image_data in images_data:
+                image = image_data.get('image')
+                service_id = image_data.get('service')
+                thumbnail = image_data.get('thumbnail')
+
                 if service_id:
-                    service_instance = Service.objects.get(id=service_id)
+                    # Assuming 'id' is the UUIDField in the Service model
+                    service_instance, _ = Service.objects.get_or_create(
+                        id=service_id)
+
+                    # Assuming 'image' and 'thumbnail' are FileFields in the ServiceImage model
                     ServiceImage.objects.create(
                         service=service_instance, image=image, thumbnail=thumbnail)
 
-            return Response("Service Image Creation Successfull", status=status.HTTP_200_OK)
+            return Response("Service Image Creation Successful", status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
