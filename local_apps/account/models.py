@@ -11,6 +11,8 @@ from django.utils import timezone
 from local_apps.service.models import Service
 from django.conf import settings
 from local_apps.api_report.middleware import get_current_request
+from django.core.exceptions import ValidationError
+from utils.id_handle import increment_two_digits, increment_two_letters, increment_one_letter
 
 
 USER_ROLE = (
@@ -31,8 +33,12 @@ class User(AbstractUser):
     username = None
     date_joined = None
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    prefix = models.CharField(max_length=10, default="SA")
+    first_two_letters = models.CharField(max_length=2, default="AA")
+    first_two_numbers = models.IntegerField(default=0)
+    last_one_letter = models.CharField(max_length=1, default="A")
+    last_two_numbers = models.IntegerField(default=0)
     account_id = models.CharField(max_length=20, unique=True)
-    account_id_count = models.IntegerField(default=0, blank=True, null=True)
     email = models.EmailField(unique=True, blank=False, max_length=200,
                               error_messages={
                                   'unique': "A user with that email already exists.",
@@ -58,54 +64,53 @@ class User(AbstractUser):
 
     ordering = ["-created_at", "-updated_at"]
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
+    def generate_id_number(self):
+        last_entry = User.objects.order_by('-created_at').first()
+        if self.role == 'Admin':
+            rle = 'ADM'
+        elif self.role == 'Staff':
+            rle = 'STF'
+        elif self.role == 'Vendor':
+            rle = 'VDR'
+        elif self.role == 'User':
+            rle = 'USR'
+        else:
+            rle = 'OTH'
 
+        if last_entry:
+            if last_entry.last_two_numbers == 99:
+                self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+            else:
+                self.last_one_letter = last_entry.last_one_letter
+
+            if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
+                self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+            else:
+                self.first_two_numbers = last_entry.first_two_numbers
+
+            if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
+                                                                                     'z'] and last_entry.last_two_numbers == 99:
+                self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
+            else:
+                self.first_two_letters = last_entry.first_two_letters
+
+            self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
+
+            self.account_id = f"{self.prefix}-{rle}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
+        else:
+            self.account_id = f"{self.prefix}-{rle}-AA00A00"
+
+  
     def save(self, *args, **kwargs):
         if not self.account_id:
-            last_usr_instance = User.objects.order_by('-account_id_count').first()
-            if last_usr_instance:
-                self.account_id_count = last_usr_instance.account_id_count + 1
-            else:
-                self.account_id_count = 1
-            if self.role == 'Admin':
-                self.account_id = 'SA-ADM-00' + str(self.account_id_count)
-            elif self.role == 'Staff':
-                self.account_id = 'SA-STF-00' + str(self.account_id_count)
-            elif self.role == 'Vendor':
-                self.account_id = 'SA-VDR-00' + str(self.account_id_count)
-            elif self.role == 'User':
-                self.account_id = 'SA-USR-00' + str(self.account_id_count)
-            else:
-                self.account_id = 'SA-OTH-00' + str(self.account_id_count)
+            self.generate_id_number()
+        super().save(*args, **kwargs)
 
-        # Check if the instance already exists
-        if self.pk:
-            try:
-                # Get the data before the update
-                data_before = serialize('json', [User.objects.get(pk=self.pk)])
-            except ObjectDoesNotExist:
-                # Instance doesn't exist yet, set data_before to None
-                data_before = None
+    # def save(self, *args, **kwargs):
+    # if not self.account_id:
+    #     self.generate_id_number()
+    # super().save(*args, **kwargs)
 
-            # Call the original save method to save the instance
-            super(User, self).save(*args, **kwargs)
-
-            # Get the data after the update
-            data_after = serialize('json', [self])
-
-            # Create a log entry
-            self.create_update_log(data_before, data_after)
-        else:
-            # Call the original save method to save the instance
-            super(User, self).save(*args, **kwargs)
 
 
 class GCCLocations(Main):
@@ -419,6 +424,14 @@ class Bookmark(Main):
 
 class Guest(Main):
     """ Guest User Model """
+
+    # ID handling section
+    prefix = models.CharField(max_length=10, default="SA-GST")
+    first_two_letters = models.CharField(max_length=2, default="AA")
+    first_two_numbers = models.IntegerField(default=0)
+    last_one_letter = models.CharField(max_length=1, default="A")
+    last_two_numbers = models.IntegerField(default=0)
+    guest_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
     first_name = models.CharField(
         max_length=255, null=True, blank=True, default="-")
     last_name = models.CharField(
@@ -469,3 +482,33 @@ class Guest(Main):
         ordering = ["-created_at", "-updated_at"]
         verbose_name = "Guest User"
         verbose_name_plural = "Guest Users"
+
+    def generate_id_number(self):
+        last_entry = Guest.objects.order_by('-created_at').first()
+        if last_entry:
+            if last_entry.last_two_numbers == 99:
+                self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+            else:
+                self.last_one_letter = last_entry.last_one_letter
+
+            if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
+                self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+            else:
+                self.first_two_numbers = last_entry.first_two_numbers
+
+            if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
+                                                                                     'z'] and last_entry.last_two_numbers == 99:
+                self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
+            else:
+                self.first_two_letters = last_entry.first_two_letters
+
+            self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
+
+            self.guest_id = f"{self.prefix}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
+        else:
+            self.guest_id = f"{self.prefix}-AA00A00"
+
+    def save(self, *args, **kwargs):
+        if not self.guest_id:
+            self.generate_id_number()
+        super(Guest, self).save(*args, **kwargs)
