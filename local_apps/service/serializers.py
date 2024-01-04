@@ -416,7 +416,7 @@ class ServiceImageMultipleSerializer(serializers.ModelSerializer):
                   "is_thumbnail"
                   ]
 
-    def create(self, validated_data):
-        # Handling multiple instances by allowing bulk creation
-        instances = [ServiceImage(**item) for item in validated_data]
-        return ServiceImage.objects.bulk_create(instances)
+    # def create(self, validated_data):
+    #     # Handling multiple instances by allowing bulk creation
+    #     instances = [ServiceImage(**item) for item in validated_data]
+    #     return ServiceImage.objects.bulk_create(instances)

@@ -10,6 +10,10 @@ from rest_framework.filters import SearchFilter
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.http import JsonResponse
 from django.http import Http404
+from rest_framework.views import APIView
+from django.db.models import Case, Count, Q, Sum, IntegerField, When
+from django.db.models.functions import Coalesce
+
 from utils.action_logs import create_log
 from .models import *
 from .serializers import *
@@ -1042,8 +1046,8 @@ class CategoryBasedListing(generics.ListAPIView):
         except Category.DoesNotExist:
             raise Http404("Category does not exist")
         except Exception as e:
-          
-            raise e  
+
+            raise e
 
 
 class ComboPackageListing(generics.ListAPIView):
@@ -1428,22 +1432,22 @@ class ServiceImageCreateMethod(generics.CreateAPIView):
     queryset = ServiceImage.objects.all()
     parser_classes = (MultiPartParser, FormParser)
 
-    # def create(self, request, *args, **kwargs):
-    #     try:
-    #         # images_data = request.data
-    #         # for image_data in request.FILES.get('image'):
-    #         #     service_id = request.data.get('service')
-    #         #     thumbnail = request.data.get('thumbnail')
+    def create(self, request, *args, **kwargs):
+        try:
+            images_data = request.data
+            for image_data in request.FILES.get('image'):
+                service_id = request.data.get('service')
+                thumbnail = request.data.get('thumbnail')
 
-    #         #     if service_id:
-    #         #         # Assuming 'id' is the UUIDField in the Service model
-    #         #         service_instance, _ = Service.objects.get_or_create(
-    #         #             id=service_id)
+                if service_id:
+                    # Assuming 'id' is the UUIDField in the Service model
+                    service_instance, _ = Service.objects.get_or_create(
+                        id=service_id)
 
-    #         #         # Assuming 'image' and 'thumbnail' are FileFields in the ServiceImage model
-    #         #         ServiceImage.objects.create(
-    #         #             service=service_instance, image=image_data, thumbnail=thumbnail)
+                    # Assuming 'image' and 'thumbnail' are FileFields in the ServiceImage model
+                    ServiceImage.objects.create(
+                        service=service_instance, image=image_data, thumbnail=thumbnail)
 
-    #         return Response("Service Image Creation Successful", status=status.HTTP_200_OK)
-    #     except Exception as e:
-    #         return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
+            return Response("Service Image Creation Successful", status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
