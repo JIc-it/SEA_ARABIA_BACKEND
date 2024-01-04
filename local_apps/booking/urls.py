@@ -10,5 +10,7 @@ urlpatterns = [
          name='booking-statusupdate'),
     path('bookings-applist', BookingAppList.as_view(), name='booking-applist'),
     path('booking-list-export/', ExportBookingCSVView.as_view(), name='booking-list-export'),
+    path('booking-cancellation/<uuid:pk>', BookingCancellation.as_view(), name='booking-cancellation'),
+
 
 ]

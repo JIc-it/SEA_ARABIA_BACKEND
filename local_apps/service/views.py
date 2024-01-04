@@ -20,6 +20,22 @@ from local_apps.booking.models import Booking
 from local_apps.booking.serializers import BookingSerializer
 
 
+def check_field_changes(service_instance, temp_values):
+    """ the function check if there is any changes to the price criterion fields and return True/False """
+
+    updated_values = {
+        'is_duration': service_instance.is_duration,
+        'is_time': service_instance.is_time,
+        'is_date': service_instance.is_date,
+        'is_day': service_instance.is_day,
+        'is_destination': service_instance.is_destination,
+    }
+
+    changed_fields = any(
+        temp_values[field] != updated_values[field] for field in updated_values)
+
+    return changed_fields
+
 # vendorPrice Type Views
 
 
@@ -128,15 +144,15 @@ class ServiceCreate(generics.CreateAPIView):
             category = request.data.pop('category', None)
             sub_category = request.data.pop('sub_category', [])
             profit_id = request.data.pop('profit_method', None)
-            price_id = request.data.pop('price_type', None)
+            # price_id = request.data.pop('price_type', None)
             company_id = request.data.pop('company', None)
 
             company_instance = Company.objects.get(id=company_id)
             profit_instance = ProfitMethod.objects.get(id=profit_id)
-            price_instance = PriceType.objects.get(id=price_id)
+            # price_instance = PriceType.objects.get(id=price_id)
 
             service_instance = Service.objects.create(
-                company=company_instance, profit_method=profit_instance, price_type=price_instance, **request.data)
+                company=company_instance, profit_method=profit_instance, **request.data)
 
             if category:
                 service_instance.category.add(category)
@@ -263,11 +279,13 @@ class ServiceUpdate(generics.UpdateAPIView):
             service_id = kwargs.get('pk')
             service_instance = Service.objects.get(id=service_id)
 
-            temp_is_duration = service_instance.is_duration
-            temp_is_time = service_instance.is_time
-            temp_is_date = service_instance.is_date
-            temp_is_day = service_instance.is_day
-            temp_is_destination = service_instance.is_destination
+            temp_values = {
+                'is_duration': service_instance.is_duration,
+                'is_time': service_instance.is_time,
+                'is_date': service_instance.is_date,
+                'is_day': service_instance.is_day,
+                'is_destination': service_instance.is_destination,
+            }
 
             if is_verified is not None:
                 service_instance.is_verified = True if is_verified == 'true' or is_verified == 'True' or is_verified == True else False
@@ -348,6 +366,29 @@ class ServiceUpdate(generics.UpdateAPIView):
 
             service_instance.save()
 
+            updated_is_duration = service_instance.is_duration
+            updated_is_time = service_instance.is_time
+            updated_is_date = service_instance.is_date
+            updated_is_day = service_instance.is_day
+            updated_is_destination = service_instance.is_destination
+
+            # changed_fields = False
+
+            # if temp_is_duration != updated_is_duration:
+            #     changed_fields = True
+
+            # if temp_is_time != updated_is_time:
+            #     changed_fields = True
+
+            # if temp_is_date != updated_is_date:
+            #     changed_fields = True
+
+            # if temp_is_day != updated_is_day:
+            #     changed_fields = True
+
+            # if temp_is_destination != updated_is_destination:
+            #     changed_fields = True
+
             if amenities_list:
                 try:
                     amenities = amenities_list.replace(" ", "")
@@ -372,6 +413,12 @@ class ServiceUpdate(generics.UpdateAPIView):
                 except:
                     sub_category_list = []
                 service_instance.sub_category.set(sub_category_list)
+
+            fields_changed = check_field_changes(service_instance, temp_values)
+
+            if fields_changed:
+
+                Price.objects.filter(service=service_instance).delete()
 
             for service_price in service_prices:
                 """ updating the service prices """
@@ -696,7 +743,8 @@ class ServiceAvailabilityCreate(generics.CreateAPIView):
                     action_value='Creation',
                     title=log_title,
                     value_before=value_before,
-                    value_after=serialize('json', [instance])  # Serialize again for the value after creation
+                    # Serialize again for the value after creation
+                    value_after=serialize('json', [instance])
                 )
 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -823,7 +871,7 @@ class UpdateAvailabilityView(generics.UpdateAPIView):
                 date_obj = datetime.strptime(date_str, "%d-%m-%Y").date()
             except ValueError:
                 return Response({"error": f"Invalid date format for {date_str}. "
-                                        f"Use DD-MM-YYYY."},
+                                 f"Use DD-MM-YYYY."},
                                 status=status.HTTP_400_BAD_REQUEST)
 
             # Use get_or_create to retrieve or create the ServiceAvailability instance
@@ -897,8 +945,11 @@ class UpdateAvailabilityView(generics.UpdateAPIView):
                 model_name='Service Availability',
                 action_value='Update',
                 title=log_title,
-                value_before=serialize('json', [service_availability_instance]),  # Serialize before update
-                value_after=serialize('json', [ServiceAvailability.objects.get(id=service_availability_instance.id)])  # Serialize after update
+                # Serialize before update
+                value_before=serialize(
+                    'json', [service_availability_instance]),
+                value_after=serialize('json', [ServiceAvailability.objects.get(
+                    id=service_availability_instance.id)])  # Serialize after update
             )
 
             return Response({"message": "Availability updated successfully"},
@@ -1301,7 +1352,8 @@ class ServicePriceDelete(generics.DestroyAPIView):
                 model_name='Service Price',
                 action_value='Delete',
                 title=log_title,
-                value_before=serialize('json', [instance])  # Serialize before deletion
+                # Serialize before deletion
+                value_before=serialize('json', [instance])
             )
 
             self.perform_destroy(instance)
@@ -1309,3 +1361,45 @@ class ServicePriceDelete(generics.DestroyAPIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# class ServiceImageCreateMethod(generics.CreateAPIView):
+#     """ api view for creating multiple images in service create """
+#     serializer_class = ServiceImageSerializer
+#     queryset = ServiceImage.objects.all()
+
+#     def create(self, request, *args, **kwargs):
+#         try:
+#             for images in request.data:
+#                 image = images.get('image', None)
+#                 service_id = images.get('service')
+#                 thumbnail = images.get('thumbnail')
+#                 if service_id:
+#                     service_instance = Service.objects.get(id=service_id)
+#                     ServiceImage.objects.create(
+#                         service=service_instance, image=image, thumbnail=thumbnail)
+
+#             return Response("Service Image Creation Successfull", status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
+
+
+class ServiceImageCreateMethod(generics.CreateAPIView):
+    """ API view for creating multiple images in service create """
+    serializer_class = ServiceImageSerializer
+    queryset = ServiceImage.objects.all()
+    parser_classes = (MultiPartParser, FormParser)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            for image in request.FILES.getlist('image'):
+                service_id = request.data.get('service')
+                thumbnail = request.data.get('thumbnail')
+                if service_id:
+                    service_instance = Service.objects.get(id=service_id)
+                    ServiceImage.objects.create(
+                        service=service_instance, image=image, thumbnail=thumbnail)
+
+            return Response("Service Image Creation Successful", status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
