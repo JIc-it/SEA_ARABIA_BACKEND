@@ -1326,6 +1326,7 @@ class PackageListAPIView(generics.ListAPIView):
 
 
 class ServiceIndividualView(generics.RetrieveAPIView):
+    """view for individual service view"""
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
 

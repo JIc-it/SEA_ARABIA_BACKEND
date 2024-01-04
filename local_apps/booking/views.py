@@ -31,6 +31,7 @@ class BookingListView(generics.ListAPIView):
         "booking_id",
         "service__name",
         "user__first_name",
+        "user__last_name",
     ]
     filterset_class = BookingFilter
 
