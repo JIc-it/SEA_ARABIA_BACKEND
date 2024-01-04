@@ -756,6 +756,49 @@ class ProfileResetPasswordView(APIView):
             )
 
 
+
+
+
+
+
+# ALL USER RESET PASSWORD FOR ADMIN CMS 
+class AllUserResetPasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user_id = request.data.get("user_id")
+        new_password = request.data.get("new_password")
+        confirm_password = request.data.get("confirm_password")
+
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"error": "User not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if new_password and confirm_password:
+            if new_password == confirm_password:
+                user.set_password(new_password)
+                user.save()
+                return Response(
+                    {"message": "Password reset successfully."},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"error": "New password and confirm password do not match."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            return Response(
+                {"error": "Empty passwords "}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+
+
 class UserListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = User.objects.all()

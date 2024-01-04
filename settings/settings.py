@@ -13,6 +13,8 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 DEFAULT_APPS = [
+    "admin_interface",
+    "colorfield",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -61,6 +63,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "local_apps.api_report.middleware.APILogMiddleware",
     # "local_apps.report.middlewares.APILogMiddleware",
+    "local_apps.api_report.middleware.ThreadLocalMiddleware",
 ]
 X_FRAME_OPTIONS = "SAMEORIGIN"
 SILENCED_SYSTEM_CHECKS = ["security.W019"]

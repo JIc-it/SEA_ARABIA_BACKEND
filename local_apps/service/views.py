@@ -8,7 +8,8 @@ from rest_framework import status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.parsers import MultiPartParser, FormParser
-
+from django.http import JsonResponse
+from django.http import Http404
 from utils.action_logs import create_log
 from .models import *
 from .serializers import *
@@ -963,7 +964,7 @@ class UpdateAvailabilityView(generics.UpdateAPIView):
 
 
 class ServiceTopSuggestion(generics.ListAPIView):
-    """ views for top suggestions & top activites   """
+    """ Views for top suggestions & top activities """
 
     queryset = Service.objects.filter(is_top_suggestion=True)
     serializer_class = ServiceSerializer
@@ -971,13 +972,16 @@ class ServiceTopSuggestion(generics.ListAPIView):
     filterset_class = ServiceFilter
 
     def get_queryset(self):
-        queryset = Service.objects.all()
+        try:
+            queryset = Service.objects.all()
 
-        service_type = self.request.query_params.get('type', None)
-        if service_type:
-            queryset = queryset.filter(type=service_type)
+            service_type = self.request.query_params.get('type', None)
+            if service_type:
+                queryset = queryset.filter(type=service_type)
 
-        return queryset
+            return queryset
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
 
 class ExploreMore(generics.ListAPIView):
@@ -989,6 +993,13 @@ class ExploreMore(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ServiceFilter
 
+    def list(self, request, *args, **kwargs):
+        try:
+            queryset = self.filter_queryset(self.get_queryset())
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # class NearByActivities(generics.ListAPIView):
 #     queryset = Service.objects.all()
@@ -1015,7 +1026,6 @@ class ExploreMore(generics.ListAPIView):
 #     except:
 #         pass
 
-
 class CategoryBasedListing(generics.ListAPIView):
     """views for category based listing"""
 
@@ -1025,9 +1035,15 @@ class CategoryBasedListing(generics.ListAPIView):
     filterset_class = ServiceFilter
 
     def get_queryset(self):
-        category_name = self.kwargs.get("category_name")
-        category = get_object_or_404(Category, name=category_name)
-        return Service.objects.filter(category=category)
+        try:
+            category_name = self.kwargs.get("category_name")
+            category = get_object_or_404(Category, name=category_name)
+            return Service.objects.filter(category=category)
+        except Category.DoesNotExist:
+            raise Http404("Category does not exist")
+        except Exception as e:
+          
+            raise e  
 
 
 class ComboPackageListing(generics.ListAPIView):
@@ -1326,6 +1342,7 @@ class PackageListAPIView(generics.ListAPIView):
 
 
 class ServiceIndividualView(generics.RetrieveAPIView):
+    """view for individual service view"""
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
 
@@ -1384,22 +1401,49 @@ class ServicePriceDelete(generics.DestroyAPIView):
 #             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
 
 
+# class ServiceImageCreateMethod(generics.CreateAPIView):
+#     """ API view for creating multiple images in service create """
+#     serializer_class = ServiceImageSerializer
+#     queryset = ServiceImage.objects.all()
+#     parser_classes = (MultiPartParser, FormParser)
+
+#     def create(self, request, *args, **kwargs):
+#         try:
+#             for image in request.FILES.getlist('image'):
+#                 service_id = request.data.get('service')
+#                 thumbnail = request.data.get('thumbnail')
+#                 if service_id:
+#                     service_instance = Service.objects.get(id=service_id)
+#                     ServiceImage.objects.create(
+#                         service=service_instance, image=image, thumbnail=thumbnail)
+
+#             return Response("Service Image Creation Successful", status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
+
+
 class ServiceImageCreateMethod(generics.CreateAPIView):
     """ API view for creating multiple images in service create """
-    serializer_class = ServiceImageSerializer
+    serializer_class = ServiceImageMultipleSerializer
     queryset = ServiceImage.objects.all()
     parser_classes = (MultiPartParser, FormParser)
 
-    def create(self, request, *args, **kwargs):
-        try:
-            for image in request.FILES.getlist('image'):
-                service_id = request.data.get('service')
-                thumbnail = request.data.get('thumbnail')
-                if service_id:
-                    service_instance = Service.objects.get(id=service_id)
-                    ServiceImage.objects.create(
-                        service=service_instance, image=image, thumbnail=thumbnail)
+    # def create(self, request, *args, **kwargs):
+    #     try:
+    #         # images_data = request.data
+    #         # for image_data in request.FILES.get('image'):
+    #         #     service_id = request.data.get('service')
+    #         #     thumbnail = request.data.get('thumbnail')
 
-            return Response("Service Image Creation Successful", status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
+    #         #     if service_id:
+    #         #         # Assuming 'id' is the UUIDField in the Service model
+    #         #         service_instance, _ = Service.objects.get_or_create(
+    #         #             id=service_id)
+
+    #         #         # Assuming 'image' and 'thumbnail' are FileFields in the ServiceImage model
+    #         #         ServiceImage.objects.create(
+    #         #             service=service_instance, image=image_data, thumbnail=thumbnail)
+
+    #         return Response("Service Image Creation Successful", status=status.HTTP_200_OK)
+    #     except Exception as e:
+    #         return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
