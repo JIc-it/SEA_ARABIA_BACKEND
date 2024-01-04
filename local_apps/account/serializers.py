@@ -15,13 +15,13 @@ class VendorSerializer(serializers.ModelSerializer):
     """vendor listing serializer"""
 
     location = serializers.CharField(
-        source="profileextra.location", default=None)
+        source="profileextra.location", default=None, allow_null=True)
     status = serializers.CharField(
-        source="company_company_user.status", default=None)
+        source="company_company_user.status", default=None, allow_null=True)
     company_id = serializers.CharField(
-        source="company_company_user.id", default=None)
+        source="company_company_user.id", default=None, allow_null=True)
     created_by = serializers.CharField(
-        source="company_company_user.created_by.first_name", default=None
+        source="company_company_user.created_by.first_name", default=None, allow_null=True
     )
 
     class Meta:
@@ -44,7 +44,8 @@ class VendorSerializer(serializers.ModelSerializer):
 class VendorDetailsSerializer(serializers.ModelSerializer):
     """serializer for showing the vendor details"""
 
-    location = serializers.CharField(source="profileextra.location")
+    location = serializers.CharField(
+        source="profileextra.location", allow_null=True)
     id_number = serializers.CharField(
         source="useridentificationdata.id_number")
     company_id = serializers.CharField(source="company_company_user.id")
