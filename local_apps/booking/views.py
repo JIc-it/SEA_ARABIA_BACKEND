@@ -30,9 +30,19 @@ class AdminBookingListView(generics.ListAPIView):
     ]
     filterset_class = BookingFilter
 
-    def get_queryset(self):
-        # Return only bookings for the authenticated user
-        return Booking.objects.filter(user=self.request.user)
+
+class AdminIndividualBookingView(generics.RetrieveAPIView):
+    serializer_class = BookingSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        try:
+            booking_id = self.request.data.get('id', None)  
+            return Booking.objects.get(id=booking_id)
+        except Booking.DoesNotExist:
+            return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)    
 
 
 class VendorBookingListView(generics.ListAPIView):
