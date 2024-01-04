@@ -821,17 +821,51 @@ def emilres(request):
 # ------------------------------------------------------------------------mobilepp-----------------------------------------------------------------#
 
 
+# class UserSignUp(generics.CreateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSignUpSerializer
+#
+#     def post(self, request, *args, **kwargs):
+#         serializer = UserSignUpSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             response_data = {'message': 'User registered successfully'}
+#             return Response(response_data, status=status.HTTP_201_CREATED)
+#         return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
 class UserSignUp(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSignUpSerializer
+    serializer_class = UserUpdatedSerializer
+    # permission_classes = [IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        serializer = UserSignUpSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            response_data = {'message': 'User registered successfully'}
-            return Response(response_data, status=status.HTTP_201_CREATED)
-        return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    def create(self, request, *args, **kwargs):
+        try:
+            email = request.data.get('email', None)
+            mobile = request.data.get('mobile', None)
+            profile_extra = request.data.get('profileextra', {})
+            location = profile_extra.get('location', None)
+            dob = profile_extra.get('dob', None)
+            gender = profile_extra.get('gender', None)
+
+            # Create a new user instance
+            user_instance = User.objects.create(
+                email=email,
+                mobile=mobile
+            )
+
+            # Create a new profile instance and associate it with the user
+            profile_instance = ProfileExtra.objects.create(
+                user=user_instance,
+                location=GCCLocations.objects.get(id=location) if location else None,
+                dob=dob,
+                gender=gender.title() if gender else None
+            )
+
+            serializer = UserUpdatedSerializer(user_instance)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
 class BookmarkCreateAPIView(generics.CreateAPIView):
