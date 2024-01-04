@@ -137,7 +137,8 @@ class VendorAddDetailsSerialzier(serializers.ModelSerializer):
 
 class ProfileExtraSerializer(serializers.ModelSerializer):
 
-    location = serializers.CharField(source="location.location")
+    location = serializers.CharField(
+        source="location.location", allow_null=True)
 
     class Meta:
         model = ProfileExtra

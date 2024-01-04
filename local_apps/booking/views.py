@@ -4,7 +4,7 @@ from rest_framework import generics, status
 from .models import Booking, Payment
 from .serializers import *
 from rest_framework.response import Response
-from local_apps.service.models import Service,Price
+from local_apps.service.models import Service, Price
 from local_apps.offer.models import Offer
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
@@ -31,7 +31,7 @@ class BookingListView(generics.ListAPIView):
         "booking_id",
         "service__name",
         "user__first_name",
-        "user__last_name" 
+        "user__last_name"
     ]
     filterset_class = BookingFilter
 
@@ -45,12 +45,12 @@ class BookingCreateView(generics.CreateAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
 
-    def create(self, request, *args, **kwargs): 
+    def create(self, request, *args, **kwargs):
         try:
             offer_id = request.data.get('offer')
             service_id = request.data.get('service')
             payment_id = request.data.get('payment')
-            price_id=request.data.get('price')
+            price_id = request.data.get('price')
 
             # Get related objects
             offer = Offer.objects.get(id=offer_id) if offer_id else None
@@ -58,7 +58,7 @@ class BookingCreateView(generics.CreateAPIView):
                 id=service_id) if service_id else None
             payment = Payment.objects.get(
                 id=payment_id) if payment_id else None
-            price =Price.objects.get(
+            price = Price.objects.get(
                 id=price_id) if price_id else None
 
             # Extract JSON fields
@@ -104,58 +104,58 @@ class BookingCreateView(generics.CreateAPIView):
                 offer_details=offer_details
             )
 
-            # booking.save()
+            booking.save()
 
             # payment initialization
 
-            api_key = settings.TAP_API_KEY
-            base_url = settings.TAP_BASE_URL
-            secret_key = settings.TAP_SECRET_KEY
+            # api_key = settings.TAP_API_KEY
+            # base_url = settings.TAP_BASE_URL
+            # secret_key = settings.TAP_SECRET_KEY
 
-            url = base_url + "authorize/"
-            total_amount = booking.price_total
-            payload = {
-                "amount": 2,
-                "currency": "KWD",
-                "metadata": {
-                    "udf1": "Sea Arabia TXN ID",
-                    "udf2": "Service Name",
-                    "udf3": "Service Category",
-                },
-                "customer": {
-                    "first_name": "Sea",
-                    "middle_name": "Arabia",
-                    "last_name": "User",
-                    "email": "prince@jicitsolution.com",
-                    "phone": {
-                        "country_code": "91",
-                        "number": "9999999999"
-                    }
-                },
-                "merchant": {"id": "1234"},
-                "source": {"id": "src_all"},
-                "redirect": {"url": "http://your_website.com/redirecturl"}
-            }
+            # url = base_url + "authorize/"
+            # total_amount = booking.price_total
+            # payload = {
+            #     "amount": 2,
+            #     "currency": "KWD",
+            #     "metadata": {
+            #         "udf1": "Sea Arabia TXN ID",
+            #         "udf2": "Service Name",
+            #         "udf3": "Service Category",
+            #     },
+            #     "customer": {
+            #         "first_name": "Sea",
+            #         "middle_name": "Arabia",
+            #         "last_name": "User",
+            #         "email": "prince@jicitsolution.com",
+            #         "phone": {
+            #             "country_code": "91",
+            #             "number": "9999999999"
+            #         }
+            #     },
+            #     "merchant": {"id": "1234"},
+            #     "source": {"id": "src_all"},
+            #     "redirect": {"url": "http://your_website.com/redirecturl"}
+            # }
 
-            headers = {
-                "accept": "application/json",
-                "content-type": "application/json",
-                "Authorization": "Bearer "+secret_key
-            }
+            # headers = {
+            #     "accept": "application/json",
+            #     "content-type": "application/json",
+            #     "Authorization": "Bearer "+secret_key
+            # }
 
-            response = requests.post(url, json=payload, headers=headers)
+            # response = requests.post(url, json=payload, headers=headers)
 
-            payment_response = response.json()
+            # payment_response = response.json()
 
-            # get the url for checkout from the json response
+            # # get the url for checkout from the json response
 
-            payment_url = payment_response.get("transaction")['url']
+            # payment_url = payment_response.get("transaction")['url']
 
-            serializer = BookingSerializer(booking)
-            serialized_data = serializer.data
-            serialized_data['payment_response'] = payment_url
+            # serializer = BookingSerializer(booking)
+            # serialized_data = serializer.data
+            # serialized_data['payment_response'] = payment_url
 
-            return Response(serialized_data, status=status.HTTP_201_CREATED)
+            return Response("serialized_data", status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -264,7 +264,6 @@ class PaymentInitiate(generics.CreateAPIView):
     pass
 
 
-
 # Booking Cancellation For Mobile Application And Vendor CMS And Admin CMS
 class BookingCancellation(generics.UpdateAPIView):
     serializer_class = BookingStatusSerializer
@@ -275,7 +274,8 @@ class BookingCancellation(generics.UpdateAPIView):
         try:
             booking_id = kwargs.get('pk', None)
             cancellation_reason = request.data.get('cancellation_reason')
-            booking_instance = Booking.objects.get(id=booking_id) if Booking.objects.filter(id=booking_id).exists() else None
+            booking_instance = Booking.objects.get(
+                id=booking_id) if Booking.objects.filter(id=booking_id).exists() else None
 
             if booking_instance and booking_instance.status != 'Cancelled':
                 booking_instance.canceld_by = self.request.user
