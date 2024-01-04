@@ -228,7 +228,7 @@ class UserList(generics.ListAPIView):
     search_fields = [
         "first_name",
         "last_name",
-        "profileextra__location__location",
+        "profileextra__location",
         "email",
         "mobile"
     ]
@@ -756,7 +756,12 @@ class ProfileResetPasswordView(APIView):
             )
 
 
-# ALL USER RESET PASSWORD FOR ADMIN CMS
+
+
+
+
+
+# ALL USER RESET PASSWORD FOR ADMIN CMS 
 class AllUserResetPasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -790,6 +795,8 @@ class AllUserResetPasswordView(APIView):
             return Response(
                 {"error": "Empty passwords "}, status=status.HTTP_400_BAD_REQUEST
             )
+
+
 
 
 class UserListView(generics.ListAPIView):
@@ -836,10 +843,10 @@ class UserSignUp(generics.CreateAPIView):
         try:
             email = request.data.get('email', None)
             mobile = request.data.get('mobile', None)
-            profile_extra = request.data.get('profileextra', {})
-            location = profile_extra.get('location', None)
-            dob = profile_extra.get('dob', None)
-            gender = profile_extra.get('gender', None)
+            # profile_extra = request.data.get('profileextra', {})
+            location = request.data.get('location', None)
+            dob = request.data.get('dob', None)
+            gender = request.data.get('gender', None)
 
             # Create a new user instance
             user_instance = User.objects.create(
