@@ -52,7 +52,9 @@ class AllBookingListView(generics.ListAPIView):
         "user__first_name",
         "user__last_name",
     ]
-    filterset_class = BookingFilter        
+    filterset_class = BookingFilter
+    def get_queryset(self):
+        return Booking.objects.all()        
 
 
 class BookingCreateView(generics.CreateAPIView):
