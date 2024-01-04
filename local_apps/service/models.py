@@ -10,6 +10,7 @@ from local_apps.core.models import Main
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from local_apps.main.models import Category, SubCategory
+from utils.id_handle import increment_one_letter, increment_two_digits, increment_two_letters
 
 
 def default_false_time_slot():
@@ -316,6 +317,13 @@ class Service(Main):
     per_head_booking = models.BooleanField(default=False)
     purchase_limit_min = models.PositiveIntegerField(null=True, blank=True)
     purchase_limit_max = models.PositiveIntegerField(null=True, blank=True)
+    # ID handling section
+    prefix = models.CharField(max_length=10, default="SA-SER")
+    first_two_letters = models.CharField(max_length=2, default="AA")
+    first_two_numbers = models.IntegerField(default=0)
+    last_one_letter = models.CharField(max_length=1, default="A")
+    last_two_numbers = models.IntegerField(default=0)
+    service_id = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -323,7 +331,32 @@ class Service(Main):
         verbose_name_plural = "Services"
 
     def __str__(self):
-        return self.name if self.name else "No Service Name"
+        return self.service_id if self.service_id else "No Service ID"
+
+    def generate_id_number(self):
+        last_entry = Service.objects.order_by('-created_at').first()
+        if last_entry:
+            if last_entry.last_two_numbers == 99:
+                self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+            else:
+                self.last_one_letter = last_entry.last_one_letter
+
+            if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
+                self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+            else:
+                self.first_two_numbers = last_entry.first_two_numbers
+
+            if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
+                                                                                     'z'] and last_entry.last_two_numbers == 99:
+                self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
+            else:
+                self.first_two_letters = last_entry.first_two_letters
+
+            self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
+
+            self.service_id = f"{self.prefix}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
+        else:
+            self.service_id = f"{self.prefix}-AA00A00"
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
@@ -356,6 +389,10 @@ class Service(Main):
         else:
             # Call the original save method to save the instance
             super(Service, self).save(*args, **kwargs)
+
+        if not self.service_id:
+            self.generate_id_number()
+        super(Service, self).save(*args, **kwargs)
 
 
 class Price(Main):
@@ -597,9 +634,41 @@ class Package(Main):
     capacity = models.PositiveIntegerField(default=0)
     image = models.FileField(upload_to="service/package/image")
     price = models.PositiveIntegerField(blank=True, null=True)
+    # ID handling section
+    prefix = models.CharField(max_length=10, default="SA-PKG")
+    first_two_letters = models.CharField(max_length=2, default="AA")
+    first_two_numbers = models.IntegerField(default=0)
+    last_one_letter = models.CharField(max_length=1, default="A")
+    last_two_numbers = models.IntegerField(default=0)
+    package_id = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return self.name if self.name else "No Packages"
+        return self.package_id if self.package_id else "No Package ID"
+
+    def generate_id_number(self):
+        last_entry = Package.objects.order_by('-created_at').first()
+        if last_entry:
+            if last_entry.last_two_numbers == 99:
+                self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+            else:
+                self.last_one_letter = last_entry.last_one_letter
+
+            if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
+                self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+            else:
+                self.first_two_numbers = last_entry.first_two_numbers
+
+            if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
+                                                                                     'z'] and last_entry.last_two_numbers == 99:
+                self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
+            else:
+                self.first_two_letters = last_entry.first_two_letters
+
+            self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
+
+            self.package_id = f"{self.prefix}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
+        else:
+            self.package_id = f"{self.prefix}-AA00A00"
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
@@ -632,6 +701,10 @@ class Package(Main):
         else:
             # Call the original save method to save the instance
             super(Package, self).save(*args, **kwargs)
+
+        if not self.package_id:
+            self.generate_id_number()
+        super(Package, self).save(*args, **kwargs)
 
 
 class CapacityCount(Main):
