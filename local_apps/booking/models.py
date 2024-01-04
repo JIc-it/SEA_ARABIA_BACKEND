@@ -9,67 +9,23 @@ from django.core.serializers import serialize
 from django.core.exceptions import ValidationError
 from utils.id_handle import increment_two_digits, increment_two_letters, increment_one_letter
 
-BOOKING_STATUS = (
-    (None, 'Default'),
-    ('Opened', 'Opened'),
-    ('Upcoming', 'Upcoming'),
-    ('Unsuccessful', 'Unsuccessful'),
-    ('Completed', 'Completed'),
-    ('Cancelled', 'Cancelled'),
-)
-
-REFUND_STATUS = (
-    (None, 'Default'),
-    ('Pending', 'Pending'),
-    ('Completed', 'Completed'),
-)
-
-REFUND_TYPE = (
-    (None, 'Default'),
-    ('Partial Amount', 'Partial Amount'),
-    ('Full Amount', 'Full Amount'),
-)
-
-USER_TYPE = (
-    (None, 'Default'),
-    ('Registered', 'Registered'),
-    ('Guest', 'Guest'),
-    ('Premium', 'Premium'),
-)
-
-BOOKING_FOR_TYPE = (
-    (None, 'Default'),
-    ('My Self', 'My Self'),
-    ('Someone Else', 'Someone Else'),
-)
-
-BOOKING_CHOICE = (
-    (None, 'Default'),
-    ("Booking", "Booking"),
-    ("Enquiry", "Enquiry")
-)
-
-BOOKING_ITEM_TYPE = (
-    (None, 'Default'),
-    ("Service", "Service"),
-    ("Activity", "Activity"),
-    ("Package", "Package"),
-    ("Event", "Event"),
-)
-
 
 class Payment(Main):
+    # ID handling section
     prefix = models.CharField(max_length=10, default="SA-PMT")
     first_two_letters = models.CharField(max_length=2, default="AA")
     first_two_numbers = models.IntegerField(default=0)
     last_one_letter = models.CharField(max_length=1, default="A")
     last_two_numbers = models.IntegerField(default=0)
     payment_id = models.CharField(max_length=255, blank=True, null=True)
+
+    # Payment details
     tap_pay_id = models.CharField(max_length=255, blank=True, null=True)
     amount = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=255, blank=True, null=True)
     payment_method = models.CharField(max_length=255, blank=True, null=True)
-    response = models.JSONField(blank=True, null=True)
+    initial_response = models.JSONField(blank=True, null=True)
+    confirmation_response = models.JSONField(blank=True, null=True)
 
     def __str__(self):
         return self.payment_id
@@ -111,6 +67,53 @@ class Payment(Main):
 
 
 class Booking(Main):
+    BOOKING_STATUS = (
+        (None, 'Default'),
+        ('Opened', 'Opened'),
+        ('Upcoming', 'Upcoming'),
+        ('Unsuccessful', 'Unsuccessful'),
+        ('Completed', 'Completed'),
+        ('Cancelled', 'Cancelled'),
+    )
+
+    REFUND_STATUS = (
+        (None, 'Default'),
+        ('Pending', 'Pending'),
+        ('Completed', 'Completed'),
+    )
+
+    REFUND_TYPE = (
+        (None, 'Default'),
+        ('Partial Amount', 'Partial Amount'),
+        ('Full Amount', 'Full Amount'),
+    )
+
+    USER_TYPE = (
+        (None, 'Default'),
+        ('Registered', 'Registered'),
+        ('Guest', 'Guest'),
+        ('Premium', 'Premium'),
+    )
+
+    BOOKING_FOR_TYPE = (
+        (None, 'Default'),
+        ('My Self', 'My Self'),
+        ('Someone Else', 'Someone Else'),
+    )
+
+    BOOKING_CHOICE = (
+        (None, 'Default'),
+        ("Booking", "Booking"),
+        ("Enquiry", "Enquiry")
+    )
+
+    BOOKING_ITEM_TYPE = (
+        (None, 'Default'),
+        ("Service", "Service"),
+        ("Activity", "Activity"),
+        ("Package", "Package"),
+        ("Event", "Event"),
+    )
     # ID handling section
     prefix = models.CharField(max_length=10, default="SA-BKG-")
     first_two_letters = models.CharField(max_length=2, default="AA")
@@ -136,7 +139,7 @@ class Booking(Main):
                               related_name='booking_booking_price')
 
     # User / customer info
-    user_type = models.CharField(choices=USER_TYPE, default='Registered', max_length=255, blank=True, null=True)
+    user_type = models.CharField(choices=USER_TYPE, default='Default', max_length=255, blank=True, null=True)
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     phone_number = models.CharField(max_length=255, blank=True, null=True)
@@ -144,8 +147,8 @@ class Booking(Main):
 
     # Booking info
     destination = models.CharField(max_length=255, blank=True, null=True)
-    booking_for = models.CharField(choices=BOOKING_FOR_TYPE, default='My Self', max_length=255, blank=True, null=True)
-    booking_item = models.CharField(choices=BOOKING_ITEM_TYPE, default='Service', max_length=255, blank=True, null=True)
+    booking_for = models.CharField(choices=BOOKING_FOR_TYPE, default='Default', max_length=255, blank=True, null=True)
+    booking_item = models.CharField(choices=BOOKING_ITEM_TYPE, default='Default', max_length=255, blank=True, null=True)
     starting_point = models.CharField(max_length=255, blank=True, null=True)
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
@@ -153,8 +156,8 @@ class Booking(Main):
     additional_hours = models.PositiveIntegerField(default=0, blank=True, null=True)
     additional_hours_amount = models.PositiveIntegerField(default=0, blank=True, null=True)
     number_of_people = models.PositiveIntegerField(default=1, blank=True, null=True)
-    booking_type = models.CharField(choices=BOOKING_CHOICE, default='Booking', max_length=255, blank=True, null=True)
-    status = models.CharField(choices=BOOKING_STATUS, default='Opened', max_length=255, blank=True, null=True)
+    booking_type = models.CharField(choices=BOOKING_CHOICE, default='Default', max_length=255, blank=True, null=True)
+    status = models.CharField(choices=BOOKING_STATUS, default='Default', max_length=255, blank=True, null=True)
 
     # Cancellation & refund
     cancellation_reason = models.TextField(blank=True, null=True)
