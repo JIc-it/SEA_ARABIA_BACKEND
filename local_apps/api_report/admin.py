@@ -20,6 +20,7 @@ class APILogAdmin(admin.ModelAdmin):
 @admin.register(ModelUpdateLog)
 class ModelUpdateLogAdmin(admin.ModelAdmin):
     list_display = ('model_name', 'timestamp')
+    list_filter = ['user', 'timestamp']
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -33,7 +34,8 @@ class ModelUpdateLogAdmin(admin.ModelAdmin):
 
 @admin.register(ActionLog)
 class ActionLogAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('model_name', 'title')
+    list_filter = ['user', 'model_name', 'action']
 
     def has_delete_permission(self, request, obj=None):
         return False
