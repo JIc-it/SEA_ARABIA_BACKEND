@@ -1,4 +1,10 @@
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.serializers import serialize
 from django.db import models
+from django.utils import timezone
+
+from local_apps.api_report.middleware import get_current_request
+from local_apps.api_report.models import ModelUpdateLog
 from local_apps.core.models import Main
 from django.conf import settings
 from utils.file_handle import remove_file
@@ -22,6 +28,38 @@ class OnboardStatus(Main):
     def __str__(self):
         return self.name
 
+    def create_update_log(self, data_before, data_after):
+        request = get_current_request()
+        ModelUpdateLog.objects.create(
+            model_name=self.__class__.__name__,
+            user=request.user if request and hasattr(request, 'user') else None,
+            timestamp=timezone.now(),
+            data_before=data_before,
+            data_after=data_after
+        )
+
+    def save(self, *args, **kwargs):
+        # Check if the instance already exists
+        if self.pk:
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [OnboardStatus.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
+
+            # Call the original save method to save the instance
+            super(OnboardStatus, self).save(*args, **kwargs)
+
+            # Get the data after the update
+            data_after = serialize('json', [self])
+
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+        else:
+            # Call the original save method to save the instance
+            super(OnboardStatus, self).save(*args, **kwargs)
+
     class Meta:
         ordering = ["-created_at", "-updated_at"]
         verbose_name = "OnBoard Status"
@@ -33,6 +71,38 @@ class ServiceTag(Main):
 
     def __str__(self):
         return self.name
+
+    def create_update_log(self, data_before, data_after):
+        request = get_current_request()
+        ModelUpdateLog.objects.create(
+            model_name=self.__class__.__name__,
+            user=request.user if request and hasattr(request, 'user') else None,
+            timestamp=timezone.now(),
+            data_before=data_before,
+            data_after=data_after
+        )
+
+    def save(self, *args, **kwargs):
+        # Check if the instance already exists
+        if self.pk:
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [ServiceTag.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
+
+            # Call the original save method to save the instance
+            super(ServiceTag, self).save(*args, **kwargs)
+
+            # Get the data after the update
+            data_after = serialize('json', [self])
+
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+        else:
+            # Call the original save method to save the instance
+            super(ServiceTag, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -81,12 +151,76 @@ class Company(Main):
     def __str__(self):
         return self.name if self.name else "No Company Name"
 
+    def create_update_log(self, data_before, data_after):
+        request = get_current_request()
+        ModelUpdateLog.objects.create(
+            model_name=self.__class__.__name__,
+            user=request.user if request and hasattr(request, 'user') else None,
+            timestamp=timezone.now(),
+            data_before=data_before,
+            data_after=data_after
+        )
+
+    def save(self, *args, **kwargs):
+        # Check if the instance already exists
+        if self.pk:
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [Company.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
+
+            # Call the original save method to save the instance
+            super(Company, self).save(*args, **kwargs)
+
+            # Get the data after the update
+            data_after = serialize('json', [self])
+
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+        else:
+            # Call the original save method to save the instance
+            super(Company, self).save(*args, **kwargs)
+
 
 class MiscellaneousType(Main):
     name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
+
+    def create_update_log(self, data_before, data_after):
+        request = get_current_request()
+        ModelUpdateLog.objects.create(
+            model_name=self.__class__.__name__,
+            user=request.user if request and hasattr(request, 'user') else None,
+            timestamp=timezone.now(),
+            data_before=data_before,
+            data_after=data_after
+        )
+
+    def save(self, *args, **kwargs):
+        # Check if the instance already exists
+        if self.pk:
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [MiscellaneousType.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
+
+            # Call the original save method to save the instance
+            super(MiscellaneousType, self).save(*args, **kwargs)
+
+            # Get the data after the update
+            data_after = serialize('json', [self])
+
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+        else:
+            # Call the original save method to save the instance
+            super(MiscellaneousType, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -114,23 +248,51 @@ class Miscellaneous(Main):
     def __str__(self):
         return self.title if self.title else "No Title"
 
+    def create_update_log(self, data_before, data_after):
+        ModelUpdateLog.objects.create(
+            model_name=self.__class__.__name__,
+            user=self.user,  # Assuming there is a user field in your Miscellaneous model
+            timestamp=timezone.now(),
+            data_before=data_before,
+            data_after=data_after
+        )
+
     def save(self, *args, **kwargs):
+        # Check if the instance already exists
+        if self.pk:
+            # Get the data before the update
+            data_before = serialize('json', [Miscellaneous.objects.get(pk=self.pk)]) or None
+
+            # Call the original save method to save the instance
+            super(Miscellaneous, self).save(*args, **kwargs)
+
+            # Get the data after the update
+            data_after = serialize('json', [self])
+
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+        else:
+            super(Miscellaneous, self).save(*args, **kwargs)
+
         try:
             this_instance = Miscellaneous.objects.get(id=self.id)
             old_file = this_instance.attachment
         except Miscellaneous.DoesNotExist:
             old_file = None
 
-        super(Miscellaneous, self).save(*args, **kwargs)
-
         if old_file and self.attachment and old_file != self.attachment:
             remove_file(old_file)
 
     def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
+
         if self.attachment:
             remove_file(self.attachment)
 
         super(Miscellaneous, self).delete(*args, **kwargs)
+
+        # Create a log entry after deletion
+        self.create_update_log(data_before, None)
 
 
 class Qualifications(Main):
@@ -147,6 +309,38 @@ class Qualifications(Main):
 
     def __str__(self):
         return self.name if self.name else "No Name"
+
+    def create_update_log(self, data_before, data_after):
+        request = get_current_request()
+        ModelUpdateLog.objects.create(
+            model_name=self.__class__.__name__,
+            user=request.user if request and hasattr(request, 'user') else None,
+            timestamp=timezone.now(),
+            data_before=data_before,
+            data_after=data_after
+        )
+
+    def save(self, *args, **kwargs):
+        # Check if the instance already exists
+        if self.pk:
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [Qualifications.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
+
+            # Call the original save method to save the instance
+            super(Qualifications, self).save(*args, **kwargs)
+
+            # Get the data after the update
+            data_after = serialize('json', [self])
+
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+        else:
+            # Call the original save method to save the instance
+            super(Qualifications, self).save(*args, **kwargs)
 
 
 class SiteVisit(Main):
@@ -170,23 +364,51 @@ class SiteVisit(Main):
     def __str__(self):
         return self.title if self.title else "No Title"
 
+    def create_update_log(self, data_before, data_after):
+        ModelUpdateLog.objects.create(
+            model_name=self.__class__.__name__,
+            user=self.user,  # Assuming there is a user field in your SiteVisit model
+            timestamp=timezone.now(),
+            data_before=data_before,
+            data_after=data_after
+        )
+
     def save(self, *args, **kwargs):
+        # Check if the instance already exists
+        if self.pk:
+            # Get the data before the update
+            data_before = serialize('json', [SiteVisit.objects.get(pk=self.pk)]) or None
+
+            # Call the original save method to save the instance
+            super(SiteVisit, self).save(*args, **kwargs)
+
+            # Get the data after the update
+            data_after = serialize('json', [self])
+
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+        else:
+            super(SiteVisit, self).save(*args, **kwargs)
+
         try:
             this_instance = SiteVisit.objects.get(id=self.id)
             old_file = this_instance.attachment
         except SiteVisit.DoesNotExist:
             old_file = None
 
-        super(SiteVisit, self).save(*args, **kwargs)
-
         if old_file and self.attachment and old_file != self.attachment:
             remove_file(old_file)
 
     def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
+
         if self.attachment:
             remove_file(self.attachment)
 
         super(SiteVisit, self).delete(*args, **kwargs)
+
+        # Create a log entry after deletion
+        self.create_update_log(data_before, None)
 
 
 class Proposal(Main):
@@ -208,23 +430,51 @@ class Proposal(Main):
     def __str__(self):
         return self.title if self.title else "No Title"
 
+    def create_update_log(self, data_before, data_after):
+        ModelUpdateLog.objects.create(
+            model_name=self.__class__.__name__,
+            user=self.user,  # Assuming there is a user field in your Proposal model
+            timestamp=timezone.now(),
+            data_before=data_before,
+            data_after=data_after
+        )
+
     def save(self, *args, **kwargs):
+        # Check if the instance already exists
+        if self.pk:
+            # Get the data before the update
+            data_before = serialize('json', [Proposal.objects.get(pk=self.pk)]) or None
+
+            # Call the original save method to save the instance
+            super(Proposal, self).save(*args, **kwargs)
+
+            # Get the data after the update
+            data_after = serialize('json', [self])
+
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+        else:
+            super(Proposal, self).save(*args, **kwargs)
+
         try:
             this_instance = Proposal.objects.get(id=self.id)
             old_file = this_instance.attachment
         except Proposal.DoesNotExist:
             old_file = None
 
-        super(Proposal, self).save(*args, **kwargs)
-
         if old_file and self.attachment and old_file != self.attachment:
             remove_file(old_file)
 
     def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
+
         if self.attachment:
             remove_file(self.attachment)
 
         super(Proposal, self).delete(*args, **kwargs)
+
+        # Create a log entry after deletion
+        self.create_update_log(data_before, None)
 
 
 class Negotiation(Main):
@@ -246,23 +496,51 @@ class Negotiation(Main):
     def __str__(self):
         return self.title if self.title else "No Title"
 
+    def create_update_log(self, data_before, data_after):
+        ModelUpdateLog.objects.create(
+            model_name=self.__class__.__name__,
+            user=self.user,  # Assuming there is a user field in your Negotiation model
+            timestamp=timezone.now(),
+            data_before=data_before,
+            data_after=data_after
+        )
+
     def save(self, *args, **kwargs):
+        # Check if the instance already exists
+        if self.pk:
+            # Get the data before the update
+            data_before = serialize('json', [Negotiation.objects.get(pk=self.pk)]) or None
+
+            # Call the original save method to save the instance
+            super(Negotiation, self).save(*args, **kwargs)
+
+            # Get the data after the update
+            data_after = serialize('json', [self])
+
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+        else:
+            super(Negotiation, self).save(*args, **kwargs)
+
         try:
             this_instance = Negotiation.objects.get(id=self.id)
             old_file = this_instance.attachment
         except Negotiation.DoesNotExist:
             old_file = None
 
-        super(Negotiation, self).save(*args, **kwargs)
-
         if old_file and self.attachment and old_file != self.attachment:
             remove_file(old_file)
 
     def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
+
         if self.attachment:
             remove_file(self.attachment)
 
         super(Negotiation, self).delete(*args, **kwargs)
+
+        # Create a log entry after deletion
+        self.create_update_log(data_before, None)
 
 
 class MOUorCharter(Main):
@@ -284,20 +562,48 @@ class MOUorCharter(Main):
     def __str__(self):
         return self.title if self.title else "No Title"
 
+    def create_update_log(self, data_before, data_after):
+        ModelUpdateLog.objects.create(
+            model_name=self.__class__.__name__,
+            user=self.user,  # Assuming there is a user field in your MOUorCharter model
+            timestamp=timezone.now(),
+            data_before=data_before,
+            data_after=data_after
+        )
+
     def save(self, *args, **kwargs):
+        # Check if the instance already exists
+        if self.pk:
+            # Get the data before the update
+            data_before = serialize('json', [MOUorCharter.objects.get(pk=self.pk)]) or None
+
+            # Call the original save method to save the instance
+            super(MOUorCharter, self).save(*args, **kwargs)
+
+            # Get the data after the update
+            data_after = serialize('json', [self])
+
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+        else:
+            super(MOUorCharter, self).save(*args, **kwargs)
+
         try:
             this_instance = MOUorCharter.objects.get(id=self.id)
             old_file = this_instance.attachment
         except MOUorCharter.DoesNotExist:
             old_file = None
 
-        super(MOUorCharter, self).save(*args, **kwargs)
-
         if old_file and self.attachment and old_file != self.attachment:
             remove_file(old_file)
 
     def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
+
         if self.attachment:
             remove_file(self.attachment)
 
         super(MOUorCharter, self).delete(*args, **kwargs)
+
+        # Create a log entry after deletion
+        self.create_update_log(data_before, None)

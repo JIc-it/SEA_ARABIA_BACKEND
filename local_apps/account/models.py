@@ -10,6 +10,7 @@ from utils.file_handle import remove_file
 from django.utils import timezone
 from local_apps.service.models import Service
 from django.conf import settings
+from local_apps.api_report.middleware import get_current_request
 
 
 USER_ROLE = (
@@ -58,9 +59,10 @@ class User(AbstractUser):
     ordering = ["-created_at", "-updated_at"]
 
     def create_update_log(self, data_before, data_after):
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=self,
+            user=request.user if request and hasattr(request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -116,9 +118,10 @@ class GCCLocations(Main):
         return self.location if self.location else "No Location"
 
     def create_update_log(self, data_before, data_after):
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=self.user,  # Assuming you have a user field in GCCLocations
+            user=request.user if request and hasattr(request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -161,9 +164,10 @@ class ProfileExtra(Main):
         return self.user.email if self.user and self.user.email else 'No user'
 
     def create_update_log(self, data_before, data_after):
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=self.user,
+            user=request.user if request and hasattr(request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -202,11 +206,13 @@ class ProfileExtra(Main):
             remove_file(old_image)
 
     def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
         # Remove image before deleting the instance
         if self.image:
             remove_file(self.image)
 
         super(ProfileExtra, self).delete(*args, **kwargs)
+        self.create_update_log(data_before, None)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -218,9 +224,10 @@ class UserIdentificationType(Main):
     name = models.CharField(max_length=255)
 
     def create_update_log(self, data_before, data_after):
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=self.user,
+            user=request.user if request and hasattr(request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -268,9 +275,10 @@ class UserIdentificationData(Main):
     is_verified = models.BooleanField(default=False)
 
     def create_update_log(self, data_before, data_after):
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=self.user,
+            user=request.user if request and hasattr(request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -299,10 +307,13 @@ class UserIdentificationData(Main):
             super(UserIdentificationData, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
         if self.image:
             remove_file(self.image)
 
         super(UserIdentificationData, self).delete(*args, **kwargs)
+        # Create a log entry after deletion
+        self.create_update_log(data_before, None)
 
     def __str__(self):
         return self.id_number if self.id_number else 'no id number'
@@ -325,9 +336,10 @@ class PasswordReset(models.Model):
         return timezone.now() > self.expires_at
 
     def create_update_log(self, data_before, data_after):
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=self.user,
+            user=request.user if request and hasattr(request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -373,9 +385,10 @@ class Bookmark(Main):
         return str(self.user)
 
     def create_update_log(self, data_before, data_after):
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=self.user,
+            user=request.user if request and hasattr(request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -421,9 +434,10 @@ class Guest(Main):
         return self.first_name if self.first_name else "No Name"
 
     def create_update_log(self, data_before, data_after):
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=None,  # Change this based on how you associate the user with Guest model
+            user=request.user if request and hasattr(request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
