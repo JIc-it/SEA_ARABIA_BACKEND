@@ -551,9 +551,10 @@ class ServiceAvailability(Main):
         return self.service.name
 
     def create_update_log(self, data_before, data_after):
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=self.user,  # Assuming there is a user field in your ServiceAvailability model
+            user=request.user if request and hasattr(request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
