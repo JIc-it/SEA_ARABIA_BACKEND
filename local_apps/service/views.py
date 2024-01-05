@@ -1048,7 +1048,7 @@ class CategoryBasedListing(generics.ListAPIView):
         except Exception as e:
 
             raise e
-        
+
 
 class ComboPackageListing(generics.ListAPIView):
     """For combo package listing"""
@@ -1063,7 +1063,6 @@ class ComboPackageListing(generics.ListAPIView):
     #     except Exception as e:
     #         error_message = "An error occurred while fetching the combo packages: {}".format(str(e))
     #         return Response({"error": error_message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
 
 
 class ServiceAvailablityTime(generics.RetrieveAPIView):
@@ -1203,7 +1202,7 @@ class ServiceReviewListApp(generics.ListAPIView):
             return Response({"error": "ServiceReview does not exist for the given service ID"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": f"An error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
 
 class ServiceReviewUpdate(generics.CreateAPIView):
     # permission_classes = [IsAuthenticated]
@@ -1473,3 +1472,33 @@ class ServiceImageCreateMethod(generics.CreateAPIView):
             return Response("Service Image Creation Successful", status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
+
+
+class ServiceAdminCountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """ view for showing the card count for service """
+
+        try:
+            # vendor_id = request.query_params.get('id', None)
+            # if vendor_id:
+            #     booking_count = Booking.objects.filter(service__company__user=vendor_id).aggregate(
+            #         total_booking=Count("pk"),
+            #         today_booking=Coalesce(Sum(
+            #             Case(When(created_at=today, then=1), default=0, output_field=IntegerField())), 0),
+            #         total_confirmed_booking=Coalesce(Sum(
+            #             Case(When(status="Successful", then=1), default=0, output_field=IntegerField())), 0),
+            #         total_cancelled_booking=Coalesce(Sum(
+            #             Case(When(status="Cancelled", then=1), default=0, output_field=IntegerField())), 0),
+            #     )
+            service_count = Service.objects.all().aggregate(
+                total_machines=Count("pk"),
+                active_machine_count=Coalesce(Sum(
+                    Case(When(is_active=True, then=1), default=0, output_field=IntegerField())), 0),
+                inactive_machine_count=Coalesce(Sum(
+                    Case(When(is_active=False, then=1), default=0, output_field=IntegerField())), 0),
+                total_vendor_count=Coalesce(Sum(Case(When(company__is_active=True, then=1), default=0, output_field=IntegerField())), 0),)
+            return Response(service_count, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)

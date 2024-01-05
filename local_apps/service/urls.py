@@ -204,4 +204,7 @@ urlpatterns = [
     path('serviceimage/create', ServiceImageCreateMethod.as_view(),
          name='serviceimagecreate'),
 
+    path('admin/count', ServiceAdminCountView.as_view(),
+         name='service_count_admin'),
+
 ]
