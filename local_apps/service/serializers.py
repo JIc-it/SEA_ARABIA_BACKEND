@@ -319,7 +319,7 @@ class ServiceReviewListSerializer(serializers.ModelSerializer):
 class ServiceAvailabilityServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ["id", "name"]
+        fields = ["id", "name", "service_id"]
 
 
 class ServiceAvailabilitySerializer(serializers.ModelSerializer):
