@@ -419,9 +419,11 @@ class SiteVisit(Main):
         return self.title if self.title else "No Title"
 
     def create_update_log(self, data_before, data_after):
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=self.user,  # Assuming there is a user field in your SiteVisit model
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -431,8 +433,10 @@ class SiteVisit(Main):
         # Check if the instance already exists
         if self.pk:
             # Get the data before the update
-            data_before = serialize(
-                'json', [SiteVisit.objects.get(pk=self.pk)]) or None
+            try:
+                data_before = serialize('json', [SiteVisit.objects.get(pk=self.pk)])
+            except SiteVisit.DoesNotExist:
+                data_before = None
 
             # Call the original save method to save the instance
             super(SiteVisit, self).save(*args, **kwargs)
