@@ -4,6 +4,7 @@ from .filters import SubcategoryFilter
 from .models import *
 from .serializers import *
 
+
 class CategoryList(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer

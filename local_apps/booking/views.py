@@ -32,17 +32,23 @@ class AdminBookingListView(generics.ListAPIView):
     filterset_class = BookingFilter
 
 
-class AdminIndividualBookingView(generics.RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
+class AdminIndividualBookingView(generics.RetrieveUpdateDestroyAPIView):
+    queryset= Booking.objects.all()
+    serializer_class= BookingSerializer
+    lookup_field ='pk'
 
-    def get_object(self):
-        try:
-            booking_id = self.request.data.get('booking_id', None)
-            return Booking.objects.get(id=booking_id)
-        except Booking.DoesNotExist:
-            return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+# class AdminIndividualBookingView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request, booking_id):
+#         try:
+#             booking = Booking.objects.filter(id=booking_id)
+#             serializer = BookingIndividualViewSerializer(booking)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except Booking.DoesNotExist:
+#             return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VendorBookingListView(generics.ListAPIView):
@@ -178,6 +184,16 @@ class PaymentFinalization(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         try:
             payment_id = request.data.get("payment_id")
+            if payment_id:
+                url = "https://api.tap.company/v2/authorize/"+payment_id
+
+                headers = {
+                    "accept": "application/json",
+                    "Authorization": "Bearer "+settings.TAP_SECRET_KEY
+                }
+
+            else:
+                return Response("Payment Id Required", status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)

@@ -234,9 +234,6 @@ class Booking(Main):
             if self.service and self.service.type:
                 self.booking_item = self.service.type
 
-            # if self.package and self.package.type:
-            #     self.booking_item = self.service.type
-
             # Automating user_type
             if self.user:
                 self.user_type = 'Registered'
@@ -257,8 +254,9 @@ class Booking(Main):
             if not self.booking_id:
                 self.generate_id_number()
 
-            # Checking if offer addition possible
+            # Checking if offer addition is possible
             if self.service and self.offer and self.booking_item in ['Activity', 'Service']:
+                redeem_temp = False
 
                 # Raising validation error if offer not started or expired
                 if self.offer.expiration in ['No-Expiry', 'Limited-Time']:
@@ -270,21 +268,20 @@ class Booking(Main):
                     raise ValidationError("Invalid offer expiration")
 
                 # Checking redeem count not exceeded
-                redeem_temp = False
                 if self.offer.redemption_type in ['One-Time', 'Limited-Number']:
                     if self.offer.redemption_type == 'One-Time' and self.offer.redeem_count >= 1:
-                        raise ValidationError("Discount / Offer Redeem count exceeded...")
+                        raise ValidationError("Discount/Offer Redeem count exceeded...")
                     elif self.offer.redemption_type == 'Limited-Number' and self.offer.specify_no <= self.offer.redeem_count:
-                        raise ValidationError("Discount / Offer Redeem count exceeded...")
+                        raise ValidationError("Discount/Offer Redeem count exceeded...")
                 else:
                     raise ValidationError("Invalid redemption type")
 
-                # Getting the user redeemed count of same service
+                # Getting the user redeemed count of the same service
                 user_redeem_count = Booking.objects.filter(user=self.user, service=self.service,
                                                            offer=self.offer).count() if Booking.objects.filter(
                     user=self.user, service=self.service, offer=self.offer).exists() else 0
 
-                # Allow multiple or single redeem on single service
+                # Allow multiple or single redeem on a single service
                 if self.offer.allow_multiple_redeem in ['One-Time', 'Multiple-Time']:
                     if self.offer.allow_multiple_redeem == 'One-Time' and user_redeem_count <= 1:
                         raise ValidationError('Offer already redeemed')
@@ -294,7 +291,7 @@ class Booking(Main):
                     raise ValidationError("Invalid allow multiple redeem")
 
                 if self.service not in self.offer.services.all():
-                    raise ValidationError("Offer not available. Pleases try another one.")
+                    raise ValidationError("Offer not available. Please try another one.")
 
                 # Storing the current price on temp
                 temp_price = self.price.price if self.price and self.price.price else 0
@@ -319,6 +316,46 @@ class Booking(Main):
                 if self.offer:
                     self.offer.redeem_count = self.offer.redeem_count + 1
                     self.offer.save()
+
+            elif not self.offer:  # Handle the case when self.offer is None
+                self.price_total = temp_price
+
+            # Additional conditions for offer expiration, multiple redeem, and service check
+            if self.offer:
+                if self.offer.allow_multiple_redeem in ['One-Time', 'Multiple-Time']:
+                    if self.offer.allow_multiple_redeem == 'One-Time' and self.offer.multiple_redeem_count < 1:
+                        redeem_temp = True
+                    elif self.offer.allow_multiple_redeem == 'Multiple-Time' and self.offer.multiple_redeem_specify_no >= self.offer.multiple_redeem_count:
+                        redeem_temp = True
+                    else:
+                        redeem_temp = True
+                        if not redeem_temp:
+                            raise ValidationError('You have already redeemed this Offer')
+                if self.offer.expiration in ['No-Expiry', 'Limited-Time']:
+                    if self.offer.expiration == 'No-Expiry' and self.offer.start_date:
+                        redeem_temp = True
+                    elif self.offer.expiration == 'Limited-Time' and self.offer.end_date:
+                        if self.offer.end_date >= date.today():
+                            redeem_temp = True
+                    else:
+                        raise ValidationError("This Offer has expired")
+                if self.service in self.offer.services.all():
+                    redeem_temp = True
+                else:
+                    raise ValidationError("The service provided does not match the service of this Offer.")
+                if self.offer.purchase_requirement == True and self.price.price >= self.offer.min_purchase_amount:
+                    redeem_temp = True
+                else:
+                    redeem_temp = False
+
+            elif self.booking_item in ['Package', 'Event']:
+                self.price_total = self.package.price if self.package and self.package.price else 0
+            else:
+                self.price_total = 0
+
+            if self.offer:
+                self.offer.redeem_count = self.offer.redeem_count + 1
+                self.offer.save()
 
             super(Booking, self).save(*args, **kwargs)
         except Exception as e:

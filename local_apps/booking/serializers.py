@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from .models import Guest
-from local_apps.account.models import User
-from .models import Offer
-from .models import Package, Price, Service
+from local_apps.service.models import Package, Price, Service
+from local_apps.offer.models import Offer
+
+from local_apps.account.models import Guest, User
 from .models import Booking, Payment
 from local_apps.service.serializers import ServiceSerializer, PackageSerializer, PriceSerializer
 from local_apps.offer.serializers import OfferSerializer
@@ -22,24 +22,20 @@ class PaymentSerializer(serializers.ModelSerializer):
                   'confirmation_response',
                   'created_at',
                   'updated_at']
+        
+
+ 
 
 
 class BookingSerializer(serializers.ModelSerializer):
     # Extra fields for mapping ladders with uuid
-    user_id = serializers.UUIDField(
-        source='user.id', allow_null=True, required=False)
-    guest_id = serializers.UUIDField(
-        source='guest.id', allow_null=True, required=False)
-    offer_id = serializers.UUIDField(
-        source='offer.id', allow_null=True, required=False)
-    service_id = serializers.UUIDField(
-        source='service.id', allow_null=True, required=False)
-    payment_id = serializers.UUIDField(
-        source='payment.id', allow_null=True, required=False)
-    package_id = serializers.UUIDField(
-        source='package.id', allow_null=True, required=False)
-    price_id = serializers.UUIDField(
-        source='price.id', allow_null=True, required=False)
+    user_id = serializers.UUIDField(source='user.id',allow_null=True)
+    guest_id = serializers.UUIDField(source='guest.id',allow_null=True)
+    offer_id = serializers.UUIDField(source='offer.id',allow_null=True)
+    service_id = serializers.UUIDField(source='service.id',allow_null=True)
+    payment_id = serializers.UUIDField(source='payment.id',allow_null=True)
+    package_id = serializers.UUIDField(source='package.id',allow_null=True)
+    price_id = serializers.UUIDField(source='price.id',allow_null=True)
 
     # Ladders for extra details
     user = UserSerializer(allow_null=True, required=False)
@@ -54,9 +50,9 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = ['id',
                   'booking_id',
-                  'user_id',
                   'guest_id',
                   'offer_id',
+                  'user_id',
                   'service_id',
                   'payment_id',
                   'package_id',
@@ -97,35 +93,46 @@ class BookingSerializer(serializers.ModelSerializer):
                   ]
 
     def create(self, validated_data):
-        # Extract data for related models
+  
         user_data = validated_data.pop('user', None)
         guest_data = validated_data.pop('guest', None)
-        offer_data = validated_data.pop('offer', None)
-        service_data = validated_data.pop('service', None)
-        payment_data = validated_data.pop('payment', None)
-        package_data = validated_data.pop('package', None)
-        price_data = validated_data.pop('price', None)
-
-        # Create Booking instance
+        offer_data = validated_data.pop('offer',None)
+        service_data=validated_data.pop('service',None)
+        payment_data=validated_data.pop('payment',None)
+        package_data=validated_data.pop('package',None)
+        price_data=validated_data.pop('price',None)
         booking = Booking.objects.create(**validated_data)
-
-        # Create related models and associate with the booking
         if user_data:
-            User.objects.create(booking=booking, **user_data)
+            user_instance = User.objects.create(**user_data)
+            booking.user = user_instance 
         if guest_data:
-            Guest.objects.create(booking=booking, **guest_data)
+            guest_instance = Guest.objects.create(**guest_data)
+            booking.guest = guest_instance
         if offer_data:
-            Offer.objects.create(booking=booking, **offer_data)
+            start_date = offer_data.get('start_date')
+            offer_instance = Offer.objects.create(start_date=start_date, **offer_data)
+            booking.offer=offer_instance
         if service_data:
-            Service.objects.create(booking=booking, **service_data)
+            service_instance = Service.objects.create(**service_data)
+            booking.service=service_instance
         if payment_data:
-            Payment.objects.create(booking=booking, **payment_data)
-        if package_data:
-            Package.objects.create(booking=booking, **package_data)
-        if price_data:
-            Price.objects.create(booking=booking, **price_data)
+            payment_instance= Payment.objects.create(**payment_data)
+            booking.payment=payment_instance
 
+        if package_data:
+            package_instance= Package.objects.create(**package_data)
+            booking.package=package_instance
+
+        if price_data:
+            price_instance=Price.objects.create(**price_data)
+            booking.price= price_instance
+        booking.save()
         return booking
+
+        
+
+
+
 
     # @staticmethod
     # def validate_user_type(self, value):
