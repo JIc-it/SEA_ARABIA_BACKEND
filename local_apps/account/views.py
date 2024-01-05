@@ -30,6 +30,7 @@ from urllib.parse import unquote, quote
 import secrets
 import string
 from utils.action_logs import create_log
+from datetime import datetime 
 
 # Google OAuth 2.0 configuration
 GOOGLE_CLIENT_ID = '28175996828-ls8r9c9l27r7kfvj28tv0ijrhgujt296.apps.googleusercontent.com'
@@ -978,7 +979,6 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
             if dob:
                 dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
                 profile_instance.dob = dob_date
-
 
             if gender:
                 profile_instance.gender = gender.title()
