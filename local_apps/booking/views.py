@@ -184,6 +184,16 @@ class PaymentFinalization(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         try:
             payment_id = request.data.get("payment_id")
+            if payment_id:
+                url = "https://api.tap.company/v2/authorize/"+payment_id
+
+                headers = {
+                    "accept": "application/json",
+                    "Authorization": "Bearer "+settings.TAP_SECRET_KEY
+                }
+
+            else:
+                return Response("Payment Id Required", status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)

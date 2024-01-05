@@ -123,8 +123,9 @@ class ServiceList(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = [
         "name",
-        "amenities__name",
-        "destination__name",
+        "category__name",
+        "sub_category__name",
+        "company__name"
     ]
     filterset_class = ServiceFilter
 
@@ -638,6 +639,7 @@ class ServiceFilterList(generics.ListAPIView):
     serializer_class = ServiceFilterListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ["name"]
+    pagination_class = None
 
     # filterset_class = ServiceFilter
 
@@ -648,13 +650,14 @@ class ServiceFilterList(generics.ListAPIView):
 
 
 class ServiceFilterAdminList(generics.ListAPIView):
-    """ View for filtering the service based on the company for Admin CMS   """
+    """ View for filtering the service based on the company for Admin CMS, No pagination provided """
     permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
     serializer_class = ServiceFilterListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ["name"]
     filterset_class = ServiceFilter
+    pagination_class = None
 
 
 class ServiceReviewList(generics.ListAPIView):
