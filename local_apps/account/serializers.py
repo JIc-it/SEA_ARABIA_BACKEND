@@ -50,6 +50,7 @@ class VendorSerializer(serializers.ModelSerializer):
             "status",
             "company_id",
             "created_by",
+            "account_id",
         ]
 
 
@@ -173,6 +174,7 @@ class UserSerializerApp(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "profileextra",
+            "account_id",
         ]
 
 
@@ -189,6 +191,7 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "password",
+            "account_id",
         ]
         extra_kwargs = {"password": {"write_only": True}}
 

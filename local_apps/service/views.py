@@ -1113,7 +1113,7 @@ class ServiceAvailablityTimeUpdate(generics.UpdateAPIView):
 
 
 class ServiceListApp(generics.ListAPIView):
-    """ for app side service lisiting """
+    """ for app side service listing """
 
     queryset = Service.objects.all()
     premium_category = Category.objects.filter(
@@ -1126,6 +1126,16 @@ class ServiceListApp(generics.ListAPIView):
         "destination__name",
     ]
     filterset_class = ServiceFilter
+
+    def list(self, request, *args, **kwargs):
+        try:
+            # Call the list method of the parent class
+            response = super().list(request, *args, **kwargs)
+            return response
+        except Exception as e:
+            # Handle the exception and return an appropriate response
+            error_message = "An error occurred while fetching the service list."
+            return Response({"error": error_message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # Export
@@ -1179,17 +1189,21 @@ class ServiceReviewCreate(generics.CreateAPIView):
 
 
 class ServiceReviewListApp(generics.ListAPIView):
-    """view for review"""
+    """View for review"""
     queryset = ServiceReview.objects.all()
     serializer_class = ServiceReviewSerializer
     lookup_field = 'pk'
 
     def get_queryset(self):
-        service_id = self.kwargs.get("pk")
-        service_list = ServiceReview.objects.filter(service=service_id)
-
-        return service_list
-
+        try:
+            service_id = self.kwargs.get("pk")
+            service_list = ServiceReview.objects.filter(service=service_id)
+            return service_list
+        except ServiceReview.DoesNotExist:
+            return Response({"error": "ServiceReview does not exist for the given service ID"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": f"An error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
 class ServiceReviewUpdate(generics.CreateAPIView):
     # permission_classes = [IsAuthenticated]
