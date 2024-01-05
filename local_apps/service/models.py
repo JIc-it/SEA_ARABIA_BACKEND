@@ -107,7 +107,8 @@ class Destination(Main):
         request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -118,7 +119,8 @@ class Destination(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [Destination.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [Destination.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -152,7 +154,8 @@ class ProfitMethod(Main):
         request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -163,7 +166,8 @@ class ProfitMethod(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [ProfitMethod.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [ProfitMethod.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -198,7 +202,8 @@ class PriceType(Main):
         request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -209,7 +214,8 @@ class PriceType(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [PriceType.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [PriceType.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -243,7 +249,8 @@ class Amenity(Main):
         request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -254,7 +261,8 @@ class Amenity(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [Amenity.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [Amenity.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -344,6 +352,7 @@ class Service(Main):
     last_one_letter = models.CharField(max_length=1, default="A")
     last_two_numbers = models.IntegerField(default=0)
     service_id = models.CharField(max_length=255, blank=True, null=True)
+    is_refundable = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -357,21 +366,27 @@ class Service(Main):
         last_entry = Service.objects.order_by('-created_at').first()
         if last_entry:
             if last_entry.last_two_numbers == 99:
-                self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
-                self.last_two_numbers = 0  # Reset last_two_numbers to 0 when last_one_letter is incremented
+                self.last_one_letter = increment_one_letter(
+                    last_entry.last_one_letter)
+                # Reset last_two_numbers to 0 when last_one_letter is incremented
+                self.last_two_numbers = 0
             else:
                 self.last_one_letter = last_entry.last_one_letter
                 self.last_two_numbers = last_entry.last_two_numbers + 1
 
             if self.last_one_letter in ['Z', 'z'] and self.last_two_numbers == 99:
-                self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
-                self.last_two_numbers = 0  # Reset last_two_numbers to 0 when first_two_numbers is incremented
+                self.first_two_numbers = increment_two_digits(
+                    last_entry.first_two_numbers)
+                # Reset last_two_numbers to 0 when first_two_numbers is incremented
+                self.last_two_numbers = 0
             else:
                 self.first_two_numbers = last_entry.first_two_numbers
 
             if self.first_two_numbers == 99 and self.last_one_letter in ['Z', 'z'] and self.last_two_numbers == 99:
-                self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
-                self.first_two_numbers = 0  # Reset first_two_numbers to 0 when first_two_letters is incremented
+                self.first_two_letters = increment_two_letters(
+                    last_entry.first_two_letters)
+                # Reset first_two_numbers to 0 when first_two_letters is incremented
+                self.first_two_numbers = 0
             else:
                 self.first_two_letters = last_entry.first_two_letters
 
@@ -385,7 +400,8 @@ class Service(Main):
         request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -396,7 +412,8 @@ class Service(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [Service.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [Service.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -453,7 +470,8 @@ class Price(Main):
         request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -464,7 +482,8 @@ class Price(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [Price.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [Price.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -511,7 +530,8 @@ class ServiceImage(Main):
         request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -522,7 +542,8 @@ class ServiceImage(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [ServiceImage.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [ServiceImage.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -580,7 +601,8 @@ class ServiceReview(Main):
         request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -591,7 +613,8 @@ class ServiceReview(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [ServiceReview.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [ServiceReview.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -633,7 +656,8 @@ class ServiceAvailability(Main):
         request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -643,7 +667,8 @@ class ServiceAvailability(Main):
         # Check if the instance already exists
         if self.pk:
             # Get the data before the update
-            data_before = serialize('json', [ServiceAvailability.objects.get(pk=self.pk)]) or None
+            data_before = serialize(
+                'json', [ServiceAvailability.objects.get(pk=self.pk)]) or None
 
             # Call the original save method to save the instance
             super(ServiceAvailability, self).save(*args, **kwargs)
@@ -691,21 +716,27 @@ class Package(Main):
         last_entry = Package.objects.order_by('-created_at').first()
         if last_entry:
             if last_entry.last_two_numbers == 99:
-                self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
-                self.last_two_numbers = 0  # Reset last_two_numbers to 0 when last_one_letter is incremented
+                self.last_one_letter = increment_one_letter(
+                    last_entry.last_one_letter)
+                # Reset last_two_numbers to 0 when last_one_letter is incremented
+                self.last_two_numbers = 0
             else:
                 self.last_one_letter = last_entry.last_one_letter
                 self.last_two_numbers = last_entry.last_two_numbers + 1
 
             if self.last_one_letter in ['Z', 'z'] and self.last_two_numbers == 99:
-                self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
-                self.last_two_numbers = 0  # Reset last_two_numbers to 0 when first_two_numbers is incremented
+                self.first_two_numbers = increment_two_digits(
+                    last_entry.first_two_numbers)
+                # Reset last_two_numbers to 0 when first_two_numbers is incremented
+                self.last_two_numbers = 0
             else:
                 self.first_two_numbers = last_entry.first_two_numbers
 
             if self.first_two_numbers == 99 and self.last_one_letter in ['Z', 'z'] and self.last_two_numbers == 99:
-                self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
-                self.first_two_numbers = 0  # Reset first_two_numbers to 0 when first_two_letters is incremented
+                self.first_two_letters = increment_two_letters(
+                    last_entry.first_two_letters)
+                # Reset first_two_numbers to 0 when first_two_letters is incremented
+                self.first_two_numbers = 0
             else:
                 self.first_two_letters = last_entry.first_two_letters
 
@@ -719,7 +750,8 @@ class Package(Main):
         request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -730,7 +762,8 @@ class Package(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [Package.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [Package.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -782,7 +815,8 @@ class CapacityCount(Main):
         request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -793,7 +827,8 @@ class CapacityCount(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [CapacityCount.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [CapacityCount.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
