@@ -34,12 +34,15 @@ class AdminBookingListView(generics.ListAPIView):
 
 class AdminIndividualBookingView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = BookingSerializer
-    queryset = Booking.objects.all()
-    def get_serializer_class(self):
-        if self.kwargs.get('pk'):
-            return BookingSerializer
-        return BookingSerializer
+
+    def get_object(self):
+        try:
+            booking_id = self.request.data.get('booking_id', None)
+            return Booking.objects.get(id=booking_id)
+        except Booking.DoesNotExist:
+            return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VendorBookingListView(generics.ListAPIView):
@@ -78,19 +81,8 @@ class BookingCreateView(generics.CreateAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
 
-    # def perform_create(self, serializer):
-    #     # Save the current booking
-    #     instance = serializer.save()
-    #     print('hello working')
-    #     # Perform additional actions after saving the booking
-    #     # For example, you can call a method on the instance or perform other operations
-    #     instance.your_custom_method()
-
-    #     # You can also perform actions on related models or any other logic you need
-    #     # ...
-
-    #     # Finally, return the instance
-    #     return instance
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
 
 
 class BookingView(generics.RetrieveAPIView):
