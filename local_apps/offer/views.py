@@ -17,6 +17,8 @@ from local_apps.company.models import Company
 from rest_framework.views import APIView
 from .filters import OfferFilter
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 
 class AdminOfferListView(generics.ListAPIView):
@@ -29,7 +31,7 @@ class AdminOfferListView(generics.ListAPIView):
     ]
     filterset_class = OfferFilter
 
-
+@method_decorator(cache_page(60 * 15), name='dispatch') 
 class BeastDealsOfferListView(generics.ListAPIView):
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer

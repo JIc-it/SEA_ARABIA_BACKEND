@@ -23,6 +23,8 @@ from local_apps.main.serializers import CategorySerializer, SubCategorySerialize
 from datetime import datetime, timedelta
 from local_apps.booking.models import Booking
 from local_apps.booking.serializers import BookingSerializer
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 
 def check_field_changes(service_instance, temp_values):
@@ -64,7 +66,7 @@ def check_field_changes(service_instance, temp_values):
 
 # Destination Type Views
 
-
+@method_decorator(cache_page(60 * 15), name='dispatch') 
 class DestinationList(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = Destination.objects.all()
@@ -94,7 +96,7 @@ class AmenityList(generics.ListAPIView):
 
 # Category Type Views
 
-
+@method_decorator(cache_page(60 * 15), name='dispatch') 
 class CategoryList(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = Category.objects.all()
@@ -103,7 +105,7 @@ class CategoryList(generics.ListAPIView):
 
 # SubCategory Type Views
 
-
+@method_decorator(cache_page(60 * 15), name='dispatch') 
 # vendor App
 class SubCategoryList(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
@@ -115,7 +117,7 @@ class SubCategoryList(generics.ListAPIView):
 
 # Service Type Views
 
-
+@method_decorator(cache_page(60 * 15), name='dispatch') 
 class ServiceList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Service.objects.all()
@@ -1064,7 +1066,7 @@ class ComboPackageListing(generics.ListAPIView):
     queryset = Package.objects.filter(is_active=True)
     serializer_class = PackageSerializer
     filter_backends = [DjangoFilterBackend]
-    # filterset_class = ServiceFilter
+    filterset_class = ServiceFilter
 
     # def list(self, request, *args, **kwargs):
     #     try:
@@ -1267,7 +1269,7 @@ class PackagDeleteAPIView(generics.DestroyAPIView):
     serializer_class = PackageSerializer
     lookup_field = 'pk'
 
-
+@method_decorator(cache_page(60 * 15), name='dispatch') 
 class PackageListAPIView(generics.ListAPIView):
     queryset = Package.objects.all()
     serializer_class = PackageSerializer

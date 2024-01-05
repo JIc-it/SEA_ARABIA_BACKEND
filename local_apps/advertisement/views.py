@@ -9,6 +9,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .filters import AdvertisementFilter
 from random import shuffle
 from django.db.models import F
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 
 class AdvertisementCreate(generics.CreateAPIView):
@@ -52,7 +54,7 @@ class AdvertisementCreate(generics.CreateAPIView):
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
-
+@method_decorator(cache_page(60 * 15), name='dispatch') 
 class AdvertisementList(generics.ListAPIView):
     """advertisement random listing"""
     # Retrieve all advertisements and randomize their order
