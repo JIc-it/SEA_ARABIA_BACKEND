@@ -365,32 +365,25 @@ class Service(Main):
     def generate_id_number(self):
         last_entry = Service.objects.order_by('-created_at').first()
         if last_entry:
-            if last_entry.last_two_numbers == 99:
-                self.last_one_letter = increment_one_letter(
-                    last_entry.last_one_letter)
-                # Reset last_two_numbers to 0 when last_one_letter is incremented
+            self.last_two_numbers = last_entry.last_two_numbers + 1
+            if self.last_two_numbers == 100:
                 self.last_two_numbers = 0
+                self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+
+                if self.last_one_letter in ['Z', 'z']:
+                    self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+                    if self.first_two_numbers == 100:
+                        self.first_two_numbers = 0
+                        self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
+                    else:
+                        self.first_two_numbers = last_entry.first_two_numbers
+                else:
+                    self.first_two_letters = last_entry.first_two_letters
+                    self.first_two_numbers = last_entry.first_two_numbers
             else:
                 self.last_one_letter = last_entry.last_one_letter
-                self.last_two_numbers = last_entry.last_two_numbers + 1
-
-            if self.last_one_letter in ['Z', 'z'] and self.last_two_numbers == 99:
-                self.first_two_numbers = increment_two_digits(
-                    last_entry.first_two_numbers)
-                # Reset last_two_numbers to 0 when first_two_numbers is incremented
-                self.last_two_numbers = 0
-            else:
-                self.first_two_numbers = last_entry.first_two_numbers
-
-            if self.first_two_numbers == 99 and self.last_one_letter in ['Z', 'z'] and self.last_two_numbers == 99:
-                self.first_two_letters = increment_two_letters(
-                    last_entry.first_two_letters)
-                # Reset first_two_numbers to 0 when first_two_letters is incremented
-                self.first_two_numbers = 0
-            else:
                 self.first_two_letters = last_entry.first_two_letters
-
-            self.last_two_numbers = increment_two_digits(self.last_two_numbers)
+                self.first_two_numbers = last_entry.first_two_numbers
 
             self.service_id = f"{self.prefix}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
         else:
@@ -408,6 +401,8 @@ class Service(Main):
         )
 
     def save(self, *args, **kwargs):
+        if not self.service_id:
+            self.generate_id_number()
         # Check if the instance already exists
         if self.pk:
             try:
@@ -429,9 +424,6 @@ class Service(Main):
         else:
             # Call the original save method to save the instance
             super(Service, self).save(*args, **kwargs)
-
-        if not self.service_id:
-            self.generate_id_number()
 
 
 class Price(Main):
