@@ -22,6 +22,9 @@ class PaymentSerializer(serializers.ModelSerializer):
                   'confirmation_response',
                   'created_at',
                   'updated_at']
+        
+
+ 
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -49,6 +52,7 @@ class BookingSerializer(serializers.ModelSerializer):
                   'booking_id',
                   'guest_id',
                   'offer_id',
+                  'user_id',
                   'service_id',
                   'payment_id',
                   'package_id',
