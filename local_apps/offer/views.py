@@ -154,7 +154,7 @@ class OfferCreateView(generics.CreateAPIView):
             )
 
             create_log(
-                # user=request.user,
+                user=request.user,
                 model_name='Offer',
                 action_value='Create',
                 title=log_title,

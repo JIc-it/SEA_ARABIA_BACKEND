@@ -1,4 +1,6 @@
 import json
+
+from local_apps.account.models import User
 from local_apps.api_report.models import ActionLog, ModelUpdateLog
 
 
@@ -24,8 +26,12 @@ def convert_string_to_dict(string):
     return None
 
 
-def create_log(user=None, model_name=None, action_value=None, title=None, value_before=None, value_after=None):
-    user = user if user else None
+def create_log(user=None, model_name=None, action_value=None,
+               title=None, value_before=None, value_after=None):
+    # Check if the user is an instance of User
+    user_instance = user if isinstance(user, User) else None
+
+    # Ensure other parameters are not None
     model_name = model_name if model_name else None
     action_value = action_value if action_value else None
     title = title if title else None
@@ -36,8 +42,9 @@ def create_log(user=None, model_name=None, action_value=None, title=None, value_
     value_before_dict = convert_string_to_dict(value_before)
     value_after_dict = convert_string_to_dict(value_after)
 
+    # Create and save the ActionLog instance
     action_data = ActionLog(
-        user=user,
+        user=user_instance,
         model_name=model_name,
         action=action_value,
         title=title,
@@ -45,12 +52,13 @@ def create_log(user=None, model_name=None, action_value=None, title=None, value_
         value_after=value_after_dict
     )
     action_data.save()
+
     return True
 
 
 def create_model_log(user=None, model_name=None, timestamp=None,
                      data_before=None, data_after=None):
-    user = user if user else None
+    user_instance = user if isinstance(user, User) else None
     model_name = model_name if model_name else None
     timestamp = timestamp if timestamp else None
     data_before = data_before if data_before else None
@@ -61,7 +69,7 @@ def create_model_log(user=None, model_name=None, timestamp=None,
     data_after_dict = convert_string_to_dict(data_after)
 
     action_data = ModelUpdateLog(
-        user=user,
+        user=user_instance,
         model_name=model_name,
         timestamp=timestamp,
         data_before=json.dumps(data_before_dict) or None,

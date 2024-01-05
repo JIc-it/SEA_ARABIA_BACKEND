@@ -3,6 +3,7 @@ from django.core.serializers import serialize
 from django.db import models
 from django.utils import timezone
 
+from local_apps.account.models import User
 from local_apps.api_report.middleware import get_current_request
 from local_apps.api_report.models import ModelUpdateLog
 from local_apps.main.models import Main
@@ -57,9 +58,17 @@ class Offer(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
+
+        # Check if the request object and user attribute exist
+        if request and hasattr(request, 'user') and isinstance(request.user, User):
+            user = request.user
+        else:
+            # If not, set user to None or handle it as appropriate for your use case
+            user = None
+
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            # user=request.user if request and hasattr(request, 'user') else None,
+            user=user,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after

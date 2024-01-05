@@ -331,7 +331,7 @@ class Service(Main):
         verbose_name_plural = "Services"
 
     def __str__(self):
-        return self.name if self.name else "No Service ID"
+        return self.service_id if self.service_id else "No Service ID"
 
     def generate_id_number(self):
         last_entry = Service.objects.order_by('-created_at').first()

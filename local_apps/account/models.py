@@ -102,9 +102,17 @@ class User(AbstractUser):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
+
+        # Check if the request object and user attribute exist
+        if request and hasattr(request, 'user') and isinstance(request.user, User):
+            user = request.user
+        else:
+            # If not, set user to None or handle it as appropriate for your use case
+            user = None
+
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            # user=request.user if request and hasattr(request, 'user') else None,
+            user=user,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -157,9 +165,17 @@ class GCCLocations(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
+
+        # Check if the request object and user attribute exist
+        if request and hasattr(request, 'user') and isinstance(request.user, User):
+            user = request.user
+        else:
+            # If not, set user to None or handle it as appropriate for your use case
+            user = None
+
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=user,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -203,9 +219,17 @@ class ProfileExtra(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
+
+        # Check if the request object and user attribute exist
+        if request and hasattr(request, 'user') and isinstance(request.user, User):
+            user = request.user
+        else:
+            # If not, set user to None or handle it as appropriate for your use case
+            user = None
+
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            # user=request.user if request and hasattr(request, 'user') else None,
+            user=user,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -263,9 +287,17 @@ class UserIdentificationType(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
+
+        # Check if the request object and user attribute exist
+        if request and hasattr(request, 'user') and isinstance(request.user, User):
+            user = request.user
+        else:
+            # If not, set user to None or handle it as appropriate for your use case
+            user = None
+
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=user,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -314,9 +346,17 @@ class UserIdentificationData(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
+
+        # Check if the request object and user attribute exist
+        if request and hasattr(request, 'user') and isinstance(request.user, User):
+            user = request.user
+        else:
+            # If not, set user to None or handle it as appropriate for your use case
+            user = None
+
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=user,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -375,9 +415,17 @@ class PasswordReset(models.Model):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
+
+        # Check if the request object and user attribute exist
+        if request and hasattr(request, 'user') and isinstance(request.user, User):
+            user = request.user
+        else:
+            # If not, set user to None or handle it as appropriate for your use case
+            user = None
+
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=user,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -424,9 +472,17 @@ class Bookmark(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
+
+        # Check if the request object and user attribute exist
+        if request and hasattr(request, 'user') and isinstance(request.user, User):
+            user = request.user
+        else:
+            # If not, set user to None or handle it as appropriate for your use case
+            user = None
+
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=user,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -481,9 +537,17 @@ class Guest(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
+
+        # Check if the request object and user attribute exist
+        if request and hasattr(request, 'user') and isinstance(request.user, User):
+            user = request.user
+        else:
+            # If not, set user to None or handle it as appropriate for your use case
+            user = None
+
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            user=user,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -517,6 +581,8 @@ class Guest(Main):
         verbose_name_plural = "Guest Users"
 
     def generate_id_number(self):
+        if not self.guest_id:
+            self.generate_id_number()
         last_entry = Guest.objects.order_by('-created_at').first()
         if last_entry:
             if last_entry.last_two_numbers == 99:
@@ -541,7 +607,7 @@ class Guest(Main):
         else:
             self.guest_id = f"{self.prefix}-AA00A00"
 
-    def save(self, *args, **kwargs):
-        if not self.guest_id:
-            self.generate_id_number()
-        super(Guest, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.guest_id:
+    #         self.generate_id_number()
+    #     super(Guest, self).save(*args, **kwargs)
