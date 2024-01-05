@@ -259,7 +259,7 @@ TAP_BASE_URL = 'https://api.tap.company/v2/'
 CACHES = {
     'default':{
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'seaarabia_cache_table',
+        # 'LOCATION': 'seaarabia_cache_table',
     }
 }
 
