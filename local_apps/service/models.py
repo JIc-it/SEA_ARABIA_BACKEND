@@ -338,21 +338,24 @@ class Service(Main):
         if last_entry:
             if last_entry.last_two_numbers == 99:
                 self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+                self.last_two_numbers = 0  # Reset last_two_numbers to 0 when last_one_letter is incremented
             else:
                 self.last_one_letter = last_entry.last_one_letter
+                self.last_two_numbers = last_entry.last_two_numbers + 1
 
-            if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
+            if self.last_one_letter in ['Z', 'z'] and self.last_two_numbers == 99:
                 self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+                self.last_two_numbers = 0  # Reset last_two_numbers to 0 when first_two_numbers is incremented
             else:
                 self.first_two_numbers = last_entry.first_two_numbers
 
-            if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
-                                                                                     'z'] and last_entry.last_two_numbers == 99:
+            if self.first_two_numbers == 99 and self.last_one_letter in ['Z', 'z'] and self.last_two_numbers == 99:
                 self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
+                self.first_two_numbers = 0  # Reset first_two_numbers to 0 when first_two_letters is incremented
             else:
                 self.first_two_letters = last_entry.first_two_letters
 
-            self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
+            self.last_two_numbers = increment_two_digits(self.last_two_numbers)
 
             self.service_id = f"{self.prefix}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
         else:
@@ -650,21 +653,24 @@ class Package(Main):
         if last_entry:
             if last_entry.last_two_numbers == 99:
                 self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+                self.last_two_numbers = 0  # Reset last_two_numbers to 0 when last_one_letter is incremented
             else:
                 self.last_one_letter = last_entry.last_one_letter
+                self.last_two_numbers = last_entry.last_two_numbers + 1
 
-            if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
+            if self.last_one_letter in ['Z', 'z'] and self.last_two_numbers == 99:
                 self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+                self.last_two_numbers = 0  # Reset last_two_numbers to 0 when first_two_numbers is incremented
             else:
                 self.first_two_numbers = last_entry.first_two_numbers
 
-            if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
-                                                                                     'z'] and last_entry.last_two_numbers == 99:
+            if self.first_two_numbers == 99 and self.last_one_letter in ['Z', 'z'] and self.last_two_numbers == 99:
                 self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
+                self.first_two_numbers = 0  # Reset first_two_numbers to 0 when first_two_letters is incremented
             else:
                 self.first_two_letters = last_entry.first_two_letters
 
-            self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
+            self.last_two_numbers = increment_two_digits(self.last_two_numbers)
 
             self.package_id = f"{self.prefix}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
         else:

@@ -38,7 +38,7 @@ class User(AbstractUser):
     first_two_numbers = models.IntegerField(default=0)
     last_one_letter = models.CharField(max_length=1, default="A")
     last_two_numbers = models.IntegerField(default=0)
-    account_id = models.CharField(max_length=20, unique=True)
+    account_id = models.CharField(max_length=220)
     email = models.EmailField(unique=True, blank=False, max_length=200,
                               error_messages={
                                   'unique': "A user with that email already exists.",
@@ -100,17 +100,50 @@ class User(AbstractUser):
         else:
             self.account_id = f"{self.prefix}-{rle}-AA00A00"
 
-  
+    def create_update_log(self, data_before, data_after):
+        request = get_current_request()
+        ModelUpdateLog.objects.create(
+            model_name=self.__class__.__name__,
+            # user=request.user if request and hasattr(request, 'user') else None,
+            timestamp=timezone.now(),
+            data_before=data_before,
+            data_after=data_after
+        )
+
     def save(self, *args, **kwargs):
         if not self.account_id:
             self.generate_id_number()
-        super().save(*args, **kwargs)
+
+        # Check if the instance already exists
+        if self.pk:
+            try:
+                # Get the data before the update
+                data_before = serialize('json', [User.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
+
+            # Call the original save method to save the instance
+            super(User, self).save(*args, **kwargs)
+
+            # Get the data after the update
+            data_after = serialize('json', [self])
+
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+        else:
+            # Call the original save method to save the instance
+            super(User, self).save(*args, **kwargs)
+  
+    # def save(self, *args, **kwargs):
+    #     if not self.account_id:
+    #         self.generate_id_number()
+    #     super().save(*args, **kwargs)
 
     # def save(self, *args, **kwargs):
     # if not self.account_id:
     #     self.generate_id_number()
     # super().save(*args, **kwargs)
-
 
 
 class GCCLocations(Main):
@@ -123,7 +156,7 @@ class GCCLocations(Main):
         return self.location if self.location else "No Location"
 
     def create_update_log(self, data_before, data_after):
-        request = get_current_request() or None
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
             user=request.user if request and hasattr(request, 'user') else None,
@@ -169,10 +202,10 @@ class ProfileExtra(Main):
         return self.user.email if self.user and self.user.email else 'No user'
 
     def create_update_log(self, data_before, data_after):
-        request = get_current_request() or None
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            # user=request.user if request and hasattr(request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
