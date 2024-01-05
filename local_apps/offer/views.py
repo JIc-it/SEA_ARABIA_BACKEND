@@ -209,10 +209,24 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
             companies = request.data.get('companies', None)
             apply_global = request.data.get('apply_global', False)
 
-            # Convert string to datetime object
-            date_format = '%Y-%m-%dT%H:%M:%S.%fZ' if "." in start_date_str else '%Y-%m-%dT%H:%M:%SZ'
-            start_date = datetime.strptime(start_date_str, date_format) if start_date_str else None
-            end_date = datetime.strptime(end_date_str, date_format) if end_date_str else None
+            # Convert string to datetime object if date strings are provided
+            if start_date_str is not None:
+                try:
+                    date_format = '%Y-%m-%dT%H:%M:%S.%fZ' if "." in start_date_str else '%Y-%m-%dT%H:%M:%SZ'
+                    start_date = datetime.strptime(start_date_str, date_format)
+                except ValueError as e:
+                    start_date = None
+            else:
+                start_date = None
+
+            if end_date_str is not None:
+                try:
+                    date_format = '%Y-%m-%dT%H:%M:%S.%fZ' if "." in end_date_str else '%Y-%m-%dT%H:%M:%SZ'
+                    end_date = datetime.strptime(end_date_str, date_format)
+                except ValueError as e:
+                    end_date = None
+            else:
+                end_date = None
 
             try:
                 if services:

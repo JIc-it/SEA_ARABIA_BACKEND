@@ -548,7 +548,7 @@ class Guest(Main):
     first_two_numbers = models.IntegerField(default=0)
     last_one_letter = models.CharField(max_length=1, default="A")
     last_two_numbers = models.IntegerField(default=0)
-    guest_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
+    guest_id = models.CharField(max_length=255, blank=True, null=True)
     first_name = models.CharField(
         max_length=255, null=True, blank=True, default="-")
     last_name = models.CharField(
@@ -562,6 +562,38 @@ class Guest(Main):
 
     def __str__(self):
         return self.first_name if self.first_name else "No Name"
+
+    def generate_id_number(self):
+        last_entry = Guest.objects.order_by('-created_at').first()
+        if last_entry:
+            if last_entry.last_two_numbers == 99:
+                self.last_one_letter = increment_one_letter(
+                    last_entry.last_one_letter)
+                # Reset last_two_numbers to 0 when last_one_letter is incremented
+                self.last_two_numbers = 0
+            else:
+                self.last_one_letter = last_entry.last_one_letter
+                self.last_two_numbers = last_entry.last_two_numbers + 1
+
+            if self.last_one_letter in ['Z', 'z'] and self.last_two_numbers == 99:
+                self.first_two_numbers = increment_two_digits(
+                    last_entry.first_two_numbers)
+                # Reset last_two_numbers to 0 when first_two_numbers is incremented
+                self.last_two_numbers = 0
+            else:
+                self.first_two_numbers = last_entry.first_two_numbers
+
+            if self.first_two_numbers == 99 and self.last_one_letter in ['Z', 'z'] and self.last_two_numbers == 99:
+                self.first_two_letters = increment_two_letters(
+                    last_entry.first_two_letters)
+                # Reset first_two_numbers to 0 when first_two_letters is incremented
+                self.first_two_numbers = 0
+            else:
+                self.first_two_letters = last_entry.first_two_letters
+
+            self.guest_id = f"{self.prefix}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
+        else:
+            self.guest_id = f"{self.prefix}-AA00A00"
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
@@ -582,6 +614,8 @@ class Guest(Main):
         )
 
     def save(self, *args, **kwargs):
+        if not self.guest_id:
+            self.generate_id_number()
         # Check if the instance already exists
         if self.pk:
             try:
@@ -607,33 +641,6 @@ class Guest(Main):
         ordering = ["-created_at", "-updated_at"]
         verbose_name = "Guest User"
         verbose_name_plural = "Guest Users"
-
-    def generate_id_number(self):
-        if not self.guest_id:
-            self.generate_id_number()
-        last_entry = Guest.objects.order_by('-created_at').first()
-        if last_entry:
-            if last_entry.last_two_numbers == 99:
-                self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
-            else:
-                self.last_one_letter = last_entry.last_one_letter
-
-            if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
-                self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
-            else:
-                self.first_two_numbers = last_entry.first_two_numbers
-
-            if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
-                                                                                     'z'] and last_entry.last_two_numbers == 99:
-                self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
-            else:
-                self.first_two_letters = last_entry.first_two_letters
-
-            self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
-
-            self.guest_id = f"{self.prefix}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
-        else:
-            self.guest_id = f"{self.prefix}-AA00A00"
 
     # def save(self, *args, **kwargs):
     #     if not self.guest_id:
