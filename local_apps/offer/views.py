@@ -202,12 +202,17 @@ class OfferUpdateView(generics.RetrieveUpdateAPIView):
             multiple_redeem_specify_no = request.data.get('multiple_redeem_specify_no', None)
             on_home_screen = request.data.get('on_home_screen', False)
             on_checkout = request.data.get('on_checkout', False)
-            start_date = request.data.get('start_date', None)
-            end_date = request.data.get('end_date', None)
+            start_date_str = request.data.get('start_date', None)
+            end_date_str = request.data.get('end_date', None)
             is_lifetime = request.data.get('is_lifetime', False)
             services = request.data.get('services', None)
             companies = request.data.get('companies', None)
             apply_global = request.data.get('apply_global', False)
+
+            # Convert string to datetime object
+            date_format = '%Y-%m-%dT%H:%M:%S.%fZ' if "." in start_date_str else '%Y-%m-%dT%H:%M:%SZ'
+            start_date = datetime.strptime(start_date_str, date_format) if start_date_str else None
+            end_date = datetime.strptime(end_date_str, date_format) if end_date_str else None
 
             try:
                 if services:
