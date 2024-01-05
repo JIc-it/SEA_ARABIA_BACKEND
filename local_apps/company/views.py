@@ -12,6 +12,8 @@ from utils.action_logs import create_log
 from .models import *
 from .serializers import *
 from .filters import *
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 
 #   service CRUD view
@@ -25,7 +27,7 @@ class ServiceTagList(generics.ListAPIView):
 
 # Onboard status view
 
-
+@method_decorator(cache_page(60 * 15), name='dispatch') 
 class OnboardStatusList(generics.ListAPIView):
     queryset = OnboardStatus.objects.all().order_by("order")
     serializer_class = OnboardStatusSerializer
@@ -46,7 +48,7 @@ class CompanyList(generics.ListAPIView):
     ]
     filterset_class = CompanyFilter
 
-
+@method_decorator(cache_page(60 * 15), name='dispatch') 
 class CompanyListCms(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Company.objects.all()

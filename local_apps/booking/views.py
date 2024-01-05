@@ -12,12 +12,14 @@ import datetime
 from .filters import *
 from .resources import BookingResource
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 today = datetime.date.today()
 
 # vendor Side List
 
-
+@method_decorator(cache_page(60 * 15), name='dispatch') 
 class AdminBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     queryset = Booking.objects.all()
@@ -50,7 +52,7 @@ class AdminIndividualBookingView(generics.RetrieveUpdateDestroyAPIView):
 #         except Exception as e:
 #             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
+@method_decorator(cache_page(60 * 15), name='dispatch') 
 class VendorBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
@@ -69,7 +71,7 @@ class VendorBookingListView(generics.ListAPIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
+@method_decorator(cache_page(60 * 15), name='dispatch') 
 class UserBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
