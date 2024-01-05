@@ -10,6 +10,7 @@ from local_apps.main.models import Main
 from rest_framework import serializers
 from local_apps.service.models import Service
 from local_apps.company.models import Company
+from utils.file_handle import remove_file
 
 DISCOUNT_TYPE = (
     ('Fixed', 'Fixed'),
@@ -95,6 +96,25 @@ class Offer(Main):
         else:
             # Call the original save method to save the instance
             super(Offer, self).save(*args, **kwargs)
+
+        # Remove old image if it has changed
+        try:
+            this_instance = Offer.objects.get(id=self.id)
+            old_image = this_instance.image
+        except Offer.DoesNotExist:
+            old_image = None
+
+        if old_image and self.image and old_image != self.image:
+            remove_file(old_image)
+
+    def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
+        if self.image:
+            remove_file(self.image)
+
+        super(Offer, self).delete(*args, **kwargs)
+        # Create a log entry after deletion
+        self.create_update_log(data_before, None)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]

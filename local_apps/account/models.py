@@ -203,6 +203,24 @@ class GCCLocations(Main):
             # Call the original save method to save the instance
             super(GCCLocations, self).save(*args, **kwargs)
 
+        # Remove old image if it has changed
+        try:
+            this_instance = GCCLocations.objects.get(id=self.id)
+            old_image = this_instance.country_flag
+        except GCCLocations.DoesNotExist:
+            old_image = None
+
+        if old_image and self.country_flag and old_image != self.country_flag:
+            remove_file(old_image)
+
+    # delete country_flag
+    def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
+        if self.country_flag:
+            remove_file(self.country_flag)
+        super(GCCLocations, self).delete(*args, **kwargs)
+        self.create_update_log(data_before, None)
+
 
 class ProfileExtra(Main):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -383,6 +401,16 @@ class UserIdentificationData(Main):
         else:
             # Call the original save method to save the instance
             super(UserIdentificationData, self).save(*args, **kwargs)
+
+        # Remove old image if it has changed
+        try:
+            this_instance = UserIdentificationData.objects.get(id=self.id)
+            old_image = this_instance.image
+        except UserIdentificationData.DoesNotExist:
+            old_image = None
+
+        if old_image and self.image and old_image != self.image:
+            remove_file(old_image)
 
     def delete(self, *args, **kwargs):
         data_before = serialize('json', [self])  # Capture data before deletion

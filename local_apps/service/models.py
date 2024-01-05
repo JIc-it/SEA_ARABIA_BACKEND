@@ -10,6 +10,7 @@ from local_apps.core.models import Main
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from local_apps.main.models import Category, SubCategory
+from utils.file_handle import remove_file
 from utils.id_handle import increment_one_letter, increment_two_digits, increment_two_letters
 
 
@@ -270,6 +271,25 @@ class Amenity(Main):
             # Call the original save method to save the instance
             super(Amenity, self).save(*args, **kwargs)
 
+        # Remove old image if it has changed
+        try:
+            this_instance = Amenity.objects.get(id=self.id)
+            old_image = this_instance.image
+        except Amenity.DoesNotExist:
+            old_image = None
+
+        if old_image and self.image and old_image != self.image:
+            remove_file(old_image)
+
+    def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
+        if self.image:
+            remove_file(self.image)
+
+        super(Amenity, self).delete(*args, **kwargs)
+        # Create a log entry after deletion
+        self.create_update_log(data_before, None)
+
     class Meta:
         ordering = ["-created_at", "-updated_at"]
         verbose_name = "Amenity"
@@ -519,6 +539,25 @@ class ServiceImage(Main):
             # Call the original save method to save the instance
             super(ServiceImage, self).save(*args, **kwargs)
 
+        # Remove old image if it has changed
+        try:
+            this_instance = ServiceImage.objects.get(id=self.id)
+            old_image = this_instance.image
+        except ServiceImage.DoesNotExist:
+            old_image = None
+
+        if old_image and self.image and old_image != self.image:
+            remove_file(old_image)
+
+    def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
+        if self.image:
+            remove_file(self.image)
+
+        super(ServiceImage, self).delete(*args, **kwargs)
+        # Create a log entry after deletion
+        self.create_update_log(data_before, None)
+
 
 class ServiceReview(Main):
     is_active = models.BooleanField(default=True)
@@ -711,6 +750,25 @@ class Package(Main):
         if not self.package_id:
             self.generate_id_number()
         super(Package, self).save(*args, **kwargs)
+
+        # Remove old image if it has changed
+        try:
+            this_instance = Package.objects.get(id=self.id)
+            old_image = this_instance.image
+        except Package.DoesNotExist:
+            old_image = None
+
+        if old_image and self.image and old_image != self.image:
+            remove_file(old_image)
+
+    def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
+        if self.image:
+            remove_file(self.image)
+
+        super(Package, self).delete(*args, **kwargs)
+        # Create a log entry after deletion
+        self.create_update_log(data_before, None)
 
 
 class CapacityCount(Main):

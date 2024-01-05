@@ -5,6 +5,7 @@ from django.db import models
 from local_apps.api_report.middleware import get_current_request
 from local_apps.api_report.models import ModelUpdateLog
 from local_apps.main.models import Main
+from utils.file_handle import remove_file
 
 
 class Advertisement(Main):
@@ -46,6 +47,25 @@ class Advertisement(Main):
         else:
             # Call the original save method to save the instance
             super(Advertisement, self).save(*args, **kwargs)
+
+        # Remove old image if it has changed
+        try:
+            this_instance = Advertisement.objects.get(id=self.id)
+            old_image = this_instance.image
+        except Advertisement.DoesNotExist:
+            old_image = None
+
+        if old_image and self.image and old_image != self.image:
+            remove_file(old_image)
+
+    def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
+        if self.image:
+            remove_file(self.image)
+
+        super(Advertisement, self).delete(*args, **kwargs)
+        # Create a log entry after deletion
+        self.create_update_log(data_before, None)
 
 
 

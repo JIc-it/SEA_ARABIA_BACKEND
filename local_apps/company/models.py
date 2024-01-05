@@ -396,6 +396,25 @@ class Qualifications(Main):
             # Call the original save method to save the instance
             super(Qualifications, self).save(*args, **kwargs)
 
+        # Remove old image if it has changed
+        try:
+            this_instance = Qualifications.objects.get(id=self.id)
+            old_image = this_instance.icon
+        except Qualifications.DoesNotExist:
+            old_image = None
+
+        if old_image and self.icon and old_image != self.icon:
+            remove_file(old_image)
+
+    def delete(self, *args, **kwargs):
+        data_before = serialize('json', [self])  # Capture data before deletion
+        if self.icon:
+            remove_file(self.icon)
+
+        super(Qualifications, self).delete(*args, **kwargs)
+        # Create a log entry after deletion
+        self.create_update_log(data_before, None)
+
 
 class SiteVisit(Main):
     company = models.ForeignKey(
