@@ -174,30 +174,33 @@ class ServiceCreate(generics.CreateAPIView):
                     amenities = []
                 service_instance.amenities.set(amenities)
 
-            for service_price in service_prices:
-                """ creating service prices """
+            if service_prices:
+                for service_price in service_prices:
+                    """ creating service prices """
 
-                price_id = service_price.get('id', None)
-                is_active = service_price.get('is_active', None)
-                name = service_price.get('name', None)
-                price = service_price.get('price', None)
-                is_range = service_price.get('is_range', None)
-                location = service_price.pop('location', None)
-                duration_hour = service_price.get('duration_hour', None)
-                duration_minute = service_price.get('duration_minute', None)
-                duration_day = service_price.get('duration_day', None)
-                end_time = service_price.get('end_time', None)
-                time = service_price.get('time', None)
-                day = service_price.get('day', None)
-                end_day = service_price.get('end_day', None)
-                date = service_price.get('date', None)
-                end_date = service_price.get('end_date', None)
+                    price_id = service_price.get('id', None)
+                    is_active = service_price.get('is_active', None)
+                    name = service_price.get('name', None)
+                    price = service_price.get('price', None)
+                    is_range = service_price.get('is_range', None)
+                    location = service_price.pop('location', None)
+                    duration_hour = service_price.get('duration_hour', None)
+                    duration_minute = service_price.get(
+                        'duration_minute', None)
+                    duration_day = service_price.get('duration_day', None)
+                    end_time = service_price.get('end_time', None)
+                    time = service_price.get('time', None)
+                    day = service_price.get('day', None)
+                    end_day = service_price.get('end_day', None)
+                    date = service_price.get('date', None)
+                    end_date = service_price.get('end_date', None)
 
-                if location:
-                    location_instance = Destination.objects.get(id=location)
+                    if location:
+                        location_instance = Destination.objects.get(
+                            id=location)
 
-                Price.objects.create(
-                    **service_price, service=service_instance, location=location_instance)
+                    Price.objects.create(
+                        **service_price, service=service_instance, location=location_instance)
 
             # Serialize the data after the service creation
             value_after = serialize('json', [service_instance])
@@ -275,6 +278,7 @@ class ServiceUpdate(generics.UpdateAPIView):
             per_head_booking = request.data.get('per_head_booking', None)
             purchase_limit_min = request.data.get('purchase_limit_min', None)
             purchase_limit_max = request.data.get('purchase_limit_max', None)
+            is_refundable = request.data.get('is_refundable', None)
 
             service_prices = request.data.get('service_price_service', [])
 
@@ -328,6 +332,9 @@ class ServiceUpdate(generics.UpdateAPIView):
 
             if is_destination is not None:
                 service_instance.is_destination = True if is_destination == 'true' or is_destination == 'True' or is_destination == True else False
+
+            if is_refundable is not None:
+                service_instance.is_refundable = True if is_refundable == 'true' or is_refundable == 'True' or is_refundable == True else False
 
             if types:
                 service_instance.type = types.title()
@@ -409,7 +416,6 @@ class ServiceUpdate(generics.UpdateAPIView):
                     category_list = category.split(",")
                 except:
                     category_list = []
-                print(category_list)
                 service_instance.category.set(category_list)
 
             if sub_category:

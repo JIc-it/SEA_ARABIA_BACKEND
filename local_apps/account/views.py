@@ -30,7 +30,7 @@ from urllib.parse import unquote, quote
 import secrets
 import string
 from utils.action_logs import create_log
-from datetime import datetime 
+from datetime import datetime
 
 # Google OAuth 2.0 configuration
 GOOGLE_CLIENT_ID = '28175996828-ls8r9c9l27r7kfvj28tv0ijrhgujt296.apps.googleusercontent.com'
@@ -356,7 +356,7 @@ class VendorAdd(generics.CreateAPIView):
                     user=user, location=location_instance
                 )
 
-            new_lead = OnboardStatus.objects.get(order=1)
+            new_lead = OnboardStatus.objects.get(order=0)
             company = Company.objects.create(
                 user=user, created_by=created_by, status=new_lead)
 

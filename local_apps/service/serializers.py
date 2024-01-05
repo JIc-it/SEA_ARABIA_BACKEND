@@ -175,6 +175,7 @@ class ServiceSerializer(serializers.ModelSerializer):
                   #   "price_type",
                   "profit_method",
                   "service_price_service",
+                  "is_refundable"
                   ]
 
     def get_is_bookmarked(self, obj):
