@@ -39,7 +39,7 @@ class AdminIndividualBookingView(generics.RetrieveAPIView):
     def get_object(self):
         try:
             booking_id = self.request.data.get('booking_id', None)  
-            return Booking.objects.filter(id=booking_id)
+            return Booking.objects.get(id=booking_id)
         except Booking.DoesNotExist:
             return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
