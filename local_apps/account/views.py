@@ -976,7 +976,9 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
                 profile_instance.location = location_instance
 
             if dob:
-                profile_instance.dob = dob
+                dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
+                profile_instance.dob = dob_date
+
 
             if gender:
                 profile_instance.gender = gender.title()

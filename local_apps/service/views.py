@@ -1048,14 +1048,22 @@ class CategoryBasedListing(generics.ListAPIView):
         except Exception as e:
 
             raise e
-
+        
 
 class ComboPackageListing(generics.ListAPIView):
-    """for combo package listing"""
+    """For combo package listing"""
     queryset = Package.objects.filter(is_active=True)
     serializer_class = PackageSerializer
     filter_backends = [DjangoFilterBackend]
-    #  filterset_class = ServiceFilter
+    filterset_class = ServiceFilter
+
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, *args, **kwargs)
+        except Exception as e:
+            error_message = "An error occurred while fetching the combo packages: {}".format(str(e))
+            return Response({"error": error_message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
 
 class ServiceAvailablityTime(generics.RetrieveAPIView):
