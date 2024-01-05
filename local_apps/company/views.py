@@ -350,14 +350,19 @@ class SiteVisitCreate(generics.CreateAPIView):
                 # Serialize the data before the creation
                 value_before = serialize('json', [site_visit_before_creation])
 
+                # Extract qualifications from request data
+                qualifications_data = request.data.pop('qualifications', [])
                 serializer = self.get_serializer(data=request.data)
                 serializer.is_valid(raise_exception=True)
                 instance = serializer.save()
 
-                qualifications = serializer.validated_data.get('qualifications')
-                if qualifications:
-                    for qualification in qualifications:
-                        instance.qualifications.add(qualification)
+                # Add qualifications to the SiteVisit instance
+                instance.qualifications.set(qualifications_data)
+
+                # qualifications = serializer.validated_data.get('qualifications')
+                # if qualifications:
+                #     for qualification in qualifications:
+                #         instance.qualifications.add(qualification)
 
                 # Serialize the data after the SiteVisit creation
                 value_after = serialize('json', [instance])
