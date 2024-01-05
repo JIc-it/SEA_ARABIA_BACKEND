@@ -490,9 +490,11 @@ class Proposal(Main):
         return self.title if self.title else "No Title"
 
     def create_update_log(self, data_before, data_after):
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=self.user,  # Assuming there is a user field in your Proposal model
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -502,8 +504,10 @@ class Proposal(Main):
         # Check if the instance already exists
         if self.pk:
             # Get the data before the update
-            data_before = serialize(
-                'json', [Proposal.objects.get(pk=self.pk)]) or None
+            try:
+                data_before = serialize('json', [Proposal.objects.get(pk=self.pk)])
+            except Proposal.DoesNotExist:
+                data_before = None
 
             # Call the original save method to save the instance
             super(Proposal, self).save(*args, **kwargs)
@@ -557,9 +561,11 @@ class Negotiation(Main):
         return self.title if self.title else "No Title"
 
     def create_update_log(self, data_before, data_after):
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=self.user,  # Assuming there is a user field in your Negotiation model
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -569,8 +575,10 @@ class Negotiation(Main):
         # Check if the instance already exists
         if self.pk:
             # Get the data before the update
-            data_before = serialize(
-                'json', [Negotiation.objects.get(pk=self.pk)]) or None
+            try:
+                data_before = serialize('json', [Negotiation.objects.get(pk=self.pk)])
+            except Negotiation.DoesNotExist:
+                data_before = None
 
             # Call the original save method to save the instance
             super(Negotiation, self).save(*args, **kwargs)
@@ -624,9 +632,11 @@ class MOUorCharter(Main):
         return self.title if self.title else "No Title"
 
     def create_update_log(self, data_before, data_after):
+        request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=self.user,  # Assuming there is a user field in your MOUorCharter model
+            user=request.user if request and hasattr(
+                request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
@@ -636,8 +646,10 @@ class MOUorCharter(Main):
         # Check if the instance already exists
         if self.pk:
             # Get the data before the update
-            data_before = serialize(
-                'json', [MOUorCharter.objects.get(pk=self.pk)]) or None
+            try:
+                data_before = serialize('json', [MOUorCharter.objects.get(pk=self.pk)])
+            except MOUorCharter.DoesNotExist:
+                data_before = None
 
             # Call the original save method to save the instance
             super(MOUorCharter, self).save(*args, **kwargs)
