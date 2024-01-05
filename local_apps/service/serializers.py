@@ -129,7 +129,8 @@ class ServiceSerializer(serializers.ModelSerializer):
         many=True, required=False, allow_null=True)
     is_bookmarked = serializers.SerializerMethodField()
     bookmark_id = serializers.SerializerMethodField()
-    company = serializers.CharField(source="company.name")
+    company = serializers.CharField(source="company.name", allow_null=True)
+    company_id = serializers.CharField(source="company.id", allow_null=True)
     # price_type = serializers.CharField(source="price_type.name")
     profit_method = ProfitMethodSerializer(required=False)
 

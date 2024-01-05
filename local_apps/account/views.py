@@ -30,7 +30,6 @@ from urllib.parse import unquote, quote
 import secrets
 import string
 from utils.action_logs import create_log
-from datetime import datetime
 
 # Google OAuth 2.0 configuration
 GOOGLE_CLIENT_ID = '28175996828-ls8r9c9l27r7kfvj28tv0ijrhgujt296.apps.googleusercontent.com'
@@ -502,8 +501,8 @@ class VendorLeadCount(APIView):
                 role="Vendor", company_company_user__is_onboard=False).count()
             total_active_vendors = Company.objects.filter(
                 is_onboard=True).count()
-            seven_days = datetime.date.today() - datetime.timedelta(7)
             # ? takes the count of the leads that are generated in the last 7 days
+            seven_days = datetime.date.today() - datetime.timedelta(7)
             new_leads = User.objects.filter(
                 created_at__date__gte=seven_days, role="Vendor").count()
             active_vendors = Company.objects.filter(is_onboard=True).annotate(
@@ -977,7 +976,7 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
                 profile_instance.location = location_instance
 
             if dob:
-                dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
+                dob_date = datetime.datetime.strptime(dob, "%Y-%m-%d").date()
                 profile_instance.dob = dob_date
 
             if gender:
