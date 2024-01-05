@@ -19,6 +19,7 @@ class AmenityAdmin(admin.ModelAdmin):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
+    list_display = ["service_id","name","created_at","updated_at"]
     pass
 
 
