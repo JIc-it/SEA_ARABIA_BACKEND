@@ -256,13 +256,13 @@ TAP_BASE_URL = 'https://api.tap.company/v2/'
 
 
 
-CACHES = {
-    'default':{
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'seaarabia_cache_table',
-    }
-}
-
-# Use the cache for session storage
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
+# CACHES = {
+#     'default':{
+#         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+#         'LOCATION': 'seaarabia_cache_table',
+#     }
+# }
+#
+# # Use the cache for session storage
+# SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+# SESSION_CACHE_ALIAS = "default"
