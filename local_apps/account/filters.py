@@ -29,7 +29,7 @@ class UserFilter(django_filters.FilterSet):
         """ function returns the result with multiple location selected """
         try:
             locations = value.split(",")
-            return queryset.filter(profileextra__location__in=locations)
+            return queryset.filter(profileextra__location__location__in=locations)
         except Exception as e:
             return queryset.none()
 
@@ -38,13 +38,13 @@ class UserFilter(django_filters.FilterSet):
         return queryset.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
 
     def get_company_company_user(self, queryset, name, value):
-        if value:
-            return queryset.filter(company_company_user__is_active=True)
+        return queryset.filter(company_company_user__is_active=value)
 
     class Meta:
         model = User
         fields = [
             "role",
             "location",
-            "created_at"
+            "created_at",
+            "company_company_user"
         ]

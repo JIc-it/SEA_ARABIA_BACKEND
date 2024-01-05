@@ -228,7 +228,7 @@ class UserList(generics.ListAPIView):
     search_fields = [
         "first_name",
         "last_name",
-        "profileextra__location",
+        "profileextra__location__location",
         "email",
         "mobile"
     ]
@@ -300,13 +300,13 @@ class VendorList(generics.ListAPIView):
         "email",
         "first_name",
         "last_name",
-        "profileextra__location",
+        "profileextra__location__location",
     ]
     ordering_fields = [
         "first_name",
         "last_name",
         "created_at",
-        "profileextra__location",
+        "profileextra__location__location",
     ]
     filterset_class = VendorFilter
 
@@ -756,12 +756,7 @@ class ProfileResetPasswordView(APIView):
             )
 
 
-
-
-
-
-
-# ALL USER RESET PASSWORD FOR ADMIN CMS 
+# ALL USER RESET PASSWORD FOR ADMIN CMS
 class AllUserResetPasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -795,8 +790,6 @@ class AllUserResetPasswordView(APIView):
             return Response(
                 {"error": "Empty passwords "}, status=status.HTTP_400_BAD_REQUEST
             )
-
-
 
 
 class UserListView(generics.ListAPIView):
@@ -857,7 +850,8 @@ class UserSignUp(generics.CreateAPIView):
             # Create a new profile instance and associate it with the user
             profile_instance = ProfileExtra.objects.create(
                 user=user_instance,
-                location=GCCLocations.objects.get(id=location) if location else None,
+                location=GCCLocations.objects.get(
+                    id=location) if location else None,
                 dob=dob,
                 gender=gender.title() if gender else None
             )

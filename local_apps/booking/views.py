@@ -20,6 +20,7 @@ today = datetime.date.today()
 
 class AdminBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
+    queryset = Booking.objects.all()
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = [
@@ -37,7 +38,7 @@ class AdminIndividualBookingView(generics.RetrieveAPIView):
 
     def get_object(self):
         try:
-            booking_id = self.request.data.get('id', None)  
+            booking_id = self.request.data.get('booking_id', None)  
             return Booking.objects.get(id=booking_id)
         except Booking.DoesNotExist:
             return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
