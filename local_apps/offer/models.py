@@ -59,7 +59,7 @@ class Offer(Main):
         request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(request, 'user') else None,
+            # user=request.user if request and hasattr(request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after

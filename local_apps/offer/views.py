@@ -85,8 +85,9 @@ class OfferCreateView(generics.CreateAPIView):
             apply_global = request.data.get('apply_global', False)
 
             # Convert string to datetime object
-            start_date = datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if start_date_str else None
-            end_date = datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if end_date_str else None
+            date_format = '%Y-%m-%dT%H:%M:%S.%fZ' if "." in start_date_str else '%Y-%m-%dT%H:%M:%SZ'
+            start_date = datetime.strptime(start_date_str, date_format) if start_date_str else None
+            end_date = datetime.strptime(end_date_str, date_format) if end_date_str else None
 
             try:
                 if services:
@@ -153,7 +154,7 @@ class OfferCreateView(generics.CreateAPIView):
             )
 
             create_log(
-                user=request.user,
+                # user=request.user,
                 model_name='Offer',
                 action_value='Create',
                 title=log_title,
