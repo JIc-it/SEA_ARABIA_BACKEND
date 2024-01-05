@@ -19,9 +19,6 @@ urlpatterns = [
          name='booking-cancellation'),
 
     #Admin Individual Booking View For Admin CMS
-    path('admin-booking-view/', AdminIndividualBookingView.as_view(),
+    path('admin-booking-view/<uuid:pk>', AdminIndividualBookingView.as_view(),
          name='booking-view-admincms'),
-
-
-
 ]
