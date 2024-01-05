@@ -337,48 +337,50 @@ class SiteVisitCreate(generics.CreateAPIView):
     queryset = SiteVisit.objects.all()
     serializer_class = SiteVisitSerializer
 
-    def create(self, request, *args, **kwargs):
-        try:
-            # Get the SiteVisit instance before the creation
-            site_visit_before_creation = SiteVisit()  # Create an empty SiteVisit instance
+    class SiteVisitCreate(generics.CreateAPIView):
+        permission_classes = [IsAuthenticated]
+        queryset = SiteVisit.objects.all()
+        serializer_class = SiteVisitSerializer
 
-            # Serialize the data before the creation
-            value_before = serialize('json', [site_visit_before_creation])
+        def create(self, request, *args, **kwargs):
+            try:
+                # Get the Offer instance before the creation
+                site_visit_before_creation = SiteVisit()  # Create an empty Offer instance
 
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
+                # Serialize the data before the creation
+                value_before = serialize('json', [site_visit_before_creation])
 
-            # Extract qualifications from validated data
-            qualifications_data = serializer.validated_data.pop('qualifications', [])
+                serializer = self.get_serializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                instance = serializer.save()
 
-            instance = serializer.save()
+                qualifications = serializer.validated_data.get('qualifications')
+                if qualifications:
+                    for qualification in qualifications:
+                        instance.qualifications.add(qualification)
 
-            # Add qualifications to the SiteVisit instance
-            instance.qualifications.set(qualifications_data)
+                # Serialize the data after the SiteVisit creation
+                value_after = serialize('json', [instance])
 
-            # Serialize the data after the SiteVisit creation
-            value_after = serialize('json', [instance])
+                # Log the SiteVisit creation action
+                log_user = self.request.user if self.request.user else 'Unknown User'
+                log_title = "{model} entry {action} by {user}".format(
+                    model="SiteVisit",
+                    action='Created',
+                    user=log_user
+                )
 
-            # Log the SiteVisit creation action
-            log_user = self.request.user if self.request.user else 'Unknown User'
-            log_title = "{model} entry {action} by {user}".format(
-                model="SiteVisit",
-                action='Created',
-                user=log_user
-            )
-
-            create_log(
-                user=self.request.user,
-                model_name='SiteVisit',
-                action_value='Create',
-                title=log_title,
-                value_before=value_before,
-                value_after=value_after
-            )
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+                create_log(
+                    user=self.request.user,
+                    model_name='SiteVisit',
+                    action_value='Create',
+                    title=log_title,
+                    value_before=value_before,
+                    value_after=value_after
+                )
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
 class SiteVisitList(generics.ListAPIView):
@@ -495,9 +497,7 @@ class ProposalCreate(generics.CreateAPIView):
                 value_before=value_before,
                 value_after=value_after
             )
-
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
@@ -583,9 +583,7 @@ class NegotiationCreate(generics.CreateAPIView):
                 value_before=value_before,
                 value_after=value_after
             )
-
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
@@ -704,9 +702,7 @@ class MOUorCharterCreate(generics.CreateAPIView):
                 value_before=value_before,
                 value_after=value_after
             )
-
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
