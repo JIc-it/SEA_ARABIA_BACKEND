@@ -415,7 +415,6 @@ class Service(Main):
 
         if not self.service_id:
             self.generate_id_number()
-        super(Service, self).save(*args, **kwargs)
 
 
 class Price(Main):
