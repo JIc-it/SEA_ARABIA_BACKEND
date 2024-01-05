@@ -657,9 +657,13 @@ class ServiceAvailability(Main):
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
-            # Get the data before the update
-            data_before = serialize(
-                'json', [ServiceAvailability.objects.get(pk=self.pk)]) or None
+            try:
+                # Get the data before the update
+                data_before = serialize(
+                    'json', [ServiceAvailability.objects.get(pk=self.pk)])
+            except ObjectDoesNotExist:
+                # Instance doesn't exist yet, set data_before to None
+                data_before = None
 
             # Call the original save method to save the instance
             super(ServiceAvailability, self).save(*args, **kwargs)
