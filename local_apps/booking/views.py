@@ -33,31 +33,13 @@ class AdminBookingListView(generics.ListAPIView):
 
 
 class AdminIndividualBookingView(generics.RetrieveAPIView):
-    serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        try:
-            booking_id = self.request.data.get('booking_id', None)
-            if booking_id is None:
-                raise ValueError("Booking ID is required.")
-
-            return Booking.objects.get(id=booking_id)
-        except Booking.DoesNotExist:
-            return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
-        except ValueError as ve:
-            return Response({"error": str(ve)}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-
-        if isinstance(instance, Response):
-            return instance
-
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)   
+    serializer_class = BookingSerializer
+    queryset = Booking.objects.all()
+    def get_serializer_class(self):
+        if self.kwargs.get('pk'):
+            return BookingSerializer
+        return BookingSerializer
 
 
 class VendorBookingListView(generics.ListAPIView):
