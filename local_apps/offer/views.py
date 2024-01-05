@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.core.serializers import serialize
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -75,12 +77,16 @@ class OfferCreateView(generics.CreateAPIView):
             multiple_redeem_specify_no = request.data.get('multiple_redeem_specify_no', None)
             on_home_screen = request.data.get('on_home_screen', False)
             on_checkout = request.data.get('on_checkout', False)
-            start_date = request.data.get('start_date', None)
-            end_date = request.data.get('end_date', None)
+            start_date_str = request.data.get('start_date', None)
+            end_date_str = request.data.get('end_date', None)
             is_lifetime = request.data.get('is_lifetime', False)
             services = request.data.get('services', None)
             companies = request.data.get('companies', None)
             apply_global = request.data.get('apply_global', False)
+
+            # Convert string to datetime object
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if start_date_str else None
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if end_date_str else None
 
             try:
                 if services:

@@ -339,8 +339,11 @@ class SiteVisitCreate(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # Serialize the data before the SiteVisit creation
-            value_before = serialize('json', [SiteVisit()])
+            # Get the Offer instance before the creation
+            site_visit_before_creation = SiteVisit()  # Create an empty Offer instance
+
+            # Serialize the data before the creation
+            value_before = serialize('json', [site_visit_before_creation])
 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
