@@ -997,13 +997,13 @@ class ExploreMore(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ServiceFilter
 
-    def list(self, request, *args, **kwargs):
-        try:
-            queryset = self.filter_queryset(self.get_queryset())
-            serializer = self.get_serializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    # def list(self, request, *args, **kwargs):
+    #     try:
+    #         queryset = self.filter_queryset(self.get_queryset())
+    #         serializer = self.get_serializer(queryset, many=True)
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    #     except Exception as e:
+    #         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # class NearByActivities(generics.ListAPIView):
 #     queryset = Service.objects.all()
@@ -1055,14 +1055,14 @@ class ComboPackageListing(generics.ListAPIView):
     queryset = Package.objects.filter(is_active=True)
     serializer_class = PackageSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_class = ServiceFilter
+    # filterset_class = ServiceFilter
 
-    def list(self, request, *args, **kwargs):
-        try:
-            return super().list(request, *args, **kwargs)
-        except Exception as e:
-            error_message = "An error occurred while fetching the combo packages: {}".format(str(e))
-            return Response({"error": error_message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    # def list(self, request, *args, **kwargs):
+    #     try:
+    #         return super().list(request, *args, **kwargs)
+    #     except Exception as e:
+    #         error_message = "An error occurred while fetching the combo packages: {}".format(str(e))
+    #         return Response({"error": error_message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
 
