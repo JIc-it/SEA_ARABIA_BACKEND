@@ -1,4 +1,8 @@
 from rest_framework import serializers
+from .models import Guest
+from local_apps.account.models import User
+from .models import Offer
+from .models import Package, Price, Service
 from .models import Booking, Payment
 from local_apps.service.serializers import ServiceSerializer, PackageSerializer, PriceSerializer
 from local_apps.offer.serializers import OfferSerializer
@@ -84,61 +88,96 @@ class BookingSerializer(serializers.ModelSerializer):
                   'created_at',
                   'updated_at'
                   ]
+    def create(self, validated_data):
+        # Extract data for related models
+        user_data = validated_data.pop('user', None)
+        guest_data = validated_data.pop('guest', None)
+        offer_data = validated_data.pop('offer', None)
+        service_data = validated_data.pop('service', None)
+        payment_data = validated_data.pop('payment', None)
+        package_data = validated_data.pop('package', None)
+        price_data = validated_data.pop('price', None)
 
-    @staticmethod
-    def validate_user_type(self, value):
-        allowed_user_types = [data[0] for data in Booking.USER_TYPE]
-        if value not in allowed_user_types:
-            raise serializers.ValidationError(f"Invalid user type. Allowed types are: {', '.join(allowed_user_types)}")
-        return value
+        # Create Booking instance
+        booking = Booking.objects.create(**validated_data)
 
-    @staticmethod
-    def validate_booking_for(self, value):
-        allowed_booking_for = [data[0] for data in Booking.BOOKING_FOR_TYPE]
-        if value not in allowed_booking_for:
-            raise serializers.ValidationError(
-                f"Invalid booking for. Allowed options are: {', '.join(allowed_booking_for)}")
-        return value
+        # Create related models and associate with the booking
+        if user_data:
+            User.objects.create(booking=booking, **user_data)
+        if guest_data:
+            Guest.objects.create(booking=booking, **guest_data)
+        if offer_data:
+            Offer.objects.create(booking=booking, **offer_data)
+        if service_data:
+            Service.objects.create(booking=booking, **service_data)
+        if payment_data:
+            Payment.objects.create(booking=booking, **payment_data)
+        if package_data:
+            Package.objects.create(booking=booking, **package_data)
+        if price_data:
+            Price.objects.create(booking=booking, **price_data)
 
-    @staticmethod
-    def validate_booking_item(self, value):
-        allowed_booking_item = [data[0] for data in Booking.BOOKING_ITEM_TYPE]
-        if value not in allowed_booking_item:
-            raise serializers.ValidationError(
-                f"Invalid booking item. Allowed items are: {', '.join(allowed_booking_item)}")
-        return value
+        return booking
 
-    @staticmethod
-    def validate_booking_type(self, value):
-        allowed_booking_type = [data[0] for data in Booking.BOOKING_CHOICE]
-        if value not in allowed_booking_type:
-            raise serializers.ValidationError(
-                f"Invalid booking type. Allowed types are: {', '.join(allowed_booking_type)}")
-        return value
+        
 
-    @staticmethod
-    def validate_status(self, value):
-        allowed_statuses = [data[0] for data in Booking.BOOKING_STATUS]
-        if value not in allowed_statuses:
-            raise serializers.ValidationError(
-                f"Invalid booking status. Allowed statuses are: {', '.join(allowed_statuses)}")
-        return value
 
-    @staticmethod
-    def validate_refund_status(self, value):
-        allowed_refund_statuses = [data[0] for data in Booking.REFUND_STATUS]
-        if value not in allowed_refund_statuses:
-            raise serializers.ValidationError(
-                f"Invalid refund status. Allowed statuses are: {', '.join(allowed_refund_statuses)}")
-        return value
 
-    @staticmethod
-    def validate_refund_type(self, value):
-        allowed_refund_types = [data[0] for data in Booking.REFUND_TYPE]
-        if value not in allowed_refund_types:
-            raise serializers.ValidationError(
-                f"Invalid refund type. Allowed types are: {', '.join(allowed_refund_types)}")
-        return value
+
+    # @staticmethod
+    # def validate_user_type(self, value):
+    #     allowed_user_types = [data[0] for data in Booking.USER_TYPE]
+    #     if value not in allowed_user_types:
+    #         raise serializers.ValidationError(f"Invalid user type. Allowed types are: {', '.join(allowed_user_types)}")
+    #     return value
+
+    # @staticmethod
+    # def validate_booking_for(self, value):
+    #     allowed_booking_for = [data[0] for data in Booking.BOOKING_FOR_TYPE]
+    #     if value not in allowed_booking_for:
+    #         raise serializers.ValidationError(
+    #             f"Invalid booking for. Allowed options are: {', '.join(allowed_booking_for)}")
+    #     return value
+
+    # @staticmethod
+    # def validate_booking_item(self, value):
+    #     allowed_booking_item = [data[0] for data in Booking.BOOKING_ITEM_TYPE]
+    #     if value not in allowed_booking_item:
+    #         raise serializers.ValidationError(
+    #             f"Invalid booking item. Allowed items are: {', '.join(allowed_booking_item)}")
+    #     return value
+
+    # @staticmethod
+    # def validate_booking_type(self, value):
+    #     allowed_booking_type = [data[0] for data in Booking.BOOKING_CHOICE]
+    #     if value not in allowed_booking_type:
+    #         raise serializers.ValidationError(
+    #             f"Invalid booking type. Allowed types are: {', '.join(allowed_booking_type)}")
+    #     return value
+
+    # @staticmethod
+    # def validate_status(self, value):
+    #     allowed_statuses = [data[0] for data in Booking.BOOKING_STATUS]
+    #     if value not in allowed_statuses:
+    #         raise serializers.ValidationError(
+    #             f"Invalid booking status. Allowed statuses are: {', '.join(allowed_statuses)}")
+    #     return value
+
+    # @staticmethod
+    # def validate_refund_status(self, value):
+    #     allowed_refund_statuses = [data[0] for data in Booking.REFUND_STATUS]
+    #     if value not in allowed_refund_statuses:
+    #         raise serializers.ValidationError(
+    #             f"Invalid refund status. Allowed statuses are: {', '.join(allowed_refund_statuses)}")
+    #     return value
+
+    # @staticmethod
+    # def validate_refund_type(self, value):
+    #     allowed_refund_types = [data[0] for data in Booking.REFUND_TYPE]
+    #     if value not in allowed_refund_types:
+    #         raise serializers.ValidationError(
+    #             f"Invalid refund type. Allowed types are: {', '.join(allowed_refund_types)}")
+    #     return value
 
 
 class BookingStatusSerializer(serializers.Serializer):
