@@ -17,7 +17,7 @@ class OfferSerializer(serializers.ModelSerializer):
         model = Offer
         fields = ['id','is_enable','name','coupon_code','image','discount_type','discount_value','up_to_amount','redemption_type','specify_no','purchase_requirement',
                   'min_purchase_amount','allow_multiple_redeem','multiple_redeem_specify_no','on_home_screen','on_checkout','start_date','end_date',
-                  'is_lifetime','services','companies','apply_global',]
+                  'is_lifetime','services','companies','apply_global']
 
 
 class OfferServiceInfoSerializer(serializers.ModelSerializer):

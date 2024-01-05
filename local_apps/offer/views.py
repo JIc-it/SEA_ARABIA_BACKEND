@@ -39,9 +39,7 @@ class BeastDealsOfferListView(generics.ListAPIView):
         
             current_datetime = timezone.now()
 
-           
             queryset = Offer.objects.filter(is_enable=True, start_date__lte=current_datetime,on_home_screen=True)
-
            
             queryset = queryset.exclude(end_date__lt=current_datetime)
 
@@ -57,7 +55,7 @@ class OfferCreateView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         try:
             # Get the Offer instance before the creation
-            offer_before_creation = Offer.objects.none()
+            offer_before_creation = Offer()  # Create an empty Offer instance
 
             # Serialize the data before the creation
             value_before = serialize('json', [offer_before_creation])
