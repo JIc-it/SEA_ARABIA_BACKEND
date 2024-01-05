@@ -251,11 +251,12 @@ class ServiceFilterListSerializer(serializers.ModelSerializer):
     sub_category = SubCategorySerializer(
         many=True, required=False, allow_null=True)
     company = serializers.CharField(source="company.name")
+    company_id = serializers.CharField(source="company.id")
 
     class Meta:
         model = Service
         fields = ["id", "name", "service_image",
-                  "category", "sub_category", "company"]
+                  "category", "sub_category", "company", "company_id"]
 
 
 class ServiceReviewSerializer(serializers.ModelSerializer):
