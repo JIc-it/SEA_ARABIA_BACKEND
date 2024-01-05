@@ -20,6 +20,7 @@ today = datetime.date.today()
 
 class AdminBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
+    queryset = Booking.objects.all()
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = [
