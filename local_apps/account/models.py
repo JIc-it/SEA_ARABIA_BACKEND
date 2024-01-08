@@ -143,8 +143,7 @@ class GCCLocations(Main):
 
     def __str__(self):
         return self.country if self.country else "No Country"
-    
-    
+
     # def save(self, *args, **kwargs):
     #     # Check if the instance already exists
     #     if self.pk:
@@ -504,11 +503,11 @@ class Guest(Main):
 
 class Notification(Main):
     is_admin = models.BooleanField(default=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True,
                              related_name="account_notification_user", )
     message = models.TextField()
-    read_by = models.ManyToManyField(settings.AUTH_USER_MODEL, null=True, blank=True,
-                                related_name="account_notification_read_by", )
+    read_by = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True,
+                                     related_name="account_notification_read_by", )
 
     def __str__(self):
         return str(self.id)

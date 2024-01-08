@@ -14,12 +14,12 @@ class ActionLogListAPIView(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
     filter_backends = [SearchFilter]
     search_fields = [
-                     'user__account_id',
-                     'user__role',
-                     'user__email',
-                     'model_name',
-                     'action'
-                     ]
+        'user__account_id',
+        'user__role',
+        'user__email',
+        'model_name',
+        'action'
+    ]
 
 
 class ActionLogVendorsAPIView(generics.ListAPIView):

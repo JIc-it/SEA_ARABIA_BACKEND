@@ -8,18 +8,14 @@ class SubCategoryFilter(django_filters.FilterSet):
         fields = ["category"]
 
 
-
-
-
 class ServiceFilter(django_filters.FilterSet):
     category = django_filters.CharFilter(method="get_category")
-  
 
     def get_category(self, queryset, name, value):
         try:
             # Split the comma-separated values into a list
             categories = value.split(",")
-            
+
             # Filter services based on multiple category names
             return queryset.filter(category__in=categories)
         except Exception as e:
@@ -44,7 +40,6 @@ class ServiceFilter(django_filters.FilterSet):
         ]
 
 
-
 # class ServiceFilter(django_filters.FilterSet):
 #     class Meta:
 #         model = Service
@@ -59,7 +54,6 @@ class ServiceFilter(django_filters.FilterSet):
 #             "amenities",
 #             "type",
 #         ]
-
 
 
 # class ServiceFilter(django_filters.FilterSet):
@@ -96,14 +90,12 @@ class ServiceFilter(django_filters.FilterSet):
 #         return queryset
 
 
-
 class ServiceReviewFilter(django_filters.FilterSet):
     class Meta:
         model = ServiceReview
         fields = [
             "rating",
         ]
-
 
 
 class PackageFilter(django_filters.FilterSet):
@@ -113,5 +105,5 @@ class PackageFilter(django_filters.FilterSet):
             "is_active",
             "name",
             "type",
-            
+
         ]

@@ -423,14 +423,14 @@ class Booking(Main):
                     self.offer.redeem_count = self.offer.redeem_count + 1
                     self.offer.save()
             elif self.price:
-    # Handling the case when self.offer is None
-    # Storing the current price on temp
+                # Handling the case when self.offer is None
+                # Storing the current price on temp
                 temp_price = self.price.price if self.price and self.price.price else 0
 
-    # Storing the offer amount on temp (set to 0 for no offer)
+                # Storing the offer amount on temp (set to 0 for no offer)
                 offer_amount = 0
 
-    # Calculating the offer amount (no offer)
+                # Calculating the offer amount (no offer)
                 self.price_total = temp_price
 
             super(Booking, self).save(*args, **kwargs)

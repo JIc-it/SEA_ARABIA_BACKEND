@@ -57,6 +57,3 @@ class Advertisement(Main):
         super(Advertisement, self).delete(*args, **kwargs)
         # Create a log entry after deletion
         create_update_log(self, data_before, None)
-
-
-

@@ -20,6 +20,8 @@ from local_apps.main.serializers import CategorySerializer, SubCategorySerialize
 from datetime import datetime, timedelta
 from local_apps.booking.models import Booking
 from local_apps.booking.serializers import BookingSerializer
+
+
 # from django.utils.decorators import method_decorator
 # from django.views.decorators.cache import cache_page
 
@@ -39,6 +41,7 @@ def check_field_changes(service_instance, temp_values):
         temp_values[field] != updated_values[field] for field in updated_values)
 
     return changed_fields
+
 
 # vendorPrice Type Views
 
@@ -428,7 +431,6 @@ class ServiceUpdate(generics.UpdateAPIView):
             fields_changed = check_field_changes(service_instance, temp_values)
 
             if fields_changed:
-
                 Price.objects.filter(service=service_instance).delete()
 
             for service_price in service_prices:
@@ -894,7 +896,7 @@ class UpdateAvailabilityView(generics.RetrieveUpdateAPIView):
                 date_obj = datetime.strptime(date_str, "%d-%m-%Y").date()
             except ValueError:
                 return Response({"error": f"Invalid date format for {date_str}. "
-                                 f"Use DD-MM-YYYY."},
+                                          f"Use DD-MM-YYYY."},
                                 status=status.HTTP_400_BAD_REQUEST)
 
             # Use get_or_create to retrieve or create the ServiceAvailability instance
@@ -1022,6 +1024,7 @@ class ExploreMore(generics.ListAPIView):
     #         return Response(serializer.data, status=status.HTTP_200_OK)
     #     except Exception as e:
     #         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 # class NearByActivities(generics.ListAPIView):
 #     queryset = Service.objects.all()
@@ -1217,7 +1220,8 @@ class ServiceReviewListApp(generics.ListAPIView):
             service_list = ServiceReview.objects.filter(service=service_id)
             return service_list
         except ServiceReview.DoesNotExist:
-            return Response({"error": "ServiceReview does not exist for the given service ID"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "ServiceReview does not exist for the given service ID"},
+                            status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": f"An error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -1276,7 +1280,8 @@ class PackagDeleteAPIView(generics.DestroyAPIView):
     serializer_class = PackageSerializer
     lookup_field = 'pk'
 
-# @method_decorator(cache_page(60 * 15), name='dispatch') 
+
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class PackageListAPIView(generics.ListAPIView):
     queryset = Package.objects.all()
     serializer_class = PackageSerializer
@@ -1516,7 +1521,8 @@ class ServiceAdminCountView(APIView):
                     Case(When(is_active=True, then=1), default=0, output_field=IntegerField())), 0),
                 inactive_machine_count=Coalesce(Sum(
                     Case(When(is_active=False, then=1), default=0, output_field=IntegerField())), 0),
-                total_vendor_count=Coalesce(Sum(Case(When(company__is_active=True, then=1), default=0, output_field=IntegerField())), 0),)
+                total_vendor_count=Coalesce(
+                    Sum(Case(When(company__is_active=True, then=1), default=0, output_field=IntegerField())), 0), )
             return Response(service_count, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
