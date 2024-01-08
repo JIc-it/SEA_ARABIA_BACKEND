@@ -1065,9 +1065,9 @@ class NotificationListView(generics.ListAPIView):
         query = Notification.objects.all()
         user = self.request.user
         if user.role in ['Admin', 'Staff']:
-            query = query.filter(is_admin=True).order_by('-create_at')
+            query = query.filter(is_admin=True).order_by('-created_at')
         else:
-            query = query.filter(user=user).order_by('-create_at')
+            query = query.filter(user=user).order_by('-created_at')
         return query
 
 
