@@ -194,16 +194,19 @@ class Booking(Main):
     status = models.CharField(
         choices=BOOKING_STATUS, default='Default', max_length=255, blank=True, null=True)
 
-    # Cancellation & refund
+    # Cancellation 
     cancellation_reason = models.TextField(blank=True, null=True)
     cancelled_by = models.JSONField(null=True, blank=True)
     cancelled_date = models.DateTimeField(blank=True, null=True)
+
+    # Refund
     is_refunded = models.BooleanField(default=False)
     refund_status = models.CharField(
         choices=REFUND_STATUS, default='Default', max_length=255, blank=True, null=True)
     refund_type = models.CharField(
         choices=REFUND_TYPE, default='Default', max_length=255, blank=True, null=True)
     refund_amount = models.PositiveIntegerField(blank=True, null=True)
+    refunded_by = models.JSONField(null=True, blank=True)
     refund_details = models.TextField(blank=True, null=True)
 
     # Actual price
