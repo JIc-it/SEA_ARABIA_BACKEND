@@ -208,6 +208,7 @@ class Booking(Main):
     refund_amount = models.PositiveIntegerField(blank=True, null=True)
     refunded_by = models.JSONField(null=True, blank=True)
     refund_details = models.TextField(blank=True, null=True)
+    refund_date = models.DateTimeField(blank=True, null=True)
 
     # Actual price
     price_total = models.PositiveIntegerField(default=0, blank=True, null=True)

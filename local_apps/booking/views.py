@@ -10,6 +10,7 @@ from django.db.models import Case, Count, Sum, IntegerField, When
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
+from django.utils import timezone
 import requests
 from . serializers import *
 from .filters import *
@@ -223,7 +224,7 @@ class ExportBooking(APIView):
         response['Content-Disposition'] = 'attachment; filename="bookings_list.csv"'
         return response
 
-
+# Admin CMS & Vendor CMS
 class BookingCancellation(generics.UpdateAPIView):
     serializer_class = BookingStatusSerializer
     queryset = Booking.objects.all()
@@ -237,18 +238,31 @@ class BookingCancellation(generics.UpdateAPIView):
                 id=booking_id) if Booking.objects.filter(id=booking_id).exists() else None
 
             if booking_instance and booking_instance.status != 'Cancelled':
-                booking_instance.cancelled_by = self.request.user
+                user_details = {
+                    "user_id": str(self.request.user.id),
+                    "username": self.request.user.username,
+                    "account_id":self.request.user.account_id,
+                    "email": self.request.user.email,
+                    "mobile":self.request.user.mobile,
+                    "role":self.request.user.role,
+
+                    # Add more user details as needed
+                }
+                booking_instance.cancelled_by = user_details
                 booking_instance.status = 'Cancelled'
                 booking_instance.cancellation_reason = cancellation_reason
                 booking_instance.refund_status = 'Pending'
+                booking_instance.cancelled_date = timezone.now().isoformat()
                 booking_instance.save()
             else:
-                return Response({"error": "Booking is al@method_decorator(cache_page(60 * 15), name='dispatch') ready cancelled."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Booking Already Cancelled."}, status=status.HTTP_400_BAD_REQUEST)
 
             return Response({"Booking Status": booking_instance.status}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
 
+# Admin CMS
 class InitializeRefund(generics.UpdateAPIView):
     serializer_class = BookingStatusSerializer
     queryset = Booking.objects.all()
@@ -279,14 +293,15 @@ class InitializeRefund(generics.UpdateAPIView):
                 booking_instance.refunded_by = user_details
                 booking_instance.is_refunded = True
                 booking_instance.refund_status = 'Completed'
-                booking_instance.refund_details = refund_details
+                booking_instance.refund_details = refund_details 
                 booking_instance.refund_amount = refund_amount
                 booking_instance.refund_type = refund_type
+                booking_instance.refund_date = timezone.now().isoformat()
                 booking_instance.save()
             else:
                 return Response({"error": "Refund is Alredy Processed."}, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response({"Booking Status": booking_instance.refund_status}, status=status.HTTP_200_OK)
+            return Response({"Refund Status": booking_instance.refund_status}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         

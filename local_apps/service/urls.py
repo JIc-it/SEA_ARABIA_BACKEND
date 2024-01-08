@@ -71,6 +71,7 @@ urlpatterns = [
     path("package-update/<uuid:pk>", PackageUpdateAPIView.as_view(), name="package-update"),
     path("package-remove/<uuid:pk>", PackagDeleteAPIView.as_view(), name="package-remove"),
     path("package-list", PackageListAPIView.as_view(), name="package-list"),
+    path("package-count", PackageCountsAPIView.as_view(), name="package-count"),
     path("price-type-list", PriceTypeList.as_view(), name="price-type-list"),
     path("profit-method-list", ProfitMethodList.as_view(), name="profit-method-list"),
     path("service/<uuid:pk>/", ServiceIndividualView.as_view(), name="service-detail"),
