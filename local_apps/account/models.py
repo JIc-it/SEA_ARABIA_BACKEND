@@ -59,7 +59,8 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
 
-    ordering = ["-created_at", "-updated_at"]
+    class Meta:
+        ordering = ["-created_at", "-updated_at"]
 
     def generate_id_number(self):
         try:
@@ -77,22 +78,26 @@ class User(AbstractUser):
 
             if last_entry:
                 if last_entry.last_two_numbers == 99:
-                    self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+                    self.last_one_letter = increment_one_letter(
+                        last_entry.last_one_letter)
                 else:
                     self.last_one_letter = last_entry.last_one_letter
 
                 if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
-                    self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+                    self.first_two_numbers = increment_two_digits(
+                        last_entry.first_two_numbers)
                 else:
                     self.first_two_numbers = last_entry.first_two_numbers
 
                 if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
                                                                                          'z'] and last_entry.last_two_numbers == 99:
-                    self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
+                    self.first_two_letters = increment_two_letters(
+                        last_entry.first_two_letters)
                 else:
                     self.first_two_letters = last_entry.first_two_letters
 
-                self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
+                self.last_two_numbers = increment_two_digits(
+                    last_entry.last_two_numbers)
 
                 self.account_id = f"{self.prefix}-{rle}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
             else:
@@ -143,8 +148,7 @@ class GCCLocations(Main):
 
     def __str__(self):
         return self.country if self.country else "No Country"
-    
-    
+
     # def save(self, *args, **kwargs):
     #     # Check if the instance already exists
     #     if self.pk:
@@ -204,7 +208,8 @@ class ProfileExtra(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [ProfileExtra.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [ProfileExtra.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -254,7 +259,8 @@ class UserIdentificationType(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [UserIdentificationType.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [UserIdentificationType.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -295,7 +301,8 @@ class UserIdentificationData(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [UserIdentificationData.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [UserIdentificationData.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -356,7 +363,8 @@ class PasswordReset(models.Model):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [PasswordReset.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [PasswordReset.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -395,7 +403,8 @@ class Bookmark(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [Bookmark.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [Bookmark.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
@@ -477,7 +486,8 @@ class Guest(Main):
         if self.pk:
             try:
                 # Get the data before the update
-                data_before = serialize('json', [Guest.objects.get(pk=self.pk)])
+                data_before = serialize(
+                    'json', [Guest.objects.get(pk=self.pk)])
             except ObjectDoesNotExist:
                 # Instance doesn't exist yet, set data_before to None
                 data_before = None
