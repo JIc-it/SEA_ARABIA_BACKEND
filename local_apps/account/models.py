@@ -143,25 +143,8 @@ class GCCLocations(Main):
 
     def __str__(self):
         return self.country if self.country else "No Country"
-
-    # def create_update_log(self, data_before, data_after):
-    #     request = get_current_request()
-    #
-    #     # Check if the request object and user attribute exist
-    #     if request and hasattr(request, 'user') and isinstance(request.user, User):
-    #         user = request.user
-    #     else:
-    #         # If not, set user to None or handle it as appropriate for your use case
-    #         user = None
-    #
-    #     ModelUpdateLog.objects.create(
-    #         model_name=self.__class__.__name__,
-    #         user=user,
-    #         timestamp=timezone.now(),
-    #         data_before=data_before,
-    #         data_after=data_after
-    #     )
-    #
+    
+    
     # def save(self, *args, **kwargs):
     #     # Check if the instance already exists
     #     if self.pk:
@@ -179,7 +162,7 @@ class GCCLocations(Main):
     #         data_after = serialize('json', [self])
     #
     #         # Create a log entry
-    #         self.create_update_log(data_before, data_after)
+    #         create_update_log(self, data_before, data_after)
     #     else:
     #         # Call the original save method to save the instance
     #         super(GCCLocations, self).save(*args, **kwargs)
@@ -200,7 +183,7 @@ class GCCLocations(Main):
     #     if self.country_flag:
     #         remove_file(self.country_flag)
     #     super(GCCLocations, self).delete(*args, **kwargs)
-    #     self.create_update_log(data_before, None)
+    #     create_update_log(self, data_before, None)
 
 
 class ProfileExtra(Main):
