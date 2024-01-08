@@ -379,7 +379,7 @@ class UserUpdatedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'mobile', 'role', 'profileextra']
+        fields = ['first_name','last_name','email', 'mobile', 'role', 'profileextra']
 
     # def update(self, instance, validated_data):
     #     instance.email = validated_data.get('email', instance.email)

@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter
 from rest_framework.views import APIView
-
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Case, Count, Sum, IntegerField, When
 from django.db.models.functions import Coalesce
@@ -14,10 +13,11 @@ from django.http import HttpResponse
 import requests
 from . serializers import*
 from .filters import*
+from .resources import*
 # from django.utils.decorators import method_decorator
 # from django.views.decorators.cache import cache_page
 
-today = datetime.date.today()
+today = datetime.now().date()
 
 # vendor Side List
 

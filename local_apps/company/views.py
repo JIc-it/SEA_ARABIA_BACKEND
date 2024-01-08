@@ -347,12 +347,14 @@ class SiteVisitCreate(generics.CreateAPIView):
 
             # Serialize the data before the creation
             value_before = serialize('json', [site_visit_before_creation])
+            qualifications = request.data.pop("qualifications", [])
 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             # taking qualifications list from the validated data
-            qualifications = serializer.validated_data.pop('qualifications')
+            # qualifications = serializer.validated_data.pop('qualifications')
             instance = serializer.save()
+
             if qualifications:
                 for qualification in qualifications:
                     instance.qualifications.add(qualification)
