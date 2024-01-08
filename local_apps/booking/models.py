@@ -39,22 +39,26 @@ class Payment(Main):
         last_entry = Payment.objects.order_by('-created_at').first()
         if last_entry:
             if last_entry.last_two_numbers == 99:
-                self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+                self.last_one_letter = increment_one_letter(
+                    last_entry.last_one_letter)
             else:
                 self.last_one_letter = last_entry.last_one_letter
 
             if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
-                self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+                self.first_two_numbers = increment_two_digits(
+                    last_entry.first_two_numbers)
             else:
                 self.first_two_numbers = last_entry.first_two_numbers
 
             if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
                                                                                      'z'] and last_entry.last_two_numbers == 99:
-                self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
+                self.first_two_letters = increment_two_letters(
+                    last_entry.first_two_letters)
             else:
                 self.first_two_letters = last_entry.first_two_letters
 
-            self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
+            self.last_two_numbers = increment_two_digits(
+                last_entry.last_two_numbers)
 
             self.payment_id = f"{self.prefix}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
         else:
@@ -120,7 +124,8 @@ class Booking(Main):
     first_two_numbers = models.IntegerField(default=0)
     last_one_letter = models.CharField(max_length=1, default="A")
     last_two_numbers = models.IntegerField(default=0)
-    booking_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
+    booking_id = models.CharField(
+        max_length=255, unique=True, blank=True, null=True)
 
     # Mapping actual data
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
@@ -139,7 +144,8 @@ class Booking(Main):
                               related_name='booking_booking_price')
 
     # User / customer info
-    user_type = models.CharField(choices=USER_TYPE, default='Default', max_length=255, blank=True, null=True)
+    user_type = models.CharField(
+        choices=USER_TYPE, default='Default', max_length=255, blank=True, null=True)
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     phone_number = models.CharField(max_length=255, blank=True, null=True)
@@ -147,23 +153,32 @@ class Booking(Main):
 
     # Booking info
     destination = models.CharField(max_length=255, blank=True, null=True)
-    booking_for = models.CharField(choices=BOOKING_FOR_TYPE, default='Default', max_length=255, blank=True, null=True)
-    booking_item = models.CharField(choices=BOOKING_ITEM_TYPE, default='Default', max_length=255, blank=True, null=True)
+    booking_for = models.CharField(
+        choices=BOOKING_FOR_TYPE, default='Default', max_length=255, blank=True, null=True)
+    booking_item = models.CharField(
+        choices=BOOKING_ITEM_TYPE, default='Default', max_length=255, blank=True, null=True)
     starting_point = models.CharField(max_length=255, blank=True, null=True)
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
     slot_details = models.CharField(max_length=255, blank=True, null=True)
-    additional_hours = models.PositiveIntegerField(default=0, blank=True, null=True)
-    additional_hours_amount = models.PositiveIntegerField(default=0, blank=True, null=True)
-    number_of_people = models.PositiveIntegerField(default=1, blank=True, null=True)
-    booking_type = models.CharField(choices=BOOKING_CHOICE, default='Default', max_length=255, blank=True, null=True)
-    status = models.CharField(choices=BOOKING_STATUS, default='Default', max_length=255, blank=True, null=True)
+    additional_hours = models.PositiveIntegerField(
+        default=0, blank=True, null=True)
+    additional_hours_amount = models.PositiveIntegerField(
+        default=0, blank=True, null=True)
+    number_of_people = models.PositiveIntegerField(
+        default=1, blank=True, null=True)
+    booking_type = models.CharField(
+        choices=BOOKING_CHOICE, default='Default', max_length=255, blank=True, null=True)
+    status = models.CharField(
+        choices=BOOKING_STATUS, default='Default', max_length=255, blank=True, null=True)
 
     # Cancellation & refund
     cancellation_reason = models.TextField(blank=True, null=True)
     cancelled_by = models.JSONField(null=True, blank=True)
-    refund_status = models.CharField(choices=REFUND_STATUS, default='Default', max_length=255, blank=True, null=True)
-    refund_type = models.CharField(choices=REFUND_TYPE, default='Default', max_length=255, blank=True, null=True)
+    refund_status = models.CharField(
+        choices=REFUND_STATUS, default='Default', max_length=255, blank=True, null=True)
+    refund_type = models.CharField(
+        choices=REFUND_TYPE, default='Default', max_length=255, blank=True, null=True)
     refund_amount = models.PositiveIntegerField(blank=True, null=True)
     refund_details = models.TextField(blank=True, null=True)
 
@@ -185,28 +200,32 @@ class Booking(Main):
         verbose_name_plural = 'Bookings'
 
     def __str__(self):
-        return self.booking_id
+        return self.booking_id if self.booking_id else "No Booking Id"
 
     def generate_id_number(self):
         last_entry = Booking.objects.order_by('-created_at').first()
         if last_entry:
             if last_entry.last_two_numbers == 99:
-                self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+                self.last_one_letter = increment_one_letter(
+                    last_entry.last_one_letter)
             else:
                 self.last_one_letter = last_entry.last_one_letter
 
             if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
-                self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+                self.first_two_numbers = increment_two_digits(
+                    last_entry.first_two_numbers)
             else:
                 self.first_two_numbers = last_entry.first_two_numbers
 
             if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
                                                                                      'z'] and last_entry.last_two_numbers == 99:
-                self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
+                self.first_two_letters = increment_two_letters(
+                    last_entry.first_two_letters)
             else:
                 self.first_two_letters = last_entry.first_two_letters
 
-            self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
+            self.last_two_numbers = increment_two_digits(
+                last_entry.last_two_numbers)
 
             self.booking_id = f"{self.prefix}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
         else:
