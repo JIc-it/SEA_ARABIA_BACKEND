@@ -270,27 +270,6 @@ class Booking(Main):
                 self.package_details = serialize('json', [self.package])
             if not self.price_details and self.price:
                 self.price_details = serialize('json', [self.price])
-    def save(self, *args, **kwargs):
-        if not self.booking_id:
-            self.generate_id_number()
-        # Check if the instance already exists
-        if self.pk:
-            # Get the data before the update
-            try:
-                data_before = serialize('json', [Booking.objects.get(pk=self.pk)])
-            except Booking.DoesNotExist:
-                data_before = None
-
-            # Call the original save method to save the instance
-            super(Booking, self).save(*args, **kwargs)
-
-            # Get the data after the update
-            data_after = serialize('json', [self])
-
-            # Create a log entry
-            create_update_log(self, data_before, data_after)
-        else:
-            super(Booking, self).save(*args, **kwargs)
 
     # def save(self, *args, **kwargs):
     #     try:
@@ -412,12 +391,30 @@ class Booking(Main):
                 # Storing the current price on temp
                 temp_price = self.price.price if self.price and self.price.price else 0
 
-    # Storing the offer amount on temp (set to 0 for no offer)
+                # Storing the offer amount on temp (set to 0 for no offer)
                 offer_amount = 0
 
-    # Calculating the offer amount (no offer)
+                # Calculating the offer amount (no offer)
                 self.price_total = temp_price
 
-            super(Booking, self).save(*args, **kwargs)
+            # super(Booking, self).save(*args, **kwargs)
+            # Check if the instance already exists
+            if self.pk:
+                # Get the data before the update
+                try:
+                    data_before = serialize('json', [Booking.objects.get(pk=self.pk)])
+                except Booking.DoesNotExist:
+                    data_before = None
+
+                # Call the original save method to save the instance
+                super(Booking, self).save(*args, **kwargs)
+
+                # Get the data after the update
+                data_after = serialize('json', [self])
+
+                # Create a log entry
+                create_update_log(self, data_before, data_after)
+            else:
+                super(Booking, self).save(*args, **kwargs)
         except Exception as e:
             raise ValidationError(str(e))
