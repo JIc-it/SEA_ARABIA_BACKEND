@@ -7,6 +7,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from django.shortcuts import get_object_or_404
 from django.http import Http404
+from rest_framework.parsers import MultiPartParser
 
 from utils.action_logs import create_log
 from .models import *
@@ -27,7 +28,7 @@ class ServiceTagList(generics.ListAPIView):
 
 # Onboard status view
 
-# @method_decorator(cache_page(60 * 15), name='dispatch') 
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class OnboardStatusList(generics.ListAPIView):
     queryset = OnboardStatus.objects.all().order_by("order")
     serializer_class = OnboardStatusSerializer
@@ -48,7 +49,9 @@ class CompanyList(generics.ListAPIView):
     ]
     filterset_class = CompanyFilter
 
-# @method_decorator(cache_page(60 * 15), name='dispatch') 
+# @method_decorator(cache_page(60 * 15), name='dispatch')
+
+
 class CompanyListCms(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Company.objects.all()
@@ -339,6 +342,7 @@ class SiteVisitCreate(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = SiteVisit.objects.all()
     serializer_class = SiteVisitSerializer
+    parser_classes = [MultiPartParser,]
 
     def create(self, request, *args, **kwargs):
         try:
