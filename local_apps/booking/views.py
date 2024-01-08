@@ -150,9 +150,12 @@ class BookingCreateView(generics.CreateAPIView):
             payment_url = authorize_response.get("transaction")['url']
             tap_id = authorize_response.get("id", None)
             payment_status = authorize_response.get("status", None)
+            payment_response_message = authorize_response.get('response')[
+                "message"]
 
             payment_instance = Payment.objects.create(tap_pay_id=tap_id,
-                                                      initial_response=authorize_response, amount=total_amount, status=payment_status)
+                                                      initial_response=authorize_response, amount=total_amount,
+                                                      status=payment_status, payment_response_message=payment_response_message)
 
             booking_instance.payment = payment_instance
             booking_instance.save()
@@ -356,14 +359,26 @@ class PaymentFinalization(generics.UpdateAPIView):
                 response = requests.get(url, headers=headers)
                 final_response = response.json()
                 #! remove the redirect and post url from the response to avoid any security issues
-                del final_response['redirect']
-                # del final_response['post']
 
-                # ? updating the payement status and booking status
+                if final_response.get('redirect', None):
+                    del final_response['redirect']
+
+                if final_response.get('post', None):
+                    del final_response['post']
+
+                # ? taking the data from the response
+
                 payment_status = final_response.get("status", None)
+                payment_response_message = final_response.get('response')[
+                    "message"]
+
+                # ? updating the payment instance
+
                 payment_instance = Payment.objects.get(tap_pay_id=payment_id)
                 payment_instance.status = payment_status
                 payment_instance.confirmation_response = final_response
+                payment_instance.payment_response_message = payment_response_message
+
                 payment_instance.save()
                 return Response(final_response, status=status.HTTP_200_OK)
             else:
