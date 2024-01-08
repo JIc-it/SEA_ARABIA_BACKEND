@@ -249,6 +249,80 @@ class BookingCancellation(generics.UpdateAPIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+class InitializeRefund(generics.UpdateAPIView):
+    serializer_class = BookingStatusSerializer
+    queryset = Booking.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        try:
+            booking_id = kwargs.get('pk', None)
+            refund_amount = request.data.get('refund_amount')
+            refund_details = request.data.get('refund_details')
+            refund_type = request.data.get('refund_type')
+            booking_instance = Booking.objects.get(
+                id=booking_id) if Booking.objects.filter(id=booking_id).exists() else None
+
+            if booking_instance and booking_instance.refund_status == 'Pending':
+                # Store logged-in user details in JSON format
+                user_details = {
+                    "user_id": str(self.request.user.id),
+                    "username": self.request.user.username,
+                    "account_id":self.request.user.account_id,
+                    "email": self.request.user.email,
+                    "mobile":self.request.user.mobile,
+                    "role":self.request.user.role,
+
+                    # Add more user details as needed
+                }
+
+                booking_instance.refunded_by = user_details
+                booking_instance.is_refunded = True
+                booking_instance.refund_status = 'Completed'
+                booking_instance.refund_details = refund_details
+                booking_instance.refund_amount = refund_amount
+                booking_instance.refund_type = refund_type
+                booking_instance.save()
+            else:
+                return Response({"error": "Refund is Alredy Processed."}, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({"Booking Status": booking_instance.refund_status}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+# class InitializeRefund(generics.UpdateAPIView):
+#     serializer_class = BookingStatusSerializer
+#     queryset = Booking.objects.all()
+#     permission_classes = [IsAuthenticated]
+
+#     def update(self, request, *args, **kwargs):
+#         try:
+            
+#             refund_amount = request.data.get('refund_amount')
+#             refund_details = request.data.get('refund_details')
+#             refund_type = request.data.get('refund_type')
+#             booking_instance = self.get_object()
+
+#             if booking_instance.refund_status == 'Pending':
+#                 booking_instance.refunded_by = self.request.user
+#                 booking_instance.is_refunded = True
+#                 booking_instance.refund_status = 'Completed'
+#                 booking_instance.refund_details = refund_details
+#                 booking_instance.refund_amount = refund_amount
+#                 booking_instance.refund_type = refund_type
+#                 booking_instance.save()
+#             else:
+#                 return Response({"error": "Booking is already refunded."}, status=status.HTTP_400_BAD_REQUEST)
+
+#             return Response({"Booking Refund Status": booking_instance.refund_status}, status=status.HTTP_200_OK)
+#         except Booking.DoesNotExist:
+#             return Response({"error": "Booking not found."}, status=status.HTTP_404_NOT_FOUND)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 class PaymentFinalization(generics.UpdateAPIView):
     serializer_class = PaymentSerializer

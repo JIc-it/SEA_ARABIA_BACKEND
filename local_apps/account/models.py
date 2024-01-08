@@ -514,7 +514,7 @@ class Guest(Main):
 
 class Notification(Main):
     is_admin = models.BooleanField(default=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null= True,
                              related_name="account_notification_user", )
     message = models.TextField()
     read_by = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True,

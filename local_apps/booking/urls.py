@@ -18,13 +18,24 @@ urlpatterns = [
     path('booking-status-update/<uuid:pk>',
          BookingStatusUpdate.as_view(), name='booking-status-update'),
     path('booking-export/', ExportBooking.as_view(), name='booking-export'),
+
+     # Booking Cancellation In Admin CMS and Vendor CMS
     path('booking-cancellation/<uuid:pk>',
          BookingCancellation.as_view(), name='booking-cancellation'),
+
     path('vendor-booking-count/', VendorBookingCardCount.as_view(),
          name='booking-cancellation'),
+         
     # Admin Individual Booking View For Admin CMS
     path('admin-booking-view/<uuid:pk>', AdminIndividualBookingView.as_view(),
          name='booking-view-admincms'),
+
+     # Initialize Refund For Admin CMS
+     path('initilize-refund-admin/<uuid:pk>', InitializeRefund.as_view(),
+         name='initilize-refund-admincms'),
+  
     path('payment-finalization', PaymentFinalization.as_view(),
          name='payment-finalization'),
+
+
 ]

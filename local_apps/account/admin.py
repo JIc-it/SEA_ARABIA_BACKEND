@@ -55,7 +55,7 @@ class UserIdentificationTypeAdmin(admin.ModelAdmin):
 class UserIdentificationDataAdmin(admin.ModelAdmin):
     list_display = ["user", "id_type", "id_number", "is_verified"]
     list_filter = ["id_type", "is_verified", "created_at", "updated_at"]
-    search_fields = ["user__email", "user__mobile", "user__first_name", "user__lase_name", "id_number"]
+    search_fields = ["user__email", "user__mobile", "user__first_name", "user__last_name", "id_number"]
 
 
 @admin.register(ProfileExtra)
