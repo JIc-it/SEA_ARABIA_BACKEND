@@ -6,7 +6,7 @@ import requests
 import datetime
 from urllib.parse import unquote, quote
 from utils.action_logs import create_log
-from datetime import datetime
+from datetime import datetime as dt
 from django.core.serializers import serialize
 # from django.views.decorators.cache import cache_page
 # from django.utils.decorators import method_decorator
@@ -492,7 +492,7 @@ class VendorLeadCount(APIView):
             total_active_vendors = Company.objects.filter(
                 is_onboard=True).count()
             # ? takes the count of the leads that are generated in the last 7 days
-            seven_days = datetime.date.today() - datetime.timedelta(7)
+            seven_days = dt.today() - datetime.timedelta(7)
             new_leads = User.objects.filter(
                 created_at__date__gte=seven_days, role="Vendor").count()
             active_vendors = Company.objects.filter(is_onboard=True).annotate(
