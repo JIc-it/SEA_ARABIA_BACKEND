@@ -588,6 +588,12 @@ class ServiceAvailability(Main):
             super(ServiceAvailability, self).save(*args, **kwargs)
 
 
+PACKAGE_OR_EVENT = (
+    ("Package", "Package"),
+    ("Event", "Event"),
+)
+
+
 class Package(Main):
     is_active = models.BooleanField(default=False)
     service = models.ForeignKey(
@@ -609,6 +615,8 @@ class Package(Main):
     last_one_letter = models.CharField(max_length=1, default="A")
     last_two_numbers = models.IntegerField(default=0)
     package_id = models.CharField(max_length=255, blank=True, null=True)
+    type = models.CharField(choices=PACKAGE_OR_EVENT,
+                            max_length=20, default='Package')
 
     def __str__(self):
         return self.package_id if self.package_id else "No Package ID"
