@@ -343,7 +343,7 @@ class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Package
         fields = ['id', 'is_active', 'service', 'name',
-                  'short_description', 'capacity', 'image', 'price']
+                  'short_description', 'capacity', 'image', 'price','type']
 
 
 class ServiceListSerializer(serializers.ModelSerializer):
