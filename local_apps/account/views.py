@@ -220,7 +220,6 @@ class UserCreate(generics.CreateAPIView):
             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class UserList(generics.ListAPIView):
     """ list all users """
 
@@ -231,7 +230,7 @@ class UserList(generics.ListAPIView):
     search_fields = [
         "first_name",
         "last_name",
-        "profileextra__location__location",
+        "profileextra__location__country",
         "email",
         "mobile"
     ]
@@ -303,13 +302,13 @@ class VendorList(generics.ListAPIView):
         "email",
         "first_name",
         "last_name",
-        "profileextra__location__location",
+        "profileextra__location__country",
     ]
     ordering_fields = [
         "first_name",
         "last_name",
         "created_at",
-        "profileextra__location__location",
+        "profileextra__location__country",
     ]
     filterset_class = VendorFilter
 

@@ -108,7 +108,7 @@ class MiscellaneousTypeSerializer(serializers.ModelSerializer):
 
 class SiteVisitSerializer(serializers.ModelSerializer):
     attachment = serializers.FileField(required=True)
-    qualifications = serializers.ListField(required=False, write_only=True)
+    qualifications = serializers.CharField(required=False, allow_null=True)
     status = serializers.CharField(
         source="company.status", default=None)
 
