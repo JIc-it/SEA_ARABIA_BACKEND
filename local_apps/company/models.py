@@ -254,8 +254,10 @@ class Miscellaneous(Main):
         # Check if the instance already exists
         if self.pk:
             # Get the data before the update
-            data_before = serialize(
-                'json', [Miscellaneous.objects.get(pk=self.pk)]) or None
+            try:
+                data_before = serialize('json', [Miscellaneous.objects.get(pk=self.pk)])
+            except Miscellaneous.DoesNotExist:
+                data_before = None
 
             # Call the original save method to save the instance
             super(Miscellaneous, self).save(*args, **kwargs)
