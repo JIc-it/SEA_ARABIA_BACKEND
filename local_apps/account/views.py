@@ -1058,3 +1058,32 @@ class GCCLocationsAPIView(APIView):
             return Response(formatted_locations, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
+
+class NotificationListView(generics.ListAPIView):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        query = Notification.objects.all()
+        user = self.request.user
+        if user.role in ['Admin', 'Staff']:
+            query = query.filter(is_admin=True).order_by('-create_at')
+        else:
+            query = query.filter(user=user).order_by('-create_at')
+        return query
+
+
+class NotificationUpdateView(generics.UpdateAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.read_by.add(request.user)
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)

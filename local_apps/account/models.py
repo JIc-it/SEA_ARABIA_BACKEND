@@ -644,3 +644,15 @@ class Guest(Main):
     #     if not self.guest_id:
     #         self.generate_id_number()
     #     super(Guest, self).save(*args, **kwargs)
+
+
+class Notification(Main):
+    is_admin = models.BooleanField(default=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+                             related_name="account_notification_user", )
+    message = models.TextField()
+    read_by = models.ManyToManyField(settings.AUTH_USER_MODEL, null=True, blank=True,
+                                related_name="account_notification_read_by", )
+
+    def __str__(self):
+        return str(self.id)

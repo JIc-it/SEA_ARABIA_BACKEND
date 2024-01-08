@@ -517,3 +517,15 @@ class OnboardVendorsListExport(resources.ModelResource):
 
     def calculate_booking_count(self, user):
         return Booking.objects.filter(user=user).count()
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    is_read = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Notification
+        fields = '__all__'
+
+    def get_is_read(self, obj):
+        request_user = self.context['request'].user
+        return obj.read_by.filter(id=request_user.id).exists()
