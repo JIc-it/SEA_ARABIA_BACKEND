@@ -364,9 +364,9 @@ class SiteVisitCreate(generics.CreateAPIView):
                     company=company_instance, attachment=attachment, title=title, note=note)
 
                 if qualifications:
-                    qualifications_list = qualifications.split(',')
-                    for qualification in qualifications_list:
-                        site_visit_instance.qualifications.add(qualification)
+                    # for qualification in qualifications:
+                    # site_visit_instance.qualifications.add(qualification)
+                    site_visit_instance.qualifications.set(qualifications)
 
                 serializer = SiteVisitSerializer(site_visit_instance)
 
