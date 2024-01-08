@@ -170,11 +170,11 @@ class BookingCreateView(generics.CreateAPIView):
     #     except Exception as e:
     #         return Response(f"Error str(e)", status=status.HTTP_400_BAD_REQUEST)
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
 
-        self.perform_create(serializer)
+    #     self.perform_create(serializer)
 
 
 class BookingView(generics.RetrieveAPIView):
