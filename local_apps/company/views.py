@@ -367,6 +367,8 @@ class SiteVisitCreate(generics.CreateAPIView):
 
                 site_visit_instance = SiteVisit.objects.create(
                     company=company_instance, attachment=attachment, title=title, note=note)
+                
+                qualifications_list = []  # Initialize qualifications_list as an empty list for cases with no qualification
 
                 if qualifications:
                     qualifications_list = qualifications.split(',')
