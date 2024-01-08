@@ -975,6 +975,110 @@ class UpdateAvailabilityView(generics.UpdateAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ListAvailabilityView(generics.ListAPIView):
+    serializer_class = ServiceAvailabilitySerializer
+
+    def get(self, request, *args, **kwargs):
+        try:
+            service_id = kwargs['service']
+            update_type = request.query_params.get('update_type', None)
+
+            # Retrieve the Service instance based on the provided UUID
+            service_instance = Service.objects.get(id=service_id)
+
+            date_str = self.kwargs.get('date')
+            try:
+                date_obj = datetime.strptime(date_str, "%d-%m-%Y").date()
+            except ValueError:
+                return Response({"error": f"Invalid date format for {date_str}. "
+                                 f"Use DD-MM-YYYY."},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            # Use get_or_create to retrieve or create the ServiceAvailability instance
+            service_availability_instance, created = ServiceAvailability.objects.get_or_create(
+                service=service_instance,
+                date=date_obj
+            )
+
+            if update_type == 'all':
+                # Handle by_duration logic
+                service_availability_instance.time = default_true_time_slot()
+                service_availability_instance.all_slots_available = True
+                service_availability_instance.save()
+
+            elif update_type == 'time':
+                # Handle by_time logic
+                time = int(request.query_params.get('time', 0))
+                # Update the availability for the specific time
+                for slot in service_availability_instance.time:
+                    if slot['time'] == time:
+                        slot['make_slot_available'] = True
+                service_availability_instance.save()
+
+            elif update_type == 'date':
+                # Handle by_duration logic
+                service_availability_instance.time = default_true_time_slot()
+                service_availability_instance.all_slots_available = True
+                service_availability_instance.save()
+
+            elif update_type == 'days':
+                # Handle by_days logic
+                selected_days = request.data.get('days', [])
+                selected_days = set(selected_days)
+
+                # Find the nearest dates that match the selected days
+                nearest_dates = []
+                current_date = date_obj
+                while len(nearest_dates) < len(selected_days):
+                    if current_date.strftime('%A').lower() in selected_days:
+                        nearest_dates.append(current_date)
+                    current_date += timedelta(days=1)
+
+                # Update availability for the nearest dates
+                for nearest_date in nearest_dates:
+                    service_availability_instance, _ = ServiceAvailability.objects.get_or_create(
+                        service=service_instance,
+                        date=nearest_date
+                    )
+                    # Assuming days_available is a list of days
+                    for day in selected_days:
+                        if day in service_availability_instance.days_available:
+                            # Update the availability for the specific day
+                            service_availability_instance.days_available[day] = True
+
+                    service_availability_instance.save()
+
+            else:
+                return Response({"error": "Invalid update_type"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            # Log the availability update action
+            log_user = request.user if request.user else 'Unknown User'
+            log_title = "{model} entry {action} by {user}".format(
+                model="Service Availability",
+                action='Update',
+                user=log_user
+            )
+
+            create_log(
+                user=request.user,
+                model_name='Service Availability',
+                action_value='Update',
+                title=log_title,
+                # Serialize before update
+                value_before=serialize(
+                    'json', [service_availability_instance]),
+                value_after=serialize('json', [ServiceAvailability.objects.get(
+                    id=service_availability_instance.id)])  # Serialize after update
+            )
+
+            return Response({"message": "Availability updated successfully"},
+                            status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 # ?---------------------------App views----------------------------------------#
 
 

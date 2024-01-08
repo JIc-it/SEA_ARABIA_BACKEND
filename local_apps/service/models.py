@@ -640,8 +640,12 @@ class ServiceAvailability(Main):
         verbose_name = "Service Availability"
         verbose_name_plural = "Service Availabilities"
 
-    # def __str__(self):
-    #     return self.service.name
+    def __str__(self):
+        return (
+            self.service.name
+            if self.service and self.service.name
+            else "No service name"
+        )
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()

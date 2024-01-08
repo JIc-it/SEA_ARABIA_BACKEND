@@ -150,6 +150,9 @@ urlpatterns = [
     path('service-booking-availability/<uuid:service>/<str:month>/<str:date>/',
          AdminServiceBookingAvailabilityList.as_view(), name='service-booking-availability'),
 
+    path('list-availability/<uuid:service>/<str:date>/',
+         ListAvailabilityView.as_view(), name='list-availability'),
+
     path('update-availability/<uuid:service>/<str:date>/',
          UpdateAvailabilityView.as_view(), name='mark-availability'),
 
