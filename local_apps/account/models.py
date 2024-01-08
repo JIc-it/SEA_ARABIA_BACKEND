@@ -225,13 +225,10 @@ class GCCLocations(Main):
 
 class ProfileExtra(Main):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    location = models.ForeignKey(
-        GCCLocations, blank=True, null=True, on_delete=models.CASCADE)
-    image = models.ImageField(
-        upload_to='account/profile_extra/image', blank=True, null=True)
+    location = models.ForeignKey(GCCLocations, blank=True, null=True, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='account/profile_extra/image', blank=True, null=True)
     dob = models.DateField(blank=True, null=True, max_length=255)
-    gender = models.CharField(
-        choices=GENDER, max_length=100, default='Male', blank=True, null=True)
+    gender = models.CharField(choices=GENDER, max_length=100, default='Male', blank=True, null=True)
 
     def __str__(self):
         return self.user.email if self.user and self.user.email else 'No user'

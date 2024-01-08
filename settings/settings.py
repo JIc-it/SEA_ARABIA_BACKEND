@@ -254,6 +254,15 @@ TAP_SECRET_KEY = 'sk_test_mKI8rCSWV0vhQ9TdlonBZ16i'
 TAP_BASE_URL = 'https://api.tap.company/v2/'
 
 
+# Google OAuth 2.0 configuration
+GOOGLE_CLIENT_ID = '28175996828-ls8r9c9l27r7kfvj28tv0ijrhgujt296.apps.googleusercontent.com'
+GOOGLE_CLIENT_SECRET = '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'
+GOOGLE_REDIRECT_URI = 'http://localhost:8888/google_callback'
+
+GOOGLE_AUTHORIZATION_URL = 'https://accounts.google.com/o/oauth2/auth'
+GOOGLE_TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
+GOOGLE_USER_INFO_URL = 'https://www.googleapis.com/oauth2/v1/userinfo'
+
 
 
 # CACHES = {

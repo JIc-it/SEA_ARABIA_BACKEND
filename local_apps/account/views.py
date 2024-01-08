@@ -1,49 +1,40 @@
 import re
+import random
+import secrets
+import string
+import requests
+import datetime
+from urllib.parse import unquote, quote
+from utils.action_logs import create_log
+from datetime import datetime
 from django.core.serializers import serialize
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+from django.conf import settings
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.shortcuts import get_object_or_404
+from django.db.models import Count, Q, Case, When, IntegerField, Sum
+from django.contrib.auth import authenticate, login
+from django.utils import timezone
+from django.contrib.auth import get_user_model
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .models import *
-from .serializers import *
-from local_apps.company.filters import CompanyFilter
-from .filters import *
-from local_apps.company.models import Company, OnboardStatus
-from rest_framework.views import APIView
-from django.utils import timezone
-from .models import PasswordReset
-from django.contrib.auth import get_user_model
-import random
-from local_apps.message_utility.views import mail_handler
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
-from django.db.models import Count, Q, Case, When, IntegerField, Sum
-import datetime
-from django.contrib.auth import authenticate, login
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.http import HttpResponse
-import requests
-from urllib.parse import unquote, quote
-import secrets
-import string
-from utils.action_logs import create_log
-from datetime import datetime
-from django.views.decorators.cache import cache_page
-from django.utils.decorators import method_decorator
+from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
+from local_apps.company.filters import CompanyFilter
+from local_apps.company.models import Company, OnboardStatus
+from local_apps.message_utility.views import mail_handler
+from .filters import *
+from .models import *
+from .serializers import *
 
-# Google OAuth 2.0 configuration
-GOOGLE_CLIENT_ID = '28175996828-ls8r9c9l27r7kfvj28tv0ijrhgujt296.apps.googleusercontent.com'
-GOOGLE_CLIENT_SECRET = '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'
-GOOGLE_REDIRECT_URI = 'http://localhost:8888/google_callback'
-
-GOOGLE_AUTHORIZATION_URL = 'https://accounts.google.com/o/oauth2/auth'
-GOOGLE_TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
-GOOGLE_USER_INFO_URL = 'https://www.googleapis.com/oauth2/v1/userinfo'
-scopes = ['email', 'profile',
-          'https://www.googleapis.com/auth/user.phonenumbers.read']
+scopes = ['email', 'profile', 'https://www.googleapis.com/auth/user.phonenumbers.read']
 scope_quoted = quote(" ".join(scopes))
 
 
@@ -72,8 +63,8 @@ class GoogleAuth(APIView):
     def get(self, request):
         try:
             authorization_url = (
-                f'{GOOGLE_AUTHORIZATION_URL}?client_id={GOOGLE_CLIENT_ID}'
-                f'&redirect_uri={GOOGLE_REDIRECT_URI}&response_type=code&scope={scope_quoted}'
+                f'{settings.GOOGLE_AUTHORIZATION_URL}?client_id={settings.GOOGLE_CLIENT_ID}'
+                f'&redirect_uri={settings.GOOGLE_REDIRECT_URI}&response_type=code&scope={scope_quoted}'
             )
             return Response(authorization_url, status=status.HTTP_200_OK)
         except Exception as e:
@@ -86,16 +77,16 @@ class GoogleAuth(APIView):
                 auth_code = unquote(code)
                 token_data = {
                     'code': auth_code,
-                    'client_id': GOOGLE_CLIENT_ID,
-                    'client_secret': GOOGLE_CLIENT_SECRET,
-                    'redirect_uri': GOOGLE_REDIRECT_URI,
+                    'client_id': settings.GOOGLE_CLIENT_ID,
+                    'client_secret': settings.GOOGLE_CLIENT_SECRET,
+                    'redirect_uri': settings.GOOGLE_REDIRECT_URI,
                     'grant_type': 'authorization_code'
                 }
                 token_response = requests.post(
-                    GOOGLE_TOKEN_URL, data=token_data)
+                    settings.GOOGLE_TOKEN_URL, data=token_data)
                 token_info = token_response.json()
                 user_info_response = requests.get(
-                    GOOGLE_USER_INFO_URL, headers={
+                    settings.GOOGLE_USER_INFO_URL, headers={
                         'Authorization': f'Bearer {token_info["access_token"]}'}
                 )
                 user_info = user_info_response.json()
@@ -135,30 +126,33 @@ class GoogleAuth(APIView):
 
 class LoginView(APIView):
     def post(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
+        try:
+            email = request.data.get('email')
+            password = request.data.get('password')
 
-        user = authenticate(request, username=email, password=password)
+            user = authenticate(request, username=email, password=password)
 
-        if user is not None:
-            login(request, user)
-            refresh = RefreshToken.for_user(user)
-            access_token = str(refresh.access_token)
-            refresh_token = str(refresh)
+            if user is not None:
+                login(request, user)
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
+                refresh_token = str(refresh)
 
-            user_id = user.id
-            print(user_id)
+                user_id = user.id
+                print(user_id)
 
-            return Response({
-                'detail': 'Login successful!',
-                'access_token': access_token,
-                'refresh_token': refresh_token,
-                # 'user_id':user_id
+                return Response({
+                    'detail': 'Login successful!',
+                    'access_token': access_token,
+                    'refresh_token': refresh_token,
+                    # 'user_id':user_id
 
-            }, status=status.HTTP_200_OK)
-        else:
-            raise AuthenticationFailed(
-                'Invalid email or password. Please try again.')
+                }, status=status.HTTP_200_OK)
+            else:
+                raise AuthenticationFailed(
+                    'Invalid email or password. Please try again.')
+        except Exception as e:
+            return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -285,7 +279,7 @@ class UserUpdate(generics.UpdateAPIView):
 
 #   Profile extra views
 class ProfileExtraCreate(generics.CreateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = ProfileExtraSerializer
 
 
@@ -295,8 +289,7 @@ class ProfileExtraCreate(generics.CreateAPIView):
 class VendorList(generics.ListAPIView):
     """ view for listing the vendor in cms """
 
-    queryset = User.objects.filter(
-        role="Vendor", company_company_user__is_onboard=False)
+    queryset = User.objects.filter(role="Vendor", company_company_user__is_onboard=False)
     serializer_class = VendorSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = [
@@ -402,10 +395,8 @@ class VendorDetailsAdd(generics.UpdateAPIView):
             # taking the data
             location_data = request.data.get("location", {})
             company_data = request.data.get("company_company_user", {})
-            user_identification_data = request.data.get(
-                "useridentificationdata", {})
+            user_identification_data = request.data.get("useridentificationdata", {})
             service_category = company_data.get('service_summary', [])
-
             user_id_type = user_identification_data.get('id_type', None)
             user_id_number = user_identification_data.get('id_number', None)
 
@@ -571,7 +562,7 @@ class UserIdTypeList(generics.ListAPIView):
     queryset = UserIdentificationType.objects.all()
 
 
-# -----------------------------------------------------------Authenitaction-Section/OTP/FORGOTPASSWORD-----------------------------------------------------------------------------------------------------------------------------#
+# -----------------------Authenitaction-Section/OTP/FORGOTPASSWORD--------------------------------------#
 
 
 def generate_otp():
@@ -586,9 +577,7 @@ class RequestOTPView(APIView):
             if serializer.is_valid():
                 email = serializer.validated_data["email"]
                 try:
-                    print(email)
                     user = User.objects.get(email=email)
-                    print(user)
                 except User.DoesNotExist:
                     return Response(
                         {"detail": "User with this email does not exist."},
@@ -767,35 +756,31 @@ class AllUserResetPasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        user_id = request.data.get("user_id")
-        new_password = request.data.get("new_password")
-        confirm_password = request.data.get("confirm_password")
-
         try:
-            user = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            return Response(
-                {"error": "User not found."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            user_id = request.data.get("user_id")
+            new_password = request.data.get("new_password")
+            confirm_password = request.data.get("confirm_password")
 
-        if new_password and confirm_password:
-            if new_password == confirm_password:
-                user.set_password(new_password)
-                user.save()
+            try:
+                user = User.objects.get(pk=user_id)
+            except User.DoesNotExist:
                 return Response(
-                    {"message": "Password reset successfully."},
-                    status=status.HTTP_200_OK,
-                )
+                    {"error": "User not found."}, status=status.HTTP_404_NOT_FOUND, )
+
+            if new_password and confirm_password:
+                if new_password == confirm_password:
+                    user.set_password(new_password)
+                    user.save()
+                    return Response(
+                        {"message": "Password reset successfully."}, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        {"error": "New password and confirm password do not match."},
+                        status=status.HTTP_400_BAD_REQUEST, )
             else:
-                return Response(
-                    {"error": "New password and confirm password do not match."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-        else:
-            return Response(
-                {"error": "Empty passwords "}, status=status.HTTP_400_BAD_REQUEST
-            )
+                return Response({"error": "Empty passwords "}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserListView(generics.ListAPIView):
@@ -810,14 +795,17 @@ class UserProfileView(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_object(self):
-        return self.request.user
+        try:
+            return self.request.user
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def emilres(request):
     return render(request, "email.html")
 
 
-# ------------------------------------------------------------------------mobilepp-----------------------------------------------------------------#
+# ---------------------------mobilepp-----------------------------------#
 
 
 # class UserSignUp(generics.CreateAPIView):
@@ -837,8 +825,6 @@ class UserSignUp(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSignUpSerializer
 
-    # permission_classes = [IsAuthenticated]
-
     def create(self, request, *args, **kwargs):
         try:
             email = request.data.get('email', None)
@@ -855,7 +841,7 @@ class UserSignUp(generics.CreateAPIView):
             )
 
             # Create a new profile instance and associate it with the user
-            profile_instance = ProfileExtra.objects.create(
+            ProfileExtra.objects.create(
                 user=user_instance,
                 location=GCCLocations.objects.get(
                     id=location) if location else None,
@@ -893,15 +879,6 @@ class BookmarkCreateAPIView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-# class BookMarkListView(generics.ListAPIView):
-#     """bookmark listing"""
-#     serializer_class = BookMarkListSerializer
-#     permission_classes = [IsAuthenticated]
-
-#     def get_queryset(self):
-
-#         return Bookmark.objects.filter(user=self.request.user)
-
 class BookMarkListView(generics.ListAPIView):
     """bookmark listing"""
     serializer_class = BookmarkListSerializer
@@ -936,14 +913,17 @@ class UserProfileView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        user = self.request.user
         try:
-            profile_extra = ProfileExtra.objects.get(user=user)
-        except ProfileExtra.DoesNotExist:
-            profile_extra = None
+            user = self.request.user
+            try:
+                profile_extra = ProfileExtra.objects.get(user=user)
+            except ProfileExtra.DoesNotExist:
+                profile_extra = None
 
-        user.profile_extra = profile_extra
-        return user
+            user.profile_extra = profile_extra
+            return user
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
@@ -1017,57 +997,54 @@ class GuestUserList(generics.ListAPIView):
 
 class ExportVendorCSVView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
-        queryset = User.objects.filter(
-            role="Vendor")
-        resource = VendorListExport()
-
-        dataset = resource.export(queryset)
-
-        response = HttpResponse(dataset.csv, content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="vendor_list.csv"'
-
-        return response
+        try:
+            queryset = User.objects.filter(role="Vendor")
+            resource = VendorListExport()
+            dataset = resource.export(queryset)
+            response = HttpResponse(dataset.csv, content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="vendor_list.csv"'
+            return response
+        except Exception as e:
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
 class ExportCustomerCSVView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
-        queryset = User.objects.filter(
-            role="User")
-        resource = CustomerListExport()
-
-        dataset = resource.export(queryset)
-
-        response = HttpResponse(dataset.csv, content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="customer_list.csv"'
-
-        return response
+        try:
+            queryset = User.objects.filter(role="User")
+            resource = CustomerListExport()
+            dataset = resource.export(queryset)
+            response = HttpResponse(dataset.csv, content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="customer_list.csv"'
+            return response
+        except Exception as e:
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
 class ExportGuestsCSVView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
-        queryset = Guest.objects.all()
-        resource = GuestsListExport()
-
-        dataset = resource.export(queryset)
-
-        response = HttpResponse(dataset.csv, content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="guests_list.csv"'
-
-        return response
+        try:
+            queryset = Guest.objects.all()
+            resource = GuestsListExport()
+            dataset = resource.export(queryset)
+            response = HttpResponse(dataset.csv, content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="guests_list.csv"'
+            return response
+        except Exception as e:
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
 class ExportOnboardVendorsCSVView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
-        queryset = User.objects.filter(
-            role="Vendor", company_company_user__is_onboard=True)
-        resource = OnboardVendorsListExport()
-
-        dataset = resource.export(queryset)
-
-        response = HttpResponse(dataset.csv, content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="vendor_users_list.csv"'
-
-        return response
+        try:
+            queryset = User.objects.filter(role="Vendor", company_company_user__is_onboard=True)
+            resource = OnboardVendorsListExport()
+            dataset = resource.export(queryset)
+            response = HttpResponse(dataset.csv, content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="vendor_users_list.csv"'
+            return response
+        except Exception as e:
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
 class GCCLocationsAPIView(APIView):
