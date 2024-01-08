@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.core.serializers import serialize
 from rest_framework import generics, views
 from rest_framework.permissions import IsAuthenticated
@@ -8,7 +9,6 @@ from rest_framework.filters import SearchFilter
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from rest_framework.parsers import MultiPartParser
-
 from utils.action_logs import create_log
 from .models import *
 from .serializers import *
@@ -353,22 +353,30 @@ class SiteVisitCreate(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # Get the Offer instance before the creation
-            site_visit_before_creation = SiteVisit()  # Create an empty Offer instance
 
             # Serialize the data before the creation
-            value_before = serialize('json', [site_visit_before_creation])
+            value_before = serialize('json', [SiteVisit()])
             qualifications = request.data.get("qualifications", None)
             attachment = request.FILES.get('attachment')
             company = request.data.get('company', None)
             title = request.data.get('title', None)
             note = request.data.get('note', None)
+            date_str = request.data.get('date', None)
+            time_str = request.data.get('time', None)
+
+            if date_str:
+                date = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+            if time_str:
+                time = datetime.strptime(time_str, '%H:%M:%S').time()
 
             if company:
                 company_instance = Company.objects.get(id=company)
 
                 site_visit_instance = SiteVisit.objects.create(
-                    company=company_instance, attachment=attachment, title=title, note=note)
+                    company=company_instance, attachment=attachment, title=title, note=note, date=date, time=time)
+                
+                qualifications_list = []  # Initialize qualifications_list as an empty list for cases with no qualification
 
                 if qualifications:
                     qualifications_list = qualifications.split(',')
@@ -496,15 +504,12 @@ class ProposalCreate(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # Get the Offer instance before the creation
-            proposal_before_creation = Proposal()  # Create an empty Offer instance
-
-            # Serialize the data before the creation
-            value_before = serialize('json', [proposal_before_creation])
+            # Serialize the data before the Proposal creation
+            value_before = serialize('json', [Proposal()])
 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            instance = self.perform_create(serializer)
+            instance = serializer.save()
 
             # Serialize the data after the Proposal creation
             value_after = serialize('json', [instance])
@@ -586,11 +591,9 @@ class NegotiationCreate(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # Get the Offer instance before the creation
-            negotiation_before_creation = Negotiation()  # Create an empty Offer instance
 
             # Serialize the data before the creation
-            value_before = serialize('json', [negotiation_before_creation])
+            value_before = serialize('json', [Negotiation()])
 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -709,11 +712,9 @@ class MOUorCharterCreate(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # Get the Offer instance before the creation
-            mou_charter_before_creation = MOUorCharter()  # Create an empty Offer instance
 
             # Serialize the data before the creation
-            value_before = serialize('json', [mou_charter_before_creation])
+            value_before = serialize('json', [MOUorCharter()])
 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -827,20 +828,20 @@ class MOUorCharterView(generics.RetrieveAPIView):
 class OnboardVendor(generics.UpdateAPIView):
     ''' view for onboarding and offloading the vendor based on the status '''
 
-    queryset = Company.objects.filter(is_onboard=False)
+    queryset = Company.objects.all()
     serializer_class = CompanyOnboardSerializer
 
     def update(self, request, *args, **kwargs):
         try:
-            # Get the Company instance before the update
-            company_before_update = self.get_object()
-
-            # Serialize the data before the update
-            value_before = serialize('json', [company_before_update])
-
             company_id = kwargs.get('pk', None)
             onboard_status = request.data.get('status', None)
+
+            # Get the initial Company instance
             company_instance = get_object_or_404(Company, id=company_id)
+
+            # Serialize the data before the update
+            value_before = serialize('json', [company_instance])
+
             company_instance.is_onboard = onboard_status
             company_instance.save()
 
@@ -867,7 +868,7 @@ class OnboardVendor(generics.UpdateAPIView):
                 value_after=value_after
             )
 
-            serializer_data = CompanyOnboardSerializer(self.request.data)
+            serializer_data = CompanyOnboardSerializer(company_after_update)
             return Response(serializer_data.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)

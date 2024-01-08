@@ -21,12 +21,14 @@ class PaymentSerializer(serializers.ModelSerializer):
                   'initial_response',
                   'confirmation_response',
                   'created_at',
-                  'updated_at']
+                  'updated_at',
+                  "payment_response_message",]
 
 
 class BookingSerializer(serializers.ModelSerializer):
     # # Extra fields for mapping ladders with uuid
-    # user_id = serializers.UUIDField(source='user.id',allow_null=True,required=False)
+    # user_id = serializers.UUIDField(
+    #     source='user.id', allow_null=True, required=False)
     # guest_id = serializers.UUIDField(source='guest.id',allow_null=True,required=False)
     # offer_id = serializers.UUIDField(source='offer.id',allow_null=True,required=False)
     # service_id = serializers.UUIDField(source='service.id',allow_null=True,required=False)
@@ -83,11 +85,39 @@ class BookingSerializer(serializers.ModelSerializer):
                   'price_total',
                   'created_at',
                   'updated_at',
-                  "payment_url"
+                  "payment_url",
+                  "user_id"
                   ]
 
     def create(self, validated_data):
-        # Create Booking instance
+        # # Extract UUIDs from validated data
+        # user_uuid = validated_data.pop('user', None)
+        # guest_uuid = validated_data.pop('guest', None)
+        # offer_uuid = validated_data.pop('offer', None)
+        # service_uuid = validated_data.pop('service', None)
+        # payment_uuid = validated_data.pop('payment', None)
+        # package_uuid = validated_data.pop('package', None)
+        # price_uuid = validated_data.pop('price', None)
+
+        # # Retrieve related instances
+        # user = User.objects.get(id=user_uuid) if user_uuid else None
+        # guest = Guest.objects.get(id=guest_uuid) if guest_uuid else None
+        # offer = Offer.objects.get(id=offer_uuid) if offer_uuid else None
+        # service = Service.objects.get(id=service_uuid) if service_uuid else None
+        # payment = Payment.objects.get(id=payment_uuid) if payment_uuid else None
+        # package = Package.objects.get(id=package_uuid) if package_uuid else None
+        # price = Price.objects.get(id=price_uuid) if price_uuid else None
+
+        # # Update validated data with related instances
+        # validated_data['user'] = user
+        # validated_data['guest'] = guest
+        # validated_data['offer'] = offer
+        # validated_data['service'] = service
+        # validated_data['payment'] = payment
+        # validated_data['package'] = package
+        # validated_data['price'] = price
+
+        # # Create Booking instance
         booking = Booking.objects.create(**validated_data)
 
         return booking

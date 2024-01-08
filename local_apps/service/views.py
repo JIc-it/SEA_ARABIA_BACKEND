@@ -1335,6 +1335,28 @@ class PackageListAPIView(generics.ListAPIView):
     filterset_class = PackageFilter
 
 
+class PackageCountsAPIView(APIView):
+    def get(self, request, format=None):
+        total_events_count = Package.objects.filter(type='Event').count()
+        total_packages_count = Package.objects.filter(type='Package').count()
+        active_events_count = Package.objects.filter(type='Event', is_active=True).count()
+        active_packages_count = Package.objects.filter(type='Package', is_active=True).count()
+
+        data = {
+            'total_events_count': total_events_count,
+            'total_packages_count': total_packages_count,
+            'active_events_count': active_events_count,
+            'active_packages_count': active_packages_count,
+        }
+
+        return Response(data)
+
+class PackageView(generics.RetrieveAPIView):
+    queryset = Package.objects.all()
+    serializer_class = PackageSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PackageFilter
+
 # class UpdateAvailabilityView(generics.UpdateAPIView):
 #     serializer_class = ServiceAvailabilitySerializer
 #
