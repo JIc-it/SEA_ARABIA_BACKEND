@@ -30,8 +30,8 @@ from urllib.parse import unquote, quote
 import secrets
 import string
 from utils.action_logs import create_log
-from django.views.decorators.cache import cache_page
-from django.utils.decorators import method_decorator
+# from django.views.decorators.cache import cache_page
+# from django.utils.decorators import method_decorator
 
 # Google OAuth 2.0 configuration
 GOOGLE_CLIENT_ID = '28175996828-ls8r9c9l27r7kfvj28tv0ijrhgujt296.apps.googleusercontent.com'
@@ -220,7 +220,7 @@ class UserCreate(generics.CreateAPIView):
             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+
 class UserList(generics.ListAPIView):
     """ list all users """
 
@@ -290,7 +290,7 @@ class ProfileExtraCreate(generics.CreateAPIView):
 
 # cms views
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+
 class VendorList(generics.ListAPIView):
     """ view for listing the vendor in cms """
 
@@ -536,7 +536,7 @@ class UserCountList(APIView):
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class VendorCountList(APIView):
     """ vendor coutn cards """
 
@@ -555,7 +555,7 @@ class VendorCountList(APIView):
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class AllUserDetails(generics.RetrieveAPIView):
     """ List all the user(different roles) details """
 
