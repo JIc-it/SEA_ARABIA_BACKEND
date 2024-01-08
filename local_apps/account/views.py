@@ -30,7 +30,7 @@ from urllib.parse import unquote, quote
 import secrets
 import string
 from utils.action_logs import create_log
-from datetime import datetime 
+from datetime import datetime
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 
@@ -221,7 +221,7 @@ class UserCreate(generics.CreateAPIView):
             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch') 
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class UserList(generics.ListAPIView):
     """ list all users """
 
@@ -291,7 +291,7 @@ class ProfileExtraCreate(generics.CreateAPIView):
 
 # cms views
 
-@method_decorator(cache_page(60 * 15), name='dispatch') 
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class VendorList(generics.ListAPIView):
     """ view for listing the vendor in cms """
 
@@ -536,7 +536,8 @@ class UserCountList(APIView):
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
-@method_decorator(cache_page(60 * 15), name='dispatch') 
+
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class VendorCountList(APIView):
     """ vendor coutn cards """
 
@@ -554,7 +555,8 @@ class VendorCountList(APIView):
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
-@method_decorator(cache_page(60 * 15), name='dispatch') 
+
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class AllUserDetails(generics.RetrieveAPIView):
     """ List all the user(different roles) details """
 
@@ -834,6 +836,7 @@ def emilres(request):
 class UserSignUp(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSignUpSerializer
+
     # permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
@@ -882,7 +885,8 @@ class BookmarkCreateAPIView(generics.CreateAPIView):
         user = self.request.user
         service = serializer.validated_data['service']
         if Bookmark.objects.filter(user=user, service=service).exists():
-            return Response({"message": "You have already bookmarked this service."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "You have already bookmarked this service."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -996,7 +1000,6 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
 
 
 class GuestUserList(generics.ListAPIView):
-
     ''' guest user listing for cms '''
     serializer_class = GuestSerializer
     queryset = Guest.objects.all()
@@ -1067,7 +1070,20 @@ class ExportOnboardVendorsCSVView(generics.ListAPIView):
         return response
 
 
-class GccLocationList(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = GccLocationSerializer
-    queryset = GCCLocations.objects.filter(is_active=True)
+class GCCLocationsAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            locations = GCCLocations.objects.filter(is_active=True)
+            serializer = GCCLocationsSerializer(locations, many=True)
+            formatted_locations = [
+                {
+                    'code': item['country_code'],
+                    'label': item['country'],
+                    'name': item['country_code'],
+                    'id': item['id']
+                }
+                for item in serializer.data
+            ]
+            return Response(formatted_locations, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)

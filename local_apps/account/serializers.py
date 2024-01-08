@@ -8,19 +8,14 @@ from local_apps.service.serializers import ServiceSerializer
 from local_apps.booking.models import Booking
 from import_export import resources
 
+
 # user cms serializers
 
 
-class GccLocationSerializer(serializers.ModelSerializer):
-    """ Serialize GCC Locations """
-
+class GCCLocationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = GCCLocations
-        fields = [
-            "id",
-            "location",
-            "country_flag"
-        ]
+        fields = ['id', 'country_code', 'country']
 
 
 class VendorSerializer(serializers.ModelSerializer):
@@ -150,7 +145,6 @@ class VendorAddDetailsSerialzier(serializers.ModelSerializer):
 
 
 class ProfileExtraSerializer(serializers.ModelSerializer):
-
     location = GccLocationSerializer(allow_null=True, required=False)
 
     class Meta:
@@ -159,7 +153,6 @@ class ProfileExtraSerializer(serializers.ModelSerializer):
 
 
 class UserSerializerApp(serializers.ModelSerializer):
-
     """serializer for showing the profile details of the user"""
 
     profileextra = ProfileExtraSerializer()
@@ -322,6 +315,8 @@ class AllUserDetailsSerializer(serializers.ModelSerializer):
             "company_onboard_status",
             "is_active"
         ]
+
+
 # ----------------------------------------------------------------------mobileapp-------------------------------------------------------------------------
 # usersignup
 
@@ -366,7 +361,6 @@ class UserSignUpSerializer(serializers.ModelSerializer):
 # bookmark
 
 class BookmarkSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Bookmark
         fields = "__all__"
