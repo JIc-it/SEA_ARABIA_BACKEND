@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.core.serializers import serialize
 from rest_framework import generics, views
 from rest_framework.permissions import IsAuthenticated
@@ -8,7 +9,6 @@ from rest_framework.filters import SearchFilter
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from rest_framework.parsers import MultiPartParser
-
 from utils.action_logs import create_log
 from .models import *
 from .serializers import *
@@ -361,12 +361,20 @@ class SiteVisitCreate(generics.CreateAPIView):
             company = request.data.get('company', None)
             title = request.data.get('title', None)
             note = request.data.get('note', None)
+            date_str = request.data.get('date', None)
+            time_str = request.data.get('time', None)
+
+            if date_str:
+                date = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+            if time_str:
+                time = datetime.strptime(time_str, '%H:%M:%S').time()
 
             if company:
                 company_instance = Company.objects.get(id=company)
 
                 site_visit_instance = SiteVisit.objects.create(
-                    company=company_instance, attachment=attachment, title=title, note=note)
+                    company=company_instance, attachment=attachment, title=title, note=note, date=date, time=time)
                 
                 qualifications_list = []  # Initialize qualifications_list as an empty list for cases with no qualification
 
