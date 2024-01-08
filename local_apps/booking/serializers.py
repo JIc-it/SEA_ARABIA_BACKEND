@@ -75,6 +75,8 @@ class BookingSerializer(serializers.ModelSerializer):
                   'cancellation_reason',
                   'cancelled_by',
                   'refund_status',
+                  'cancelled_date',
+                  'is_refunded',
                   'refund_type',
                   'refund_amount',
                   'refund_details',
