@@ -12,6 +12,8 @@ from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 import requests
+from . serializers import*
+from .filters import*
 # from django.utils.decorators import method_decorator
 # from django.views.decorators.cache import cache_page
 
@@ -253,7 +255,7 @@ class BookingCancellation(generics.UpdateAPIView):
                 booking_instance.refund_status = 'Pending'
                 booking_instance.save()
             else:
-                return Response({"error": "Booking is already cancelled."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Booking is al@method_decorator(cache_page(60 * 15), name='dispatch') ready cancelled."}, status=status.HTTP_400_BAD_REQUEST)
 
             return Response({"Booking Status": booking_instance.status}, status=status.HTTP_200_OK)
         except Exception as e:
