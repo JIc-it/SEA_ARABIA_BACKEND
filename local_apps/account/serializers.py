@@ -145,7 +145,7 @@ class VendorAddDetailsSerialzier(serializers.ModelSerializer):
 
 
 class ProfileExtraSerializer(serializers.ModelSerializer):
-    location = GccLocationSerializer(allow_null=True, required=False)
+    location = GCCLocationsSerializer(allow_null=True, required=False)
 
     class Meta:
         model = ProfileExtra

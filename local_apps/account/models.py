@@ -158,7 +158,7 @@ class User(AbstractUser):
 
 class GCCLocations(Main):
     country = models.CharField(max_length=255)
-    country_code = models.CharField()
+    country_code = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

@@ -68,5 +68,5 @@ urlpatterns = [
     path('onboard-vendors-list-export/', ExportOnboardVendorsCSVView.as_view(), name='onboard-vendors-export-csv'),
 
     # gcc location listing
-    path('gcc-locations', GccLocationList.as_view(), name='gcc-locations'),
+    path('gcc-locations', GCCLocationsAPIView.as_view(), name='gcc-locations'),
 ]
