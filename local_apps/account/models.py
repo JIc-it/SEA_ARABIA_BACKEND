@@ -4,15 +4,13 @@ from django.core.serializers import serialize
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from local_apps.account.managers import CustomUserManager
-from local_apps.api_report.models import ModelUpdateLog
 from local_apps.core.models import Main
 from utils.file_handle import remove_file
 from django.utils import timezone
 from local_apps.service.models import Service
 from django.conf import settings
-from local_apps.api_report.middleware import get_current_request
-from django.core.exceptions import ValidationError
 from utils.id_handle import increment_two_digits, increment_two_letters, increment_one_letter
+from utils.model_logs import create_update_log
 
 USER_ROLE = (
     ('Admin', "Admin"),
@@ -102,24 +100,6 @@ class User(AbstractUser):
         except Exception as e:
             print(e)
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-
-        # Check if the request object and user attribute exist
-        if request and hasattr(request, 'user') and isinstance(request.user, User):
-            user = request.user
-        else:
-            # If not, set user to None or handle it as appropriate for your use case
-            user = None
-
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=user,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         if not self.account_id:
             self.generate_id_number()
@@ -140,7 +120,7 @@ class User(AbstractUser):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(User, self).save(*args, **kwargs)
@@ -236,24 +216,6 @@ class ProfileExtra(Main):
     def __str__(self):
         return self.user.email if self.user and self.user.email else 'No user'
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-
-        # Check if the request object and user attribute exist
-        if request and hasattr(request, 'user') and isinstance(request.user, User):
-            user = request.user
-        else:
-            # If not, set user to None or handle it as appropriate for your use case
-            user = None
-
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=user,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -271,7 +233,7 @@ class ProfileExtra(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(ProfileExtra, self).save(*args, **kwargs)
@@ -293,7 +255,7 @@ class ProfileExtra(Main):
             remove_file(self.image)
 
         super(ProfileExtra, self).delete(*args, **kwargs)
-        self.create_update_log(data_before, None)
+        create_update_log(self, data_before, None)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -303,24 +265,6 @@ class ProfileExtra(Main):
 
 class UserIdentificationType(Main):
     name = models.CharField(max_length=255)
-
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-
-        # Check if the request object and user attribute exist
-        if request and hasattr(request, 'user') and isinstance(request.user, User):
-            user = request.user
-        else:
-            # If not, set user to None or handle it as appropriate for your use case
-            user = None
-
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=user,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -339,7 +283,7 @@ class UserIdentificationType(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(UserIdentificationType, self).save(*args, **kwargs)
@@ -363,24 +307,6 @@ class UserIdentificationData(Main):
         upload_to='account/user_identification_data/image', blank=True, null=True)
     is_verified = models.BooleanField(default=False)
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-
-        # Check if the request object and user attribute exist
-        if request and hasattr(request, 'user') and isinstance(request.user, User):
-            user = request.user
-        else:
-            # If not, set user to None or handle it as appropriate for your use case
-            user = None
-
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=user,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -398,7 +324,7 @@ class UserIdentificationData(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(UserIdentificationData, self).save(*args, **kwargs)
@@ -420,7 +346,7 @@ class UserIdentificationData(Main):
 
         super(UserIdentificationData, self).delete(*args, **kwargs)
         # Create a log entry after deletion
-        self.create_update_log(data_before, None)
+        create_update_log(self, data_before, None)
 
     def __str__(self):
         return self.id_number if self.id_number else 'no id number'
@@ -442,24 +368,6 @@ class PasswordReset(models.Model):
     def is_expired(self):
         return timezone.now() > self.expires_at
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-
-        # Check if the request object and user attribute exist
-        if request and hasattr(request, 'user') and isinstance(request.user, User):
-            user = request.user
-        else:
-            # If not, set user to None or handle it as appropriate for your use case
-            user = None
-
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=user,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -477,7 +385,7 @@ class PasswordReset(models.Model):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(PasswordReset, self).save(*args, **kwargs)
@@ -499,24 +407,6 @@ class Bookmark(Main):
     def __str__(self):
         return str(self.user)
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-
-        # Check if the request object and user attribute exist
-        if request and hasattr(request, 'user') and isinstance(request.user, User):
-            user = request.user
-        else:
-            # If not, set user to None or handle it as appropriate for your use case
-            user = None
-
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=user,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -534,7 +424,7 @@ class Bookmark(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(Bookmark, self).save(*args, **kwargs)
@@ -596,27 +486,10 @@ class Guest(Main):
         else:
             self.guest_id = f"{self.prefix}-AA00A00"
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-
-        # Check if the request object and user attribute exist
-        if request and hasattr(request, 'user') and isinstance(request.user, User):
-            user = request.user
-        else:
-            # If not, set user to None or handle it as appropriate for your use case
-            user = None
-
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=user,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         if not self.guest_id:
             self.generate_id_number()
+
         # Check if the instance already exists
         if self.pk:
             try:
@@ -633,7 +506,7 @@ class Guest(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(Guest, self).save(*args, **kwargs)

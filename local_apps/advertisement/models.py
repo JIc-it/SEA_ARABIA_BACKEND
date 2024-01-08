@@ -1,11 +1,9 @@
-from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import serialize
 from django.db import models
-from local_apps.api_report.middleware import get_current_request
-from local_apps.api_report.models import ModelUpdateLog
 from local_apps.main.models import Main
 from utils.file_handle import remove_file
+from utils.model_logs import create_update_log
 
 
 class Advertisement(Main):
@@ -15,26 +13,6 @@ class Advertisement(Main):
 
     def __str__(self):
         return self.name if self.name else "No Advertisement"
-
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        user = getattr(request, 'user', None)
-        if user and user.is_authenticated:
-            ModelUpdateLog.objects.create(
-                model_name=self.__class__.__name__,
-                user=user,
-                timestamp=timezone.now(),
-                data_before=data_before,
-                data_after=data_after
-            )
-        else:
-            ModelUpdateLog.objects.create(
-                model_name=self.__class__.__name__,
-                user=None,
-                timestamp=timezone.now(),
-                data_before=data_before,
-                data_after=data_after
-            )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -53,7 +31,7 @@ class Advertisement(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(Advertisement, self).save(*args, **kwargs)
@@ -75,7 +53,7 @@ class Advertisement(Main):
 
         super(Advertisement, self).delete(*args, **kwargs)
         # Create a log entry after deletion
-        self.create_update_log(data_before, None)
+        create_update_log(self, data_before, None)
 
 
 

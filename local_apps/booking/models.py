@@ -1,16 +1,12 @@
-from datetime import date
 from django.db import models
 from django.conf import settings
-from django.utils import timezone
-from local_apps.api_report.middleware import get_current_request
-from local_apps.api_report.models import ModelUpdateLog
 from local_apps.core.models import Main
 from local_apps.service.models import Service, Package, Price
 from local_apps.offer.models import Offer
 from local_apps.account.models import Guest
 from django.core.serializers import serialize
-from django.core.exceptions import ValidationError
 from utils.id_handle import increment_two_digits, increment_two_letters, increment_one_letter
+from utils.model_logs import create_update_log
 
 
 class Payment(Main):
@@ -37,26 +33,6 @@ class Payment(Main):
         ordering = ["-created_at", "-updated_at"]
         verbose_name = "Payment"
         verbose_name_plural = "Payments"
-
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        user = getattr(request, 'user', None)
-        if user and user.is_authenticated:
-            ModelUpdateLog.objects.create(
-                model_name=self.__class__.__name__,
-                user=user,
-                timestamp=timezone.now(),
-                data_before=data_before,
-                data_after=data_after
-            )
-        else:
-            ModelUpdateLog.objects.create(
-                model_name=self.__class__.__name__,
-                user=None,
-                timestamp=timezone.now(),
-                data_before=data_before,
-                data_after=data_after
-            )
 
     def generate_id_number(self):
         last_entry = Payment.objects.order_by('-created_at').first()
@@ -105,7 +81,7 @@ class Payment(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             super(Payment, self).save(*args, **kwargs)
 
@@ -246,26 +222,6 @@ class Booking(Main):
     def __str__(self):
         return self.booking_id if self.booking_id else "No Booking Id"
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        user = getattr(request, 'user', None)
-        if user and user.is_authenticated:
-            ModelUpdateLog.objects.create(
-                model_name=self.__class__.__name__,
-                user=user,
-                timestamp=timezone.now(),
-                data_before=data_before,
-                data_after=data_after
-            )
-        else:
-            ModelUpdateLog.objects.create(
-                model_name=self.__class__.__name__,
-                user=None,
-                timestamp=timezone.now(),
-                data_before=data_before,
-                data_after=data_after
-            )
-
     def generate_id_number(self):
         last_entry = Booking.objects.order_by('-created_at').first()
         if last_entry:
@@ -313,7 +269,7 @@ class Booking(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             super(Booking, self).save(*args, **kwargs)
 
