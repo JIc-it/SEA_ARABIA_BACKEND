@@ -949,10 +949,7 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserUpdatedSerializer
     permission_classes = [IsAuthenticated]
-
-    # def get_object(self):
-    #     return self.request.user
-    # FIXME::    get object code commented so that user can be taken from the user id passed
+    
 
     def update(self, request, *args, **kwargs):
         try:
@@ -961,13 +958,14 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
             mobile = request.data.get('mobile', None)
             first_name = request.data.get('first_name', None)
             last_name = request.data.get('last_name', None)
-            profile_extra = request.data.get('profileextra', {})
-            location = profile_extra.get('location', None)
-            dob = profile_extra.get('dob', None)
-            gender = profile_extra.get('gender', None)
+            profile_extra_data = request.data.get('profileextra', {})
+            location_id = profile_extra_data.get('location', None)
+            dob = profile_extra_data.get('dob', None)
+            gender = profile_extra_data.get('gender', None)
+            image = request.data.get('image', None)  # Get the image from request data
+
             user_instance = get_object_or_404(User, id=user_id)
-            profile_instance, _ = ProfileExtra.objects.get_or_create(
-                user=user_instance)
+            profile_instance, _ = ProfileExtra.objects.get_or_create(user=user_instance)
 
             if email:
                 user_instance.email = email
@@ -977,17 +975,16 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
                 user_instance.first_name = first_name
             if last_name:
                 user_instance.last_name = last_name
-
-            if location:
-                location_instance = GCCLocations.objects.get(id=location)
+            if location_id:
+                location_instance = GCCLocations.objects.get(id=location_id)
                 profile_instance.location = location_instance
-
             if dob:
                 dob_date = datetime.datetime.strptime(dob, "%Y-%m-%d").date()
                 profile_instance.dob = dob_date
-
             if gender:
                 profile_instance.gender = gender.title()
+            if image:  
+                profile_instance.image = image  
 
             user_instance.save()
             profile_instance.save()
@@ -996,7 +993,6 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
-
 
 class GuestUserList(generics.ListAPIView):
     ''' guest user listing for cms '''

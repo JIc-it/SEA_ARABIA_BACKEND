@@ -36,24 +36,11 @@ class AdminBookingListView(generics.ListAPIView):
     ]
     filterset_class = BookingFilter
 
-
+#Individual Booking For Admin CMS
 class AdminIndividualBookingView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     lookup_field = 'pk'
-
-# class AdminIndividualBookingView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request, booking_id):
-#         try:
-#             booking = Booking.objects.filter(id=booking_id)
-#             serializer = BookingIndividualViewSerializer(booking)
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         except Booking.DoesNotExist:
-#             return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
-#         except Exception as e:
-#             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # @method_decorator(cache_page(60 * 15), name='dispatch')
