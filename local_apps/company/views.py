@@ -504,7 +504,7 @@ class ProposalCreate(generics.CreateAPIView):
 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            instance = self.perform_create(serializer)
+            instance = serializer.save()
 
             # Serialize the data after the Proposal creation
             value_after = serialize('json', [instance])
