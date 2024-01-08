@@ -12,6 +12,7 @@ import datetime
 from .filters import *
 from .resources import BookingResource
 from django.http import HttpResponse
+import requests
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
@@ -19,7 +20,8 @@ today = datetime.date.today()
 
 # vendor Side List
 
-@method_decorator(cache_page(60 * 15), name='dispatch') 
+
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class AdminBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     queryset = Booking.objects.all()
@@ -35,9 +37,9 @@ class AdminBookingListView(generics.ListAPIView):
 
 
 class AdminIndividualBookingView(generics.RetrieveUpdateDestroyAPIView):
-    queryset= Booking.objects.all()
-    serializer_class= BookingSerializer
-    lookup_field ='pk'
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+    lookup_field = 'pk'
 
 # class AdminIndividualBookingView(APIView):
 #     permission_classes = [IsAuthenticated]
@@ -52,7 +54,8 @@ class AdminIndividualBookingView(generics.RetrieveUpdateDestroyAPIView):
 #         except Exception as e:
 #             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@method_decorator(cache_page(60 * 15), name='dispatch') 
+
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class VendorBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
@@ -71,7 +74,8 @@ class VendorBookingListView(generics.ListAPIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@method_decorator(cache_page(60 * 15), name='dispatch') 
+
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class UserBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
@@ -89,8 +93,10 @@ class BookingCreateView(generics.CreateAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+    def perform_create(self, serializer):
+        booking_instance = serializer.save()
+        print(booking_instance, ',,,,,,,,,,,,,,,')
+        return super().perform_create(serializer)
 
 
 class BookingView(generics.RetrieveAPIView):
@@ -193,7 +199,11 @@ class PaymentFinalization(generics.UpdateAPIView):
                     "accept": "application/json",
                     "Authorization": "Bearer "+settings.TAP_SECRET_KEY
                 }
-
+                response = requests.get(url, headers=headers)
+                final_response = response.json()
+                del final_response['redirect']
+                del final_response['post']
+                return Response(final_response, status=status.HTTP_200_OK)
             else:
                 return Response("Payment Id Required", status=status.HTTP_400_BAD_REQUEST)
 

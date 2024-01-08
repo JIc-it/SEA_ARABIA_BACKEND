@@ -14,7 +14,6 @@ from local_apps.api_report.middleware import get_current_request
 from django.core.exceptions import ValidationError
 from utils.id_handle import increment_two_digits, increment_two_letters, increment_one_letter
 
-
 USER_ROLE = (
     ('Admin', "Admin"),
     ('Staff', "Staff"),
@@ -65,40 +64,43 @@ class User(AbstractUser):
     ordering = ["-created_at", "-updated_at"]
 
     def generate_id_number(self):
-        last_entry = User.objects.order_by('-created_at').first()
-        if self.role == 'Admin':
-            rle = 'ADM'
-        elif self.role == 'Staff':
-            rle = 'STF'
-        elif self.role == 'Vendor':
-            rle = 'VDR'
-        elif self.role == 'User':
-            rle = 'USR'
-        else:
-            rle = 'OTH'
-
-        if last_entry:
-            if last_entry.last_two_numbers == 99:
-                self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+        try:
+            last_entry = User.objects.order_by('-created_at').first()
+            if self.role == 'Admin':
+                rle = 'ADM'
+            elif self.role == 'Staff':
+                rle = 'STF'
+            elif self.role == 'Vendor':
+                rle = 'VDR'
+            elif self.role == 'User':
+                rle = 'USR'
             else:
-                self.last_one_letter = last_entry.last_one_letter
+                rle = 'OTH'
 
-            if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
-                self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+            if last_entry:
+                if last_entry.last_two_numbers == 99:
+                    self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+                else:
+                    self.last_one_letter = last_entry.last_one_letter
+
+                if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
+                    self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+                else:
+                    self.first_two_numbers = last_entry.first_two_numbers
+
+                if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
+                                                                                         'z'] and last_entry.last_two_numbers == 99:
+                    self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
+                else:
+                    self.first_two_letters = last_entry.first_two_letters
+
+                self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
+
+                self.account_id = f"{self.prefix}-{rle}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
             else:
-                self.first_two_numbers = last_entry.first_two_numbers
-
-            if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
-                                                                                     'z'] and last_entry.last_two_numbers == 99:
-                self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
-            else:
-                self.first_two_letters = last_entry.first_two_letters
-
-            self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
-
-            self.account_id = f"{self.prefix}-{rle}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
-        else:
-            self.account_id = f"{self.prefix}-{rle}-AA00A00"
+                self.account_id = f"{self.prefix}-{rle}-AA00A00"
+        except Exception as e:
+            print(e)
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
@@ -142,7 +144,7 @@ class User(AbstractUser):
         else:
             # Call the original save method to save the instance
             super(User, self).save(*args, **kwargs)
-  
+
     # def save(self, *args, **kwargs):
     #     if not self.account_id:
     #         self.generate_id_number()
@@ -155,71 +157,70 @@ class User(AbstractUser):
 
 
 class GCCLocations(Main):
-    location = models.CharField(max_length=255, null=True, blank=True)
-    country_flag = models.ImageField(
-        upload_to="account/gcclocations/country_flag", null=True, blank=True)
+    country = models.CharField(max_length=255, default='Kuwait')
+    country_code = models.CharField(max_length=255, default='KW')
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.location if self.location else "No Location"
+        return self.country if self.country else "No Country"
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-
-        # Check if the request object and user attribute exist
-        if request and hasattr(request, 'user') and isinstance(request.user, User):
-            user = request.user
-        else:
-            # If not, set user to None or handle it as appropriate for your use case
-            user = None
-
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=user,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
-    def save(self, *args, **kwargs):
-        # Check if the instance already exists
-        if self.pk:
-            try:
-                # Get the data before the update
-                data_before = serialize('json', [GCCLocations.objects.get(pk=self.pk)])
-            except ObjectDoesNotExist:
-                # Instance doesn't exist yet, set data_before to None
-                data_before = None
-
-            # Call the original save method to save the instance
-            super(GCCLocations, self).save(*args, **kwargs)
-
-            # Get the data after the update
-            data_after = serialize('json', [self])
-
-            # Create a log entry
-            self.create_update_log(data_before, data_after)
-        else:
-            # Call the original save method to save the instance
-            super(GCCLocations, self).save(*args, **kwargs)
-
-        # Remove old image if it has changed
-        try:
-            this_instance = GCCLocations.objects.get(id=self.id)
-            old_image = this_instance.country_flag
-        except GCCLocations.DoesNotExist:
-            old_image = None
-
-        if old_image and self.country_flag and old_image != self.country_flag:
-            remove_file(old_image)
-
-    # delete country_flag
-    def delete(self, *args, **kwargs):
-        data_before = serialize('json', [self])  # Capture data before deletion
-        if self.country_flag:
-            remove_file(self.country_flag)
-        super(GCCLocations, self).delete(*args, **kwargs)
-        self.create_update_log(data_before, None)
+    # def create_update_log(self, data_before, data_after):
+    #     request = get_current_request()
+    #
+    #     # Check if the request object and user attribute exist
+    #     if request and hasattr(request, 'user') and isinstance(request.user, User):
+    #         user = request.user
+    #     else:
+    #         # If not, set user to None or handle it as appropriate for your use case
+    #         user = None
+    #
+    #     ModelUpdateLog.objects.create(
+    #         model_name=self.__class__.__name__,
+    #         user=user,
+    #         timestamp=timezone.now(),
+    #         data_before=data_before,
+    #         data_after=data_after
+    #     )
+    #
+    # def save(self, *args, **kwargs):
+    #     # Check if the instance already exists
+    #     if self.pk:
+    #         try:
+    #             # Get the data before the update
+    #             data_before = serialize('json', [GCCLocations.objects.get(pk=self.pk)])
+    #         except ObjectDoesNotExist:
+    #             # Instance doesn't exist yet, set data_before to None
+    #             data_before = None
+    #
+    #         # Call the original save method to save the instance
+    #         super(GCCLocations, self).save(*args, **kwargs)
+    #
+    #         # Get the data after the update
+    #         data_after = serialize('json', [self])
+    #
+    #         # Create a log entry
+    #         self.create_update_log(data_before, data_after)
+    #     else:
+    #         # Call the original save method to save the instance
+    #         super(GCCLocations, self).save(*args, **kwargs)
+    #
+    #     # Remove old image if it has changed
+    #     try:
+    #         this_instance = GCCLocations.objects.get(id=self.id)
+    #         old_image = this_instance.country_flag
+    #     except GCCLocations.DoesNotExist:
+    #         old_image = None
+    #
+    #     if old_image and self.country_flag and old_image != self.country_flag:
+    #         remove_file(old_image)
+    #
+    # # delete country_flag
+    # def delete(self, *args, **kwargs):
+    #     data_before = serialize('json', [self])  # Capture data before deletion
+    #     if self.country_flag:
+    #         remove_file(self.country_flag)
+    #     super(GCCLocations, self).delete(*args, **kwargs)
+    #     self.create_update_log(data_before, None)
 
 
 class ProfileExtra(Main):
