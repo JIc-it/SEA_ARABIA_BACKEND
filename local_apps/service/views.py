@@ -1318,7 +1318,11 @@ class PackageCountsAPIView(APIView):
 
         return Response(data)
 
-
+class PackageView(generics.RetrieveAPIView):
+    queryset = Package.objects.all()
+    serializer_class = PackageSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PackageFilter
 
 # class UpdateAvailabilityView(generics.UpdateAPIView):
 #     serializer_class = ServiceAvailabilitySerializer
