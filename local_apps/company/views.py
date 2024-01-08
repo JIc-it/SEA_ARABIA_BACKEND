@@ -496,8 +496,11 @@ class ProposalCreate(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # Serialize the data before the Proposal creation
-            value_before = serialize('json', [Proposal()])
+            # Get the Offer instance before the creation
+            proposal_before_creation = Proposal()  # Create an empty Offer instance
+
+            # Serialize the data before the creation
+            value_before = serialize('json', [proposal_before_creation])
 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -583,8 +586,11 @@ class NegotiationCreate(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # Serialize the data before the Negotiation creation
-            value_before = serialize('json', [Negotiation()])
+            # Get the Offer instance before the creation
+            negotiation_before_creation = SiteVisit()  # Create an empty Offer instance
+
+            # Serialize the data before the creation
+            value_before = serialize('json', [negotiation_before_creation])
 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -703,8 +709,11 @@ class MOUorCharterCreate(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # Serialize the data before the MOUorCharter creation
-            value_before = serialize('json', [MOUorCharter()])
+            # Get the Offer instance before the creation
+            mou_charter_before_creation = SiteVisit()  # Create an empty Offer instance
+
+            # Serialize the data before the creation
+            value_before = serialize('json', [mou_charter_before_creation])
 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
