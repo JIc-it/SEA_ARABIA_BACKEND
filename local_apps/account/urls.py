@@ -72,4 +72,7 @@ urlpatterns = [
     path('gcc-locations', GCCLocationsAPIView.as_view(), name='gcc-locations'),
     path('notifications/', NotificationListView.as_view(), name='notification-list'),
     path('notifications/<int:pk>/', NotificationUpdateView.as_view(), name='notification-update'),
+
+    path('notifications/', NotificationListView.as_view(), name='notification-list'),
+    path('notifications/<uuid:pk>/', NotificationUpdateView.as_view(), name='notification-update'),
 ]

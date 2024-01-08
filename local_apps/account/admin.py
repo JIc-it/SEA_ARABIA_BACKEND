@@ -85,3 +85,8 @@ class GCCLocationAdmin(admin.ModelAdmin):
     list_display = ["country", "country_code", "is_active", "created_at", "updated_at"]
     list_filter = ["created_at", "updated_at"]
     search_fields = ["country", "country_code", ]
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ["is_admin", "user", "created_at"]
