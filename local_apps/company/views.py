@@ -496,11 +496,8 @@ class ProposalCreate(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # Get the Offer instance before the creation
-            proposal_before_creation = Proposal()  # Create an empty Offer instance
-
-            # Serialize the data before the creation
-            value_before = serialize('json', [proposal_before_creation])
+            # Serialize the data before the Proposal creation
+            value_before = serialize('json', [Proposal()])
 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -827,20 +824,20 @@ class MOUorCharterView(generics.RetrieveAPIView):
 class OnboardVendor(generics.UpdateAPIView):
     ''' view for onboarding and offloading the vendor based on the status '''
 
-    queryset = Company.objects.filter(is_onboard=False)
+    queryset = Company.objects.all()
     serializer_class = CompanyOnboardSerializer
 
     def update(self, request, *args, **kwargs):
         try:
-            # Get the Company instance before the update
-            company_before_update = self.get_object()
-
-            # Serialize the data before the update
-            value_before = serialize('json', [company_before_update])
-
             company_id = kwargs.get('pk', None)
             onboard_status = request.data.get('status', None)
+
+            # Get the initial Company instance
             company_instance = get_object_or_404(Company, id=company_id)
+
+            # Serialize the data before the update
+            value_before = serialize('json', [company_instance])
+
             company_instance.is_onboard = onboard_status
             company_instance.save()
 
@@ -867,7 +864,7 @@ class OnboardVendor(generics.UpdateAPIView):
                 value_after=value_after
             )
 
-            serializer_data = CompanyOnboardSerializer(self.request.data)
+            serializer_data = CompanyOnboardSerializer(company_after_update)
             return Response(serializer_data.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
