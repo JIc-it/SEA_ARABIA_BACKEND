@@ -1,10 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import serialize
 from django.db import models
-from django.utils import timezone
-
-from local_apps.api_report.middleware import get_current_request
-from local_apps.api_report.models import ModelUpdateLog
 from local_apps.company.models import Company
 from local_apps.core.models import Main
 from django.conf import settings
@@ -12,6 +8,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from local_apps.main.models import Category, SubCategory
 from utils.file_handle import remove_file
 from utils.id_handle import increment_one_letter, increment_two_digits, increment_two_letters
+from utils.model_logs import create_update_log
 
 
 def default_false_time_slot():
@@ -103,17 +100,6 @@ class Destination(Main):
     def __str__(self):
         return self.name
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -132,7 +118,7 @@ class Destination(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(Destination, self).save(*args, **kwargs)
@@ -149,17 +135,6 @@ class ProfitMethod(Main):
 
     def __str__(self):
         return self.name
-
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -179,7 +154,7 @@ class ProfitMethod(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(ProfitMethod, self).save(*args, **kwargs)
@@ -197,17 +172,6 @@ class PriceType(Main):
 
     def __str__(self):
         return self.name
-
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -227,7 +191,7 @@ class PriceType(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(PriceType, self).save(*args, **kwargs)
@@ -244,17 +208,6 @@ class Amenity(Main):
 
     def __str__(self):
         return self.name
-
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -274,7 +227,7 @@ class Amenity(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(Amenity, self).save(*args, **kwargs)
@@ -296,7 +249,7 @@ class Amenity(Main):
 
         super(Amenity, self).delete(*args, **kwargs)
         # Create a log entry after deletion
-        self.create_update_log(data_before, None)
+        create_update_log(self, data_before, None)
 
     class Meta:
         ordering = ["-created_at", "-updated_at"]
@@ -389,17 +342,6 @@ class Service(Main):
         else:
             self.service_id = f"{self.prefix}-AA00A00"
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         if not self.service_id:
             self.generate_id_number()
@@ -420,7 +362,7 @@ class Service(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(Service, self).save(*args, **kwargs)
@@ -455,17 +397,10 @@ class Price(Main):
         max_length=128, choices=DATE_CHOICES, default='', blank=True, null=True)
 
     def __str__(self):
-        return self.service.name
-
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
+        return (
+            self.service.name
+            if self.service and self.service.name
+            else "No service name"
         )
 
     def save(self, *args, **kwargs):
@@ -486,7 +421,7 @@ class Price(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(Price, self).save(*args, **kwargs)
@@ -517,17 +452,6 @@ class ServiceImage(Main):
             else "No service name"
         )
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -546,7 +470,7 @@ class ServiceImage(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(ServiceImage, self).save(*args, **kwargs)
@@ -568,7 +492,7 @@ class ServiceImage(Main):
 
         super(ServiceImage, self).delete(*args, **kwargs)
         # Create a log entry after deletion
-        self.create_update_log(data_before, None)
+        create_update_log(self, data_before, None)
 
 
 class ServiceReview(Main):
@@ -588,17 +512,6 @@ class ServiceReview(Main):
     def __str__(self):
         return self.review_title if self.review_title else "No Title"
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -617,7 +530,7 @@ class ServiceReview(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(ServiceReview, self).save(*args, **kwargs)
@@ -647,17 +560,6 @@ class ServiceAvailability(Main):
             else "No service name"
         )
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            # user=request.user if request and hasattr(
-            #     request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -676,7 +578,7 @@ class ServiceAvailability(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             super(ServiceAvailability, self).save(*args, **kwargs)
 
@@ -745,17 +647,6 @@ class Package(Main):
         else:
             self.package_id = f"{self.prefix}-AA00A00"
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -774,7 +665,7 @@ class Package(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(Package, self).save(*args, **kwargs)
@@ -800,7 +691,7 @@ class Package(Main):
 
         super(Package, self).delete(*args, **kwargs)
         # Create a log entry after deletion
-        self.create_update_log(data_before, None)
+        create_update_log(self, data_before, None)
 
 
 class CapacityCount(Main):
@@ -809,17 +700,6 @@ class CapacityCount(Main):
                                 related_name='service_capacitycount_service')
     package = models.ForeignKey(Package, blank=True, null=True, on_delete=models.SET_NULL,
                                 related_name='service_capacitycount_package')
-
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -839,7 +719,7 @@ class CapacityCount(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(CapacityCount, self).save(*args, **kwargs)

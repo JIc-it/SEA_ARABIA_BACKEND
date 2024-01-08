@@ -7,6 +7,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from django.shortcuts import get_object_or_404
 from django.http import Http404
+from rest_framework.parsers import MultiPartParser
 
 from utils.action_logs import create_log
 from .models import *
@@ -27,7 +28,7 @@ class ServiceTagList(generics.ListAPIView):
 
 # Onboard status view
 
-# @method_decorator(cache_page(60 * 15), name='dispatch') 
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class OnboardStatusList(generics.ListAPIView):
     queryset = OnboardStatus.objects.all().order_by("order")
     serializer_class = OnboardStatusSerializer
@@ -48,7 +49,9 @@ class CompanyList(generics.ListAPIView):
     ]
     filterset_class = CompanyFilter
 
-# @method_decorator(cache_page(60 * 15), name='dispatch') 
+# @method_decorator(cache_page(60 * 15), name='dispatch')
+
+
 class CompanyListCms(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Company.objects.all()
@@ -339,6 +342,14 @@ class SiteVisitCreate(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = SiteVisit.objects.all()
     serializer_class = SiteVisitSerializer
+    parser_classes = [MultiPartParser,]
+
+    # def perform_create(self, serializer):
+    #     instance = serializer.save()
+    #     qualifications = self.request.data.get("qualifications",None)
+    #     if qualifications:
+    #         instance.qualifications.set(qualifications)
+    #     return super().perform_create(serializer)
 
     def create(self, request, *args, **kwargs):
         try:
@@ -347,38 +358,52 @@ class SiteVisitCreate(generics.CreateAPIView):
 
             # Serialize the data before the creation
             value_before = serialize('json', [site_visit_before_creation])
+            qualifications = request.data.get("qualifications", None)
+            attachment = request.FILES.get('attachment')
+            company = request.data.get('company', None)
+            title = request.data.get('title', None)
+            note = request.data.get('note', None)
 
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            # taking qualifications list from the validated data
-            qualifications = serializer.validated_data.pop('qualifications')
-            instance = serializer.save()
-            if qualifications:
-                for qualification in qualifications:
-                    instance.qualifications.add(qualification)
+            if company:
+                company_instance = Company.objects.get(id=company)
 
-            # Serialize the data after the SiteVisit creation
-            value_after = serialize('json', [instance])
+                site_visit_instance = SiteVisit.objects.create(
+                    company=company_instance, attachment=attachment, title=title, note=note)
 
-            # Log the SiteVisit creation action
-            log_user = self.request.user if self.request.user else 'Unknown User'
-            log_title = "{model} entry {action} by {user}".format(
-                model="SiteVisit",
-                action='Created',
-                user=log_user
-            )
+                if qualifications:
 
-            create_log(
-                user=self.request.user,
-                model_name='SiteVisit',
-                action_value='Create',
-                title=log_title,
-                value_before=value_before,
-                value_after=value_after
-            )
-            serialized_data = serializer.data
-            serialized_data["qualifications"] = qualifications
-            return Response(serialized_data, status=status.HTTP_201_CREATED)
+                    qualifications_list = qualifications.split(',')
+                    for qualification in qualifications_list:
+                        print(qualification, ',,')
+                        site_visit_instance.qualifications.add(qualification)
+                        # site_visit_instance.qualifications.set(qualifications_list)
+
+                serializer = SiteVisitSerializer(site_visit_instance)
+
+                # Serialize the data after the SiteVisit creation
+                value_after = serialize('json', [site_visit_instance])
+
+                # Log the SiteVisit creation action
+                log_user = self.request.user if self.request.user else 'Unknown User'
+                log_title = "{model} entry {action} by {user}".format(
+                    model="SiteVisit",
+                    action='Created',
+                    user=log_user
+                )
+
+                create_log(
+                    user=self.request.user,
+                    model_name='SiteVisit',
+                    action_value='Create',
+                    title=log_title,
+                    value_before=value_before,
+                    value_after=value_after
+                )
+                serialized_data = serializer.data
+                serialized_data['qualifications'] = qualifications_list
+                return Response(serialized_data, status=status.HTTP_201_CREATED)
+            else:
+                return Response("Company id not provided", status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 

@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter
 from rest_framework.views import APIView
-
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Case, Count, Sum, IntegerField, When
 from django.db.models.functions import Coalesce
@@ -14,10 +13,11 @@ from django.http import HttpResponse
 import requests
 from . serializers import*
 from .filters import*
+from .resources import*
 # from django.utils.decorators import method_decorator
 # from django.views.decorators.cache import cache_page
 
-today = datetime.date.today()
+today = datetime.now().date()
 
 # vendor Side List
 
@@ -36,24 +36,11 @@ class AdminBookingListView(generics.ListAPIView):
     ]
     filterset_class = BookingFilter
 
-
+#Individual Booking For Admin CMS
 class AdminIndividualBookingView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     lookup_field = 'pk'
-
-# class AdminIndividualBookingView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request, booking_id):
-#         try:
-#             booking = Booking.objects.filter(id=booking_id)
-#             serializer = BookingIndividualViewSerializer(booking)
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         except Booking.DoesNotExist:
-#             return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
-#         except Exception as e:
-#             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # @method_decorator(cache_page(60 * 15), name='dispatch')

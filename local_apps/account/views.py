@@ -112,6 +112,7 @@ class GoogleAuth(APIView):
                     raise Exception('Invalid gmail address found')
             else:
                 raise Exception('Code must be provided')
+
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -209,7 +210,7 @@ class UserCreate(generics.CreateAPIView):
             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
 
 
-# @method_decorator(cache_page(60 * 15), name='dispatch')
+
 class UserList(generics.ListAPIView):
     """ list all users """
 
@@ -220,7 +221,7 @@ class UserList(generics.ListAPIView):
     search_fields = [
         "first_name",
         "last_name",
-        "profileextra__location__location",
+        "profileextra__location__country",
         "email",
         "mobile"
     ]
@@ -279,7 +280,7 @@ class ProfileExtraCreate(generics.CreateAPIView):
 
 # cms views
 
-# @method_decorator(cache_page(60 * 15), name='dispatch')
+
 class VendorList(generics.ListAPIView):
     """ view for listing the vendor in cms """
 
@@ -291,13 +292,13 @@ class VendorList(generics.ListAPIView):
         "email",
         "first_name",
         "last_name",
-        "profileextra__location__location",
+        "profileextra__location__country",
     ]
     ordering_fields = [
         "first_name",
         "last_name",
         "created_at",
-        "profileextra__location__location",
+        "profileextra__location__country",
     ]
     filterset_class = VendorFilter
 
@@ -925,9 +926,6 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = UserUpdatedSerializer
     permission_classes = [IsAuthenticated]
 
-    # def get_object(self):
-    #     return self.request.user
-    # FIXME::    get object code commented so that user can be taken from the user id passed
 
     def update(self, request, *args, **kwargs):
         try:
@@ -936,13 +934,14 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
             mobile = request.data.get('mobile', None)
             first_name = request.data.get('first_name', None)
             last_name = request.data.get('last_name', None)
-            profile_extra = request.data.get('profileextra', {})
-            location = profile_extra.get('location', None)
-            dob = profile_extra.get('dob', None)
-            gender = profile_extra.get('gender', None)
+            profile_extra_data = request.data.get('profileextra', {})
+            location_id = profile_extra_data.get('location', None)
+            dob = profile_extra_data.get('dob', None)
+            gender = profile_extra_data.get('gender', None)
+            image = request.data.get('image', None)  # Get the image from request data
+
             user_instance = get_object_or_404(User, id=user_id)
-            profile_instance, _ = ProfileExtra.objects.get_or_create(
-                user=user_instance)
+            profile_instance, _ = ProfileExtra.objects.get_or_create(user=user_instance)
 
             if email:
                 user_instance.email = email
@@ -952,17 +951,16 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
                 user_instance.first_name = first_name
             if last_name:
                 user_instance.last_name = last_name
-
-            if location:
-                location_instance = GCCLocations.objects.get(id=location)
+            if location_id:
+                location_instance = GCCLocations.objects.get(id=location_id)
                 profile_instance.location = location_instance
-
             if dob:
                 dob_date = datetime.datetime.strptime(dob, "%Y-%m-%d").date()
                 profile_instance.dob = dob_date
-
             if gender:
                 profile_instance.gender = gender.title()
+            if image:
+                profile_instance.image = image
 
             user_instance.save()
             profile_instance.save()
@@ -971,7 +969,6 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
-
 
 class GuestUserList(generics.ListAPIView):
     ''' guest user listing for cms '''

@@ -1,17 +1,12 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import serialize
 from django.db import models
-from django.utils import timezone
-
-from local_apps.api_report.middleware import get_current_request
-from local_apps.api_report.models import ModelUpdateLog
 from local_apps.core.models import Main
 from django.conf import settings
 from utils.file_handle import remove_file
 from local_apps.main.models import Category
-from django.core.exceptions import ValidationError
 from utils.id_handle import increment_two_digits, increment_two_letters, increment_one_letter
-
+from utils.model_logs import create_update_log
 
 COMPANY_STATUS = (
     ("New Lead", "New Lead"),
@@ -31,17 +26,6 @@ class OnboardStatus(Main):
     def __str__(self):
         return self.name
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -60,7 +44,7 @@ class OnboardStatus(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(OnboardStatus, self).save(*args, **kwargs)
@@ -76,17 +60,6 @@ class ServiceTag(Main):
 
     def __str__(self):
         return self.name
-
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -106,7 +79,7 @@ class ServiceTag(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(ServiceTag, self).save(*args, **kwargs)
@@ -166,17 +139,6 @@ class Company(Main):
     def __str__(self):
         return self.name if self.name else "No Company Name"
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def generate_id_number(self):
         last_entry = Company.objects.order_by('-created_at').first()
         if last_entry:
@@ -227,7 +189,7 @@ class Company(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(Company, self).save(*args, **kwargs)
@@ -238,17 +200,6 @@ class MiscellaneousType(Main):
 
     def __str__(self):
         return self.name
-
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -268,7 +219,7 @@ class MiscellaneousType(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(MiscellaneousType, self).save(*args, **kwargs)
@@ -299,15 +250,6 @@ class Miscellaneous(Main):
     def __str__(self):
         return self.title if self.title else "No Title"
 
-    def create_update_log(self, data_before, data_after):
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=self.user,  # Assuming there is a user field in your Miscellaneous model
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -322,7 +264,7 @@ class Miscellaneous(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             super(Miscellaneous, self).save(*args, **kwargs)
 
@@ -344,7 +286,7 @@ class Miscellaneous(Main):
         super(Miscellaneous, self).delete(*args, **kwargs)
 
         # Create a log entry after deletion
-        self.create_update_log(data_before, None)
+        create_update_log(self, data_before, None)
 
 
 class Qualifications(Main):
@@ -361,17 +303,6 @@ class Qualifications(Main):
 
     def __str__(self):
         return self.name if self.name else "No Name"
-
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -391,7 +322,7 @@ class Qualifications(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             # Call the original save method to save the instance
             super(Qualifications, self).save(*args, **kwargs)
@@ -413,7 +344,7 @@ class Qualifications(Main):
 
         super(Qualifications, self).delete(*args, **kwargs)
         # Create a log entry after deletion
-        self.create_update_log(data_before, None)
+        create_update_log(self, data_before, None)
 
 
 class SiteVisit(Main):
@@ -437,17 +368,6 @@ class SiteVisit(Main):
     def __str__(self):
         return self.title if self.title else "No Title"
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -464,7 +384,7 @@ class SiteVisit(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             super(SiteVisit, self).save(*args, **kwargs)
 
@@ -486,7 +406,7 @@ class SiteVisit(Main):
         super(SiteVisit, self).delete(*args, **kwargs)
 
         # Create a log entry after deletion
-        self.create_update_log(data_before, None)
+        create_update_log(self, data_before, None)
 
 
 class Proposal(Main):
@@ -508,17 +428,6 @@ class Proposal(Main):
     def __str__(self):
         return self.title if self.title else "No Title"
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -535,7 +444,7 @@ class Proposal(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             super(Proposal, self).save(*args, **kwargs)
 
@@ -557,7 +466,7 @@ class Proposal(Main):
         super(Proposal, self).delete(*args, **kwargs)
 
         # Create a log entry after deletion
-        self.create_update_log(data_before, None)
+        create_update_log(self, data_before, None)
 
 
 class Negotiation(Main):
@@ -579,17 +488,6 @@ class Negotiation(Main):
     def __str__(self):
         return self.title if self.title else "No Title"
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -606,7 +504,7 @@ class Negotiation(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             super(Negotiation, self).save(*args, **kwargs)
 
@@ -628,7 +526,7 @@ class Negotiation(Main):
         super(Negotiation, self).delete(*args, **kwargs)
 
         # Create a log entry after deletion
-        self.create_update_log(data_before, None)
+        create_update_log(self, data_before, None)
 
 
 class MOUorCharter(Main):
@@ -650,17 +548,6 @@ class MOUorCharter(Main):
     def __str__(self):
         return self.title if self.title else "No Title"
 
-    def create_update_log(self, data_before, data_after):
-        request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
-
     def save(self, *args, **kwargs):
         # Check if the instance already exists
         if self.pk:
@@ -677,7 +564,7 @@ class MOUorCharter(Main):
             data_after = serialize('json', [self])
 
             # Create a log entry
-            self.create_update_log(data_before, data_after)
+            create_update_log(self, data_before, data_after)
         else:
             super(MOUorCharter, self).save(*args, **kwargs)
 
@@ -699,4 +586,4 @@ class MOUorCharter(Main):
         super(MOUorCharter, self).delete(*args, **kwargs)
 
         # Create a log entry after deletion
-        self.create_update_log(data_before, None)
+        create_update_log(self, data_before, None)
