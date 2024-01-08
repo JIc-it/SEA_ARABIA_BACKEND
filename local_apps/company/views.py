@@ -371,7 +371,6 @@ class SiteVisitCreate(generics.CreateAPIView):
                     company=company_instance, attachment=attachment, title=title, note=note)
 
                 if qualifications:
-
                     qualifications_list = qualifications.split(',')
                     for qualification in qualifications_list:
                         print(qualification, ',,')

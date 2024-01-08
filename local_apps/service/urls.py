@@ -59,6 +59,9 @@ urlpatterns = [
     # service availability create
     path("availability-create/", ServiceAvailabilityCreate.as_view(), name="availability-create"),
 
+    # service availability retrieve
+    path("availability-retrieve/<str:date>/<uuid:service>/", ServiceAvailabilityRetrieveView.as_view(), name="availability-retrieve"),
+
     # service listing for app side
     path("service-list-app", ServiceListApp.as_view(), name="service-list-app"),
     path("export-service-list", ExportServiceCSVView.as_view(), name="export-service-list"),
