@@ -29,6 +29,7 @@ urlpatterns = [
     # Service Image urls
     path("service-image-update/<uuid:pk>", ServiceImageUpdate.as_view(), name="service-image-update"),
     path("service-image/create", ServiceImageCreate.as_view(), name="service-image-create"),
+    path("service-multiple-image/create", ServiceMultipleImageCreate.as_view(), name="service-multiple-image-create"),
     path("service-image/status/<uuid:pk>", ServiceImageStatus.as_view(), name="service-image-status"),
     path("service-image/delete/<uuid:pk>", ServiceImageDelete.as_view(), name="service-image-status"),
 
@@ -60,7 +61,8 @@ urlpatterns = [
     path("availability-create/", ServiceAvailabilityCreate.as_view(), name="availability-create"),
 
     # service availability retrieve
-    path("availability-retrieve/<str:date>/<uuid:service>/", ServiceAvailabilityRetrieveView.as_view(), name="availability-retrieve"),
+    path("availability-retrieve/<str:date>/<uuid:service>/", ServiceAvailabilityRetrieveView.as_view(),
+         name="availability-retrieve"),
 
     # service listing for app side
     path("service-list-app", ServiceListApp.as_view(), name="service-list-app"),

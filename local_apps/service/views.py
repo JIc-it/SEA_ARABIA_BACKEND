@@ -1,29 +1,27 @@
 from django.http import HttpResponse
+from django.http import JsonResponse
+from django.http import Http404
+from django.db.models import Case, Count, Q, Sum, IntegerField, When
+from django.db.models.functions import Coalesce
+from django.shortcuts import get_object_or_404
+# from django.utils.decorators import method_decorator
+# from django.views.decorators.cache import cache_page
 from rest_framework import generics
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.parsers import MultiPartParser, FormParser
-from django.http import JsonResponse
-from django.http import Http404
 from rest_framework.views import APIView
-from django.db.models import Case, Count, Q, Sum, IntegerField, When
-from django.db.models.functions import Coalesce
-from utils.action_logs import create_log
-from .serializers import *
-from .filters import *
-from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from local_apps.main.serializers import CategorySerializer, SubCategorySerializer
-from datetime import datetime, timedelta
 from local_apps.booking.models import Booking
 from local_apps.booking.serializers import BookingSerializer
-
-
-# from django.utils.decorators import method_decorator
-# from django.views.decorators.cache import cache_page
+from utils.action_logs import create_log
+from datetime import datetime, timedelta
+from .serializers import *
+from .filters import *
 
 
 def check_field_changes(service_instance, temp_values):
@@ -41,27 +39,6 @@ def check_field_changes(service_instance, temp_values):
         temp_values[field] != updated_values[field] for field in updated_values)
 
     return changed_fields
-
-
-# vendorPrice Type Views
-
-
-# class VendorPriceTypeList(generics.ListAPIView):
-#     # permission_classes = [IsAuthenticated]
-#     queryset = VendorPriceType.objects.all()
-#     serializer_class = VendorPriceTypeSerializer
-
-
-# class VendorPriceTypeCreate(generics.CreateAPIView):
-#     # permission_classes = [IsAuthenticated]
-#     queryset = VendorPriceType.objects.all()
-#     serializer_class = VendorPriceTypeSerializer
-
-
-# class VendorPriceTypeUpdate(generics.UpdateAPIView):
-#     # permission_classes = [IsAuthenticated]
-#     queryset = VendorPriceType.objects.all()
-#     serializer_class = VendorPriceTypeSerializer
 
 
 # Destination Type Views
@@ -548,6 +525,62 @@ class ServiceImageUpdate(generics.UpdateAPIView):
 class ServiceImageCreate(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ServiceImageSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            image_data = request.FILES.get('image')
+            service_id = request.data.get('service')
+            try:
+                service = Service.objects.get(id=service_id)
+            except Service.DoesNotExist:
+                return Response({'error': 'Service not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+            service_image = ServiceImage.objects.create(service=service, image=image_data)
+            response_data = {
+                'id': service_image.id,
+                'image': service_image.image.url,
+                'service': service_image.service.id,
+            }
+
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(f"Error {str(e)}", status=status.HTTP_400_BAD_REQUEST)
+
+
+class ServiceMultipleImageCreate(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ServiceImageSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            # Get service ID from the request data
+            service_id = request.data.get('service')
+
+            # Check if the service exists
+            try:
+                service = Service.objects.get(id=service_id)
+            except Service.DoesNotExist:
+                return Response({'error': 'Service not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Get a list of images from the request data
+            images_data = request.FILES.getlist('image')
+
+            # List to store created ServiceImage instances
+            created_images = []
+
+            # Iterate over each image and create ServiceImage instance
+            for image_data in images_data:
+                service_image = ServiceImage.objects.create(service=service, image=image_data)
+                created_images.append({
+                    'id': service_image.id,
+                    'image': service_image.image.url,
+                    'service': service_image.service.id,
+                })
+
+            return Response(created_images, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
 class ServiceImageStatus(generics.UpdateAPIView):

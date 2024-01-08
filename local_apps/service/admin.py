@@ -19,7 +19,7 @@ class AmenityAdmin(admin.ModelAdmin):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ["service_id","name","created_at","updated_at"]
+    list_display = ["service_id", "name", "created_at", "updated_at"]
     pass
 
 
@@ -46,6 +46,7 @@ class ServiceAvailabilityAdmin(admin.ModelAdmin):
 @admin.register(Package)
 class PackageAdmin(admin.ModelAdmin):
     pass
+
 
 @admin.register(PriceType)
 class PriceTypeAdmin(admin.ModelAdmin):
