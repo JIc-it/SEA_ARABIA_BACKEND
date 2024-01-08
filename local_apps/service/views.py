@@ -975,6 +975,31 @@ class UpdateAvailabilityView(generics.UpdateAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ListAvailabilityView(generics.ListAPIView):
+    serializer_class = ServiceAvailabilitySerializer
+
+    def get_queryset(self):
+        try:
+            service_id = self.kwargs['service']
+            date_str = self.kwargs['date']
+
+            # Retrieve the Service instance based on the provided UUID
+            service_instance = Service.objects.get(id=service_id)
+
+            try:
+                date_obj = datetime.strptime(date_str, "%d-%m-%Y").date()
+            except ValueError:
+                return Response({"error": f"Invalid date format for {date_str}. Use DD-MM-YYYY."},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            # Get the service availabilities for the specified service and date
+            queryset = ServiceAvailability.objects.filter(service=service_instance, date=date_obj)
+            return queryset
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 # ?---------------------------App views----------------------------------------#
 
 

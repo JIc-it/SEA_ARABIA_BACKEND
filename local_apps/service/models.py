@@ -640,15 +640,19 @@ class ServiceAvailability(Main):
         verbose_name = "Service Availability"
         verbose_name_plural = "Service Availabilities"
 
-    # def __str__(self):
-    #     return self.service.name
+    def __str__(self):
+        return (
+            self.service.name
+            if self.service and self.service.name
+            else "No service name"
+        )
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
         ModelUpdateLog.objects.create(
             model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
+            # user=request.user if request and hasattr(
+            #     request, 'user') else None,
             timestamp=timezone.now(),
             data_before=data_before,
             data_after=data_after
