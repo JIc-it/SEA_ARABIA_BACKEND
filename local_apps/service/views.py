@@ -986,6 +986,19 @@ class UpdateAvailabilityView(generics.RetrieveUpdateAPIView):
 
 # ?---------------------------App views----------------------------------------#
 
+class ServiceAvailabilityRetrieveView(generics.RetrieveAPIView):
+    queryset = ServiceAvailability.objects.all()
+    serializer_class = ServiceAvailabilitySerializer
+
+    def get_object(self):
+        try:
+            service_id = self.kwargs['service']
+            date_str = self.kwargs.get('date')
+            date_obj = datetime.strptime(date_str, "%d-%m-%Y").date()
+            return ServiceAvailability.objects.get(service__id=service_id, date=date_obj)
+        except (ServiceAvailability.DoesNotExist, ValueError):
+            raise NotFound("No Service Availability Found")
+
 
 class ServiceTopSuggestion(generics.ListAPIView):
     """ Views for top suggestions & top activities """
