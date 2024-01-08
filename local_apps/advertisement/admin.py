@@ -1,10 +1,9 @@
 from django.contrib import admin
 from .models import *
 
-# Register your models here.
-
 
 @admin.register(Advertisement)
 class AdvertisementAdmin(admin.ModelAdmin):
-    list_display = ['name','created_at','updated_at']
-    pass
+    list_display = ["name", "is_active,", "created_at", "updated_at"]
+    filter = ["is_active,", "created_at", "updated_at"]
+    search_fields = ["name"]

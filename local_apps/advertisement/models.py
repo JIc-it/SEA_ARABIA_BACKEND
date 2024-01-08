@@ -1,7 +1,7 @@
+from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import serialize
-from django.db import models
 from local_apps.api_report.middleware import get_current_request
 from local_apps.api_report.models import ModelUpdateLog
 from local_apps.main.models import Main
@@ -10,8 +10,8 @@ from utils.file_handle import remove_file
 
 class Advertisement(Main):
     is_active = models.BooleanField(default=False)
-    name = models.CharField(max_length=255,blank=True,null=True)
-    image = models.ImageField(upload_to="advertisement/advertisement/image",null=True,blank=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    image = models.ImageField(upload_to="advertisement/advertisement/image", null=True, blank=True)
 
     def __str__(self):
         return self.name if self.name else "No Advertisement"
@@ -66,6 +66,3 @@ class Advertisement(Main):
         super(Advertisement, self).delete(*args, **kwargs)
         # Create a log entry after deletion
         self.create_update_log(data_before, None)
-
-
-
