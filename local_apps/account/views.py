@@ -8,8 +8,8 @@ from urllib.parse import unquote, quote
 from utils.action_logs import create_log
 from datetime import datetime
 from django.core.serializers import serialize
-from django.views.decorators.cache import cache_page
-from django.utils.decorators import method_decorator
+# from django.views.decorators.cache import cache_page
+# from django.utils.decorators import method_decorator
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -41,20 +41,16 @@ scope_quoted = quote(" ".join(scopes))
 def generate_random_password(length=12):
     # Define the characters to include in the password
     characters = string.ascii_letters + string.digits + string.punctuation
-
     # Use secrets.choice to select random characters for the password
     password = ''.join(secrets.choice(characters) for _ in range(length))
-
     return password
 
 
 def validate_gmail(email):
     # Define the regular expression for a Gmail email address
     pattern = re.compile(r'^[a-zA-Z0-9_.+-]+@gmail\.com$')
-
     # Use the match() method to check if the email matches the pattern
     match = pattern.match(email)
-
     # Return True if the email is a valid Gmail address, otherwise False
     return bool(match)
 
@@ -116,7 +112,6 @@ class GoogleAuth(APIView):
                     raise Exception('Invalid gmail address found')
             else:
                 raise Exception('Code must be provided')
-
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -214,7 +209,7 @@ class UserCreate(generics.CreateAPIView):
             return Response(f'Error {str(e)}', status=status.HTTP_400_BAD_REQUEST)
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class UserList(generics.ListAPIView):
     """ list all users """
 
@@ -284,7 +279,7 @@ class ProfileExtraCreate(generics.CreateAPIView):
 
 # cms views
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class VendorList(generics.ListAPIView):
     """ view for listing the vendor in cms """
 
