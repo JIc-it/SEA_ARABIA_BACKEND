@@ -1,25 +1,26 @@
+import requests
+import datetime
 from rest_framework import generics, status
-from .serializers import *
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.views import APIView
+
+from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Case, Count, Sum, IntegerField, When
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
-import datetime
-from .filters import *
-from .resources import BookingResource
 from django.http import HttpResponse
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
+import requests
+# from django.utils.decorators import method_decorator
+# from django.views.decorators.cache import cache_page
 
 today = datetime.date.today()
 
 # vendor Side List
 
-@method_decorator(cache_page(60 * 15), name='dispatch') 
+
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class AdminBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     queryset = Booking.objects.all()
@@ -35,9 +36,9 @@ class AdminBookingListView(generics.ListAPIView):
 
 
 class AdminIndividualBookingView(generics.RetrieveUpdateDestroyAPIView):
-    queryset= Booking.objects.all()
-    serializer_class= BookingSerializer
-    lookup_field ='pk'
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+    lookup_field = 'pk'
 
 # class AdminIndividualBookingView(APIView):
 #     permission_classes = [IsAuthenticated]
@@ -52,7 +53,8 @@ class AdminIndividualBookingView(generics.RetrieveUpdateDestroyAPIView):
 #         except Exception as e:
 #             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@method_decorator(cache_page(60 * 15), name='dispatch') 
+
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class VendorBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
@@ -71,7 +73,8 @@ class VendorBookingListView(generics.ListAPIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@method_decorator(cache_page(60 * 15), name='dispatch') 
+
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class UserBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
@@ -89,8 +92,86 @@ class BookingCreateView(generics.CreateAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+    # def perform_create(self, serializer):
+
+    #     try:
+    #         booking_instance = serializer.save()
+    #         # payment initialization
+
+    #         api_key = settings.TAP_API_KEY
+    #         base_url = settings.TAP_BASE_URL
+    #         secret_key = settings.TAP_SECRET_KEY
+
+    #         total_amount = getattr(booking_instance, "price_total", 0)
+    #         user_first_name = getattr(
+    #             booking_instance.user, "first_name", "No First Name")
+    #         user_last_name = getattr(
+    #             booking_instance.user, "last_name", "No Last Name")
+    #         user_email = getattr(booking_instance.user,
+    #                              "email", "default_email")
+    #         user_mobile = getattr(booking_instance.user, "mobile", 0000000000)
+
+    #         url = base_url + "authorize/"
+    #         total_amount = booking_instance.price_total
+    #         payload = {
+    #             "amount": total_amount,
+    #             "currency": "KWD",
+    #             "metadata": {
+    #                 "udf1": "Sea Arabia TXN ID",
+    #                 "udf2": "Service Name",
+    #                 "udf3": "Service Category",
+    #             },
+    #             "customer": {
+    #                 "first_name": user_first_name,
+    #                 "middle_name": "",
+    #                 "last_name": user_last_name,
+    #                 "email": user_email,
+    #                 "phone": {
+    #                     "country_code": "+965",
+    #                     "number": user_mobile
+    #                 }
+    #             },
+    #             "merchant": {"id": "1234"},
+    #             "source": {"id": "src_all"},
+    #             "redirect": {"url": "http://your_website.com/redirecturl"}
+    #         }
+
+    #         headers = {
+    #             "accept": "application/json",
+    #             "content-type": "application/json",
+    #             "Authorization": "Bearer "+secret_key
+    #         }
+
+    #         response = requests.post(url, json=payload, headers=headers)
+
+    #         authorize_response = response.json()
+
+    #         # get the url for checkout from the json response
+
+    #         payment_url = authorize_response.get("transaction")['url']
+    #         print(payment_url, '<<<<<<')
+    #         tap_id = authorize_response.get("id", None)
+    #         payment_status = authorize_response.get("status", None)
+
+    #         payment_instance = Payment.objects.create(tap_pay_id=tap_id,
+    #                                                   initial_response=authorize_response, amount=total_amount, status=payment_status)
+
+    #         # booking_instance.payment = payment_instance
+    #         # booking_instance.save()
+
+    #         serializer = BookingSerializer(booking_instance)
+    #         serialized_data = dict(serializer.data)
+    #         print(serialized_data, '?>>>>>>>>>>>>')
+    #         serialized_data['payment_url'] = payment_url
+    #         return Response("serialized_data", status=status.HTTP_200_OK)
+    #     except Exception as e:
+    #         return Response(f"Error str(e)", status=status.HTTP_400_BAD_REQUEST)
+
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+
+    #     self.perform_create(serializer)
 
 
 class BookingView(generics.RetrieveAPIView):
@@ -193,7 +274,11 @@ class PaymentFinalization(generics.UpdateAPIView):
                     "accept": "application/json",
                     "Authorization": "Bearer "+settings.TAP_SECRET_KEY
                 }
-
+                response = requests.get(url, headers=headers)
+                final_response = response.json()
+                del final_response['redirect']
+                del final_response['post']
+                return Response(final_response, status=status.HTTP_200_OK)
             else:
                 return Response("Payment Id Required", status=status.HTTP_400_BAD_REQUEST)
 

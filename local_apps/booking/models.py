@@ -39,22 +39,26 @@ class Payment(Main):
         last_entry = Payment.objects.order_by('-created_at').first()
         if last_entry:
             if last_entry.last_two_numbers == 99:
-                self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+                self.last_one_letter = increment_one_letter(
+                    last_entry.last_one_letter)
             else:
                 self.last_one_letter = last_entry.last_one_letter
 
             if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
-                self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+                self.first_two_numbers = increment_two_digits(
+                    last_entry.first_two_numbers)
             else:
                 self.first_two_numbers = last_entry.first_two_numbers
 
             if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
                                                                                      'z'] and last_entry.last_two_numbers == 99:
-                self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
+                self.first_two_letters = increment_two_letters(
+                    last_entry.first_two_letters)
             else:
                 self.first_two_letters = last_entry.first_two_letters
 
-            self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
+            self.last_two_numbers = increment_two_digits(
+                last_entry.last_two_numbers)
 
             self.payment_id = f"{self.prefix}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
         else:
@@ -120,7 +124,8 @@ class Booking(Main):
     first_two_numbers = models.IntegerField(default=0)
     last_one_letter = models.CharField(max_length=1, default="A")
     last_two_numbers = models.IntegerField(default=0)
-    booking_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
+    booking_id = models.CharField(
+        max_length=255, unique=True, blank=True, null=True)
 
     # Mapping actual data
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
@@ -139,7 +144,8 @@ class Booking(Main):
                               related_name='booking_booking_price')
 
     # User / customer info
-    user_type = models.CharField(choices=USER_TYPE, default='Default', max_length=255, blank=True, null=True)
+    user_type = models.CharField(
+        choices=USER_TYPE, default='Default', max_length=255, blank=True, null=True)
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     phone_number = models.CharField(max_length=255, blank=True, null=True)
@@ -147,23 +153,32 @@ class Booking(Main):
 
     # Booking info
     destination = models.CharField(max_length=255, blank=True, null=True)
-    booking_for = models.CharField(choices=BOOKING_FOR_TYPE, default='Default', max_length=255, blank=True, null=True)
-    booking_item = models.CharField(choices=BOOKING_ITEM_TYPE, default='Default', max_length=255, blank=True, null=True)
+    booking_for = models.CharField(
+        choices=BOOKING_FOR_TYPE, default='Default', max_length=255, blank=True, null=True)
+    booking_item = models.CharField(
+        choices=BOOKING_ITEM_TYPE, default='Default', max_length=255, blank=True, null=True)
     starting_point = models.CharField(max_length=255, blank=True, null=True)
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
     slot_details = models.CharField(max_length=255, blank=True, null=True)
-    additional_hours = models.PositiveIntegerField(default=0, blank=True, null=True)
-    additional_hours_amount = models.PositiveIntegerField(default=0, blank=True, null=True)
-    number_of_people = models.PositiveIntegerField(default=1, blank=True, null=True)
-    booking_type = models.CharField(choices=BOOKING_CHOICE, default='Default', max_length=255, blank=True, null=True)
-    status = models.CharField(choices=BOOKING_STATUS, default='Default', max_length=255, blank=True, null=True)
+    additional_hours = models.PositiveIntegerField(
+        default=0, blank=True, null=True)
+    additional_hours_amount = models.PositiveIntegerField(
+        default=0, blank=True, null=True)
+    number_of_people = models.PositiveIntegerField(
+        default=1, blank=True, null=True)
+    booking_type = models.CharField(
+        choices=BOOKING_CHOICE, default='Default', max_length=255, blank=True, null=True)
+    status = models.CharField(
+        choices=BOOKING_STATUS, default='Default', max_length=255, blank=True, null=True)
 
     # Cancellation & refund
     cancellation_reason = models.TextField(blank=True, null=True)
     cancelled_by = models.JSONField(null=True, blank=True)
-    refund_status = models.CharField(choices=REFUND_STATUS, default='Default', max_length=255, blank=True, null=True)
-    refund_type = models.CharField(choices=REFUND_TYPE, default='Default', max_length=255, blank=True, null=True)
+    refund_status = models.CharField(
+        choices=REFUND_STATUS, default='Default', max_length=255, blank=True, null=True)
+    refund_type = models.CharField(
+        choices=REFUND_TYPE, default='Default', max_length=255, blank=True, null=True)
     refund_amount = models.PositiveIntegerField(blank=True, null=True)
     refund_details = models.TextField(blank=True, null=True)
 
@@ -185,155 +200,163 @@ class Booking(Main):
         verbose_name_plural = 'Bookings'
 
     def __str__(self):
-        return self.booking_id
+        return self.booking_id if self.booking_id else "No Booking Id"
 
     def generate_id_number(self):
         last_entry = Booking.objects.order_by('-created_at').first()
         if last_entry:
             if last_entry.last_two_numbers == 99:
-                self.last_one_letter = increment_one_letter(last_entry.last_one_letter)
+                self.last_one_letter = increment_one_letter(
+                    last_entry.last_one_letter)
             else:
                 self.last_one_letter = last_entry.last_one_letter
 
             if last_entry.last_one_letter in ['Z', 'z'] and last_entry.last_two_numbers == 99:
-                self.first_two_numbers = increment_two_digits(last_entry.first_two_numbers)
+                self.first_two_numbers = increment_two_digits(
+                    last_entry.first_two_numbers)
             else:
                 self.first_two_numbers = last_entry.first_two_numbers
 
             if last_entry.first_two_numbers == 99 and last_entry.last_one_letter in ['Z',
                                                                                      'z'] and last_entry.last_two_numbers == 99:
-                self.first_two_letters = increment_two_letters(last_entry.first_two_letters)
+                self.first_two_letters = increment_two_letters(
+                    last_entry.first_two_letters)
             else:
                 self.first_two_letters = last_entry.first_two_letters
 
-            self.last_two_numbers = increment_two_digits(last_entry.last_two_numbers)
+            self.last_two_numbers = increment_two_digits(
+                last_entry.last_two_numbers)
 
             self.booking_id = f"{self.prefix}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
         else:
             self.booking_id = f"{self.prefix}-AA00A00"
 
-    # def save(self, *args, **kwargs):
-    #     try:
-    #         # Hard storing mapping datas
-    #         if not self.user_details and self.user:
-    #             self.user_details = serialize('json', [self.user])
-    #         if not self.guest_details and self.guest:
-    #             self.guest_details = serialize('json', [self.guest])
-    #         if not self.offer_details and self.offer:
-    #             self.offer_details = serialize('json', [self.offer])
-    #         if not self.service_details and self.service:
-    #             self.service_details = serialize('json', [self.service])
-    #         if not self.payment_details and self.payment:
-    #             self.payment_details = serialize('json', [self.payment])
-    #         if not self.package_details and self.package:
-    #             self.package_details = serialize('json', [self.package])
-    #         if not self.price_details and self.price:
-    #             self.price_details = serialize('json', [self.price])
+    def save(self, *args, **kwargs):
+        try:
+            # Hard storing mapping datas
+            if not self.user_details and self.user:
+                self.user_details = serialize('json', [self.user])
+            if not self.guest_details and self.guest:
+                self.guest_details = serialize('json', [self.guest])
+            if not self.offer_details and self.offer:
+                self.offer_details = serialize('json', [self.offer])
+            if not self.service_details and self.service:
+                self.service_details = serialize('json', [self.service])
+            if not self.payment_details and self.payment:
+                self.payment_details = serialize('json', [self.payment])
+            if not self.package_details and self.package:
+                self.package_details = serialize('json', [self.package])
+            if not self.price_details and self.price:
+                self.price_details = serialize('json', [self.price])
 
-    #         # Automating booking_item
-    #         if self.service and self.service.type:
-    #             self.booking_item = self.service.type
+            # Automating booking_item
+            if self.service and self.service.type:
+                self.booking_item = self.service.type
 
-    #         # if self.package and self.package.type:
-    #         #     self.booking_item = self.service.type
+            # if self.package and self.package.type:
+            #     self.booking_item = self.service.type
 
-    #         # Automating user_type
-    #         if self.user:
-    #             self.user_type = 'Registered'
-    #         elif self.guest:
-    #             self.user_type = 'Guest'
-    #         else:
-    #             self.user_type = None
+            # Automating user_type
+            if self.user:
+                self.user_type = 'Registered'
+            elif self.guest:
+                self.user_type = 'Guest'
+            else:
+                self.user_type = None
 
-    #         # Automating booking_type
-    #         if self.service:
-    #             self.booking_type = 'Booking'
-    #         elif self.package:
-    #             self.booking_type = 'Enquiry'
-    #         else:
-    #             self.booking_type = None
+            # Automating booking_type
+            if self.service:
+                self.booking_type = 'Booking'
+            elif self.package:
+                self.booking_type = 'Enquiry'
+            else:
+                self.booking_type = None
 
-    #         # Generating booking_id
-    #         if not self.booking_id:
-    #             self.generate_id_number()
+            # Generating booking_id
+            if not self.booking_id:
+                self.generate_id_number()
 
-    #         # Checking if offer addition possible
-    #         if self.service and self.offer != None and self.booking_item in ['Activity', 'Service']:
-    #             print("-------------------------------------------------------")
+            # Checking if offer addition possible
+            if self.service and self.offer != None and self.booking_item in ['Activity', 'Service']:
+                print("-------------------------------------------------------")
 
-    #             print(self.offer)
-    #             print(type(self.offer))
+                print(self.offer)
+                print(type(self.offer))
 
-    #             # Raising validation error if offer not started or expired
-    #             if self.offer and self.offer.expiration in ['No-Expiry', 'Limited-Time']:
-    #                 if self.offer and self.offer.start_date and self.offer.start_date >= date.today():
-    #                     raise ValidationError("Offer not started yet")
-    #                 if self.offer and self.offer.expiration == 'Limited-Time' and self.offer.end_date and self.offer.end_date <= date.today():
-    #                     raise ValidationError("Offer has expired")
-    #             else:
-    #                 raise ValidationError("Invalid offer expiration")
+                # Raising validation error if offer not started or expired
+                if self.offer and self.offer.expiration in ['No-Expiry', 'Limited-Time']:
+                    if self.offer and self.offer.start_date and self.offer.start_date >= date.today():
+                        raise ValidationError("Offer not started yet")
+                    if self.offer and self.offer.expiration == 'Limited-Time' and self.offer.end_date and self.offer.end_date <= date.today():
+                        raise ValidationError("Offer has expired")
+                else:
+                    raise ValidationError("Invalid offer expiration")
 
-    #             # Checking redeem count not exceeded
-    #             redeem_temp = False
-    #             if self.offer and self.offer.redemption_type in ['One-Time', 'Limited-Number']:
-    #                 if self.offer.redemption_type == 'One-Time' and self.offer.redeem_count >= 1:
-    #                     raise ValidationError("Discount / Offer Redeem count exceeded...")
-    #                 elif self.offer.redemption_type == 'Limited-Number' and self.offer.specify_no <= self.offer.redeem_count:
-    #                     raise ValidationError("Discount / Offer Redeem count exceeded...")
-    #             else:
-    #                 raise ValidationError("Invalid redemption type")
+                # Checking redeem count not exceeded
+                redeem_temp = False
+                if self.offer and self.offer.redemption_type in ['One-Time', 'Limited-Number']:
+                    if self.offer.redemption_type == 'One-Time' and self.offer.redeem_count >= 1:
+                        raise ValidationError(
+                            "Discount / Offer Redeem count exceeded...")
+                    elif self.offer.redemption_type == 'Limited-Number' and self.offer.specify_no <= self.offer.redeem_count:
+                        raise ValidationError(
+                            "Discount / Offer Redeem count exceeded...")
+                else:
+                    raise ValidationError("Invalid redemption type")
 
-    #             # Getting the user redeemed count of same service
-    #             user_redeem_count = Booking.objects.filter(user=self.user, service=self.service,
-    #                                                        offer=self.offer).count() if Booking.objects.filter(
-    #                 user=self.user, service=self.service, offer=self.offer).exists() else 0
+                # Getting the user redeemed count of same service
+                user_redeem_count = Booking.objects.filter(user=self.user, service=self.service,
+                                                           offer=self.offer).count() if Booking.objects.filter(
+                    user=self.user, service=self.service, offer=self.offer).exists() else 0
 
-    #             # Allow multiple or single redeem on single service
-    #             if self.offer.allow_multiple_redeem in ['One-Time', 'Multiple-Time']:
-    #                 if self.offer.allow_multiple_redeem == 'One-Time' and user_redeem_count <= 1:
-    #                     raise ValidationError('Offer already redeemed')
-    #                 elif self.offer.allow_multiple_redeem == 'Multiple-Time' and self.offer.multiple_redeem_specify_no <= user_redeem_count:
-    #                     raise ValidationError('Offer redeemed exceeded')
-    #             else:
-    #                 raise ValidationError("Invalid allow multiple redeem")
+                # Allow multiple or single redeem on single service
+                if self.offer.allow_multiple_redeem in ['One-Time', 'Multiple-Time']:
+                    if self.offer.allow_multiple_redeem == 'One-Time' and user_redeem_count <= 1:
+                        raise ValidationError('Offer already redeemed')
+                    elif self.offer.allow_multiple_redeem == 'Multiple-Time' and self.offer.multiple_redeem_specify_no <= user_redeem_count:
+                        raise ValidationError('Offer redeemed exceeded')
+                else:
+                    raise ValidationError("Invalid allow multiple redeem")
 
-    #             if self.service not in self.offer.services.all():
-    #                 raise ValidationError("Offer not available. Pleases try another one.")
+                if self.service not in self.offer.services.all():
+                    raise ValidationError(
+                        "Offer not available. Pleases try another one.")
 
-    #             # Storing the current price on temp
-    #             temp_price = self.price.price if self.price and self.price.price else 0
+                # Storing the current price on temp
+                temp_price = self.price.price if self.price and self.price.price else 0
 
-    #             # Storing the offer amount on temp
-    #             offer_amount = 0
+                # Storing the offer amount on temp
+                offer_amount = 0
 
-    #             # Calculating the offer amount
-    #             if self.offer.discount_type == 'Percentage':
-    #                 offer_amount = (temp_price * self.offer.discount_value) / 100
-    #                 if offer_amount >= self.offer.up_to_amount:
-    #                     offer_amount = self.offer.up_to_amount
-    #             else:
-    #                 offer_amount = self.offer.discount_value
+                # Calculating the offer amount
+                if self.offer.discount_type == 'Percentage':
+                    offer_amount = (
+                        temp_price * self.offer.discount_value) / 100
+                    if offer_amount >= self.offer.up_to_amount:
+                        offer_amount = self.offer.up_to_amount
+                else:
+                    offer_amount = self.offer.discount_value
 
-    #             # Checking min purchase amount
-    #             if self.offer.purchase_requirement and self.offer.min_purchase_amount <= temp_price:
-    #                 self.price_total = temp_price - offer_amount
-    #             else:
-    #                 self.price_total = temp_price
+                # Checking min purchase amount
+                if self.offer.purchase_requirement and self.offer.min_purchase_amount <= temp_price:
+                    self.price_total = temp_price - offer_amount
+                else:
+                    self.price_total = temp_price
 
-    #             if self.offer:
-    #                 self.offer.redeem_count = self.offer.redeem_count + 1
-    #                 self.offer.save()
-    #         elif self.price:
-    # # Handling the case when self.offer is None
-    # # Storing the current price on temp
-    #             temp_price = self.price.price if self.price and self.price.price else 0
+                if self.offer:
+                    self.offer.redeem_count = self.offer.redeem_count + 1
+                    self.offer.save()
+            elif self.price:
+                # Handling the case when self.offer is None
+                # Storing the current price on temp
+                temp_price = self.price.price if self.price and self.price.price else 0
 
-    # # Storing the offer amount on temp (set to 0 for no offer)
-    #             offer_amount = 0
+    # Storing the offer amount on temp (set to 0 for no offer)
+                offer_amount = 0
 
-    # # Calculating the offer amount (no offer)
-    #             self.price_total = temp_price
+    # Calculating the offer amount (no offer)
+                self.price_total = temp_price
 
-    #         super(Booking, self).save(*args, **kwargs)
-    #     except Exception as e:
-    #         raise ValidationError(str(e))
+            super(Booking, self).save(*args, **kwargs)
+        except Exception as e:
+            raise ValidationError(str(e))

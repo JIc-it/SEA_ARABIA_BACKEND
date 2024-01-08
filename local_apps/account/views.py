@@ -139,7 +139,6 @@ class LoginView(APIView):
                 refresh_token = str(refresh)
 
                 user_id = user.id
-                print(user_id)
 
                 return Response({
                     'detail': 'Login successful!',
@@ -279,7 +278,7 @@ class UserUpdate(generics.UpdateAPIView):
 
 #   Profile extra views
 class ProfileExtraCreate(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = ProfileExtraSerializer
 
 
@@ -528,7 +527,7 @@ class UserCountList(APIView):
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class VendorCountList(APIView):
     """ vendor coutn cards """
 
@@ -547,7 +546,7 @@ class VendorCountList(APIView):
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class AllUserDetails(generics.RetrieveAPIView):
     """ List all the user(different roles) details """
 

@@ -22,9 +22,6 @@ class PaymentSerializer(serializers.ModelSerializer):
                   'confirmation_response',
                   'created_at',
                   'updated_at']
-        
-
- 
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -45,10 +42,12 @@ class BookingSerializer(serializers.ModelSerializer):
     payment = PaymentSerializer(allow_null=True, required=False)
     package = PackageSerializer(allow_null=True, required=False)
     price = PriceSerializer(allow_null=True, required=False)
+    payment_url = serializers.CharField(allow_null=True, required=False)
 
     class Meta:
         model = Booking
         fields = ['id',
+                  "booking_id",
                   'user',
                   'guest',
                   'offer',
@@ -81,7 +80,8 @@ class BookingSerializer(serializers.ModelSerializer):
                   'refund_details',
                   'price_total',
                   'created_at',
-                  'updated_at'
+                  'updated_at',
+                  "payment_url"
                   ]
 
     def create(self, validated_data):
@@ -89,11 +89,6 @@ class BookingSerializer(serializers.ModelSerializer):
         booking = Booking.objects.create(**validated_data)
 
         return booking
-
-        
-
-
-
 
     # @staticmethod
     # def validate_user_type(self, value):

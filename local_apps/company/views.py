@@ -12,8 +12,8 @@ from utils.action_logs import create_log
 from .models import *
 from .serializers import *
 from .filters import *
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
+# from django.utils.decorators import method_decorator
+# from django.views.decorators.cache import cache_page
 
 
 #   service CRUD view
@@ -27,7 +27,7 @@ class ServiceTagList(generics.ListAPIView):
 
 # Onboard status view
 
-@method_decorator(cache_page(60 * 15), name='dispatch') 
+# @method_decorator(cache_page(60 * 15), name='dispatch') 
 class OnboardStatusList(generics.ListAPIView):
     queryset = OnboardStatus.objects.all().order_by("order")
     serializer_class = OnboardStatusSerializer
@@ -48,7 +48,7 @@ class CompanyList(generics.ListAPIView):
     ]
     filterset_class = CompanyFilter
 
-@method_decorator(cache_page(60 * 15), name='dispatch') 
+# @method_decorator(cache_page(60 * 15), name='dispatch') 
 class CompanyListCms(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Company.objects.all()
@@ -350,9 +350,9 @@ class SiteVisitCreate(generics.CreateAPIView):
 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
+            # taking qualifications list from the validated data
+            qualifications = serializer.validated_data.pop('qualifications')
             instance = serializer.save()
-
-            qualifications = serializer.validated_data.get('qualifications')
             if qualifications:
                 for qualification in qualifications:
                     instance.qualifications.add(qualification)
@@ -376,7 +376,9 @@ class SiteVisitCreate(generics.CreateAPIView):
                 value_before=value_before,
                 value_after=value_after
             )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            serialized_data = serializer.data
+            serialized_data["qualifications"] = qualifications
+            return Response(serialized_data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response(f"Error: {str(e)}", status=status.HTTP_400_BAD_REQUEST)
 
