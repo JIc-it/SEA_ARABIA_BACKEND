@@ -1,5 +1,7 @@
 import uuid
 from django.db import models
+from django.conf import settings
+from django.contrib.sessions.models import Session
 
 
 class Main(models.Model):
@@ -9,3 +11,8 @@ class Main(models.Model):
 
     class Meta:
         abstract = True
+
+
+class UserSession(Main):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    session = models.OneToOneField(Session, on_delete=models.CASCADE)
