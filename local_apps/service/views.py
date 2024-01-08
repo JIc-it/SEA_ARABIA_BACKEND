@@ -1066,7 +1066,7 @@ class ComboPackageListing(generics.ListAPIView):
     queryset = Package.objects.filter(is_active=True)
     serializer_class = PackageSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_class = ServiceFilter
+    filterset_class = PackageFilter
 
     # def list(self, request, *args, **kwargs):
     #     try:
