@@ -11,19 +11,16 @@ from django.db.models import Case, Count, Sum, IntegerField, When
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-
-from .filters import *
-from .serializers import *
-from .resources import BookingResource
+import requests
+# from django.utils.decorators import method_decorator
+# from django.views.decorators.cache import cache_page
 
 today = datetime.date.today()
 
 # vendor Side List
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class AdminBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     queryset = Booking.objects.all()
@@ -57,7 +54,7 @@ class AdminIndividualBookingView(generics.RetrieveUpdateDestroyAPIView):
 #             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class VendorBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
@@ -77,7 +74,7 @@ class VendorBookingListView(generics.ListAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 class UserBookingListView(generics.ListAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
