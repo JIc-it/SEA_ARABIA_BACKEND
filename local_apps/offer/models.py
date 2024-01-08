@@ -59,21 +59,38 @@ class Offer(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
-
-        # Check if the request object and user attribute exist
-        if request and hasattr(request, 'user') and isinstance(request.user, User):
-            user = request.user
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=user,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
         else:
-            # If not, set user to None or handle it as appropriate for your use case
-            user = None
-
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=user,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=None,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+        #
+        # # Check if the request object and user attribute exist
+        # if request and hasattr(request, 'user') and isinstance(request.user, User):
+        #     user = request.user
+        # else:
+        #     # If not, set user to None or handle it as appropriate for your use case
+        #     user = None
+        #
+        # ModelUpdateLog.objects.create(
+        #     model_name=self.__class__.__name__,
+        #     user=user,
+        #     timestamp=timezone.now(),
+        #     data_before=data_before,
+        #     data_after=data_after
+        # )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists

@@ -2,7 +2,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import serialize
 from django.db import models
 from django.utils import timezone
-
 from local_apps.api_report.middleware import get_current_request
 from local_apps.api_report.models import ModelUpdateLog
 from local_apps.company.models import Company
@@ -105,14 +104,23 @@ class Destination(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=user,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+        else:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=None,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -200,14 +208,23 @@ class PriceType(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=user,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+        else:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=None,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -247,14 +264,23 @@ class Amenity(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=user,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+        else:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=None,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -391,14 +417,23 @@ class Service(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=user,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+        else:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=None,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
 
     def save(self, *args, **kwargs):
         if not self.service_id:
@@ -455,18 +490,31 @@ class Price(Main):
         max_length=128, choices=DATE_CHOICES, default='', blank=True, null=True)
 
     def __str__(self):
-        return self.service.name
+        return (
+            self.service.name
+            if self.service and self.service.name
+            else "No service name"
+        )
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=user,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+        else:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=None,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -519,14 +567,23 @@ class ServiceImage(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=user,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+        else:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=None,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -590,14 +647,23 @@ class ServiceReview(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=user,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+        else:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=None,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -649,14 +715,23 @@ class ServiceAvailability(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=user,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+        else:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=None,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -747,14 +822,23 @@ class Package(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=user,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+        else:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=None,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists
@@ -812,14 +896,23 @@ class CapacityCount(Main):
 
     def create_update_log(self, data_before, data_after):
         request = get_current_request()
-        ModelUpdateLog.objects.create(
-            model_name=self.__class__.__name__,
-            user=request.user if request and hasattr(
-                request, 'user') else None,
-            timestamp=timezone.now(),
-            data_before=data_before,
-            data_after=data_after
-        )
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=user,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+        else:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=None,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
 
     def save(self, *args, **kwargs):
         # Check if the instance already exists

@@ -1,6 +1,9 @@
 from datetime import date
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
+from local_apps.api_report.middleware import get_current_request
+from local_apps.api_report.models import ModelUpdateLog
 from local_apps.core.models import Main
 from local_apps.service.models import Service, Package, Price
 from local_apps.offer.models import Offer
@@ -35,6 +38,26 @@ class Payment(Main):
         verbose_name = "Payment"
         verbose_name_plural = "Payments"
 
+    def create_update_log(self, data_before, data_after):
+        request = get_current_request()
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=user,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+        else:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=None,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+
     def generate_id_number(self):
         last_entry = Payment.objects.order_by('-created_at').first()
         if last_entry:
@@ -67,7 +90,28 @@ class Payment(Main):
     def save(self, *args, **kwargs):
         if not self.payment_id:
             self.generate_id_number()
-        super(Payment, self).save(*args, **kwargs)
+        # Check if the instance already exists
+        if self.pk:
+            # Get the data before the update
+            try:
+                data_before = serialize('json', [Payment.objects.get(pk=self.pk)])
+            except Payment.DoesNotExist:
+                data_before = None
+
+            # Call the original save method to save the instance
+            super(Payment, self).save(*args, **kwargs)
+
+            # Get the data after the update
+            data_after = serialize('json', [self])
+
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+        else:
+            super(Payment, self).save(*args, **kwargs)
+
+        # if not self.payment_id:
+        #     self.generate_id_number()
+        # super(Payment, self).save(*args, **kwargs)
 
 
 class Booking(Main):
@@ -202,6 +246,26 @@ class Booking(Main):
     def __str__(self):
         return self.booking_id if self.booking_id else "No Booking Id"
 
+    def create_update_log(self, data_before, data_after):
+        request = get_current_request()
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=user,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+        else:
+            ModelUpdateLog.objects.create(
+                model_name=self.__class__.__name__,
+                user=None,
+                timestamp=timezone.now(),
+                data_before=data_before,
+                data_after=data_after
+            )
+
     def generate_id_number(self):
         last_entry = Booking.objects.order_by('-created_at').first()
         if last_entry:
@@ -230,6 +294,28 @@ class Booking(Main):
             self.booking_id = f"{self.prefix}-{self.first_two_letters}{self.first_two_numbers:02d}{self.last_one_letter}{self.last_two_numbers:02d}"
         else:
             self.booking_id = f"{self.prefix}-AA00A00"
+
+    def save(self, *args, **kwargs):
+        if not self.booking_id:
+            self.generate_id_number()
+        # Check if the instance already exists
+        if self.pk:
+            # Get the data before the update
+            try:
+                data_before = serialize('json', [Booking.objects.get(pk=self.pk)])
+            except Booking.DoesNotExist:
+                data_before = None
+
+            # Call the original save method to save the instance
+            super(Booking, self).save(*args, **kwargs)
+
+            # Get the data after the update
+            data_after = serialize('json', [self])
+
+            # Create a log entry
+            self.create_update_log(data_before, data_after)
+        else:
+            super(Booking, self).save(*args, **kwargs)
 
     # def save(self, *args, **kwargs):
     #     try:
