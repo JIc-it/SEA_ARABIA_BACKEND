@@ -166,6 +166,8 @@ class ServiceCreate(generics.CreateAPIView):
                     if location:
                         location_instance = Destination.objects.get(id=location) if Destination.objects.filter(
                             id=location).exists() else None
+                    else:
+                        location_instance = None
 
                     Price.objects.create(
                         **service_price, service=service_instance, location=location_instance)
