@@ -33,7 +33,8 @@ class AdminBookingListView(generics.ListAPIView):
         "booking_id",
         "service__name",
         "user__first_name",
-        "user__last_name"
+        "user__last_name",
+    
     ]
     filterset_class = BookingFilter
 
@@ -310,37 +311,8 @@ class InitializeRefund(generics.UpdateAPIView):
             return Response({"Refund Status": booking_instance.refund_status}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
 
-
-# class InitializeRefund(generics.UpdateAPIView):
-#     serializer_class = BookingStatusSerializer
-#     queryset = Booking.objects.all()
-#     permission_classes = [IsAuthenticated]
-
-#     def update(self, request, *args, **kwargs):
-#         try:
-
-#             refund_amount = request.data.get('refund_amount')
-#             refund_details = request.data.get('refund_details')
-#             refund_type = request.data.get('refund_type')
-#             booking_instance = self.get_object()
-
-#             if booking_instance.refund_status == 'Pending':
-#                 booking_instance.refunded_by = self.request.user
-#                 booking_instance.is_refunded = True
-#                 booking_instance.refund_status = 'Completed'
-#                 booking_instance.refund_details = refund_details
-#                 booking_instance.refund_amount = refund_amount
-#                 booking_instance.refund_type = refund_type
-#                 booking_instance.save()
-#             else:
-#                 return Response({"error": "Booking is already refunded."}, status=status.HTTP_400_BAD_REQUEST)
-
-#             return Response({"Booking Refund Status": booking_instance.refund_status}, status=status.HTTP_200_OK)
-#         except Booking.DoesNotExist:
-#             return Response({"error": "Booking not found."}, status=status.HTTP_404_NOT_FOUND)
-#         except Exception as e:
-#             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PaymentFinalization(generics.UpdateAPIView):

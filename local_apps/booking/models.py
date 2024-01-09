@@ -334,10 +334,6 @@ class Booking(Main):
     #         # Checking if offer addition possible
     #         if self.service and self.offer != None and self.booking_item in ['Activity', 'Service']:
     #             print("-------------------------------------------------------")
-    #             print(self.offer)
-    #             print(type(self.offer))
-    #             print(self.offer)
-    #             print(type(self.offer))
 
                 # Raising validation error if offer not started or expired
     #             if self.offer and self.offer.expiration in ['No-Expiry', 'Limited-Time']:
