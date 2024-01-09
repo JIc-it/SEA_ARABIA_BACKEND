@@ -29,6 +29,11 @@ class Payment(Main):
     confirmation_response = models.JSONField(blank=True, null=True)
     payment_response_message = models.CharField(
         max_length=255, null=True, blank=True)
+    response_code = models.CharField(max_length=200, blank=True, null=True)
+    gateway_response_code = models.CharField(
+        max_length=200, blank=True, null=True)
+    gateway_response_message = models.CharField(
+        max_length=200, blank=True, null=True)
 
     def __str__(self):
         return self.payment_id
@@ -335,68 +340,68 @@ class Booking(Main):
     #             print(type(self.offer))
 
                 # Raising validation error if offer not started or expired
-                if self.offer and self.offer.expiration in ['No-Expiry', 'Limited-Time']:
-                    if self.offer and self.offer.start_date and self.offer.start_date >= date.today():
-                        raise ValidationError("Offer not started yet")
-                    if self.offer and self.offer.expiration == 'Limited-Time' and self.offer.end_date and self.offer.end_date <= date.today():
-                        raise ValidationError("Offer has expired")
-                else:
-                    raise ValidationError("Invalid offer expiration")
-                # Raising validation error if offer not started or expired
-                if self.offer and self.offer.expiration in ['No-Expiry', 'Limited-Time']:
-                    if self.offer and self.offer.start_date and self.offer.start_date >= date.today():
-                        raise ValidationError("Offer not started yet")
-                    if self.offer and self.offer.expiration == 'Limited-Time' and self.offer.end_date and self.offer.end_date <= date.today():
-                        raise ValidationError("Offer has expired")
-                else:
-                    raise ValidationError("Invalid offer expiration")
-
-                # Checking redeem count not exceeded
-                redeem_temp = False
-                if self.offer and self.offer.redemption_type in ['One-Time', 'Limited-Number']:
-                    if self.offer.redemption_type == 'One-Time' and self.offer.redeem_count >= 1:
-                        raise ValidationError(
-                            "Discount / Offer Redeem count exceeded...")
-                    elif self.offer.redemption_type == 'Limited-Number' and self.offer.specify_no <= self.offer.redeem_count:
-                        raise ValidationError(
-                            "Discount / Offer Redeem count exceeded...")
-                else:
-                    raise ValidationError("Invalid redemption type")
-
-    #             # Getting the user redeemed count of same service
-    #             user_redeem_count = Booking.objects.filter(user=self.user, service=self.service,
-    #                 user=self.user, service=self.service, offer=self.offer).exists() else 0
-    #             # Allow multiple or single redeem on single service
-    #             if self.offer.allow_multiple_redeem in ['One-Time', 'Multiple-Time']:
-    #                 if self.offer.allow_multiple_redeem == 'One-Time' and user_redeem_count <= 1:
-    #                     raise ValidationError('Offer already redeemed')
-    #                 elif self.offer.allow_multiple_redeem == 'Multiple-Time' and self.offer.multiple_redeem_specify_no <= user_redeem_count:
-    #                     raise ValidationError('Offer redeemed exceeded')
+    #             if self.offer and self.offer.expiration in ['No-Expiry', 'Limited-Time']:
+    #                 if self.offer and self.offer.start_date and self.offer.start_date >= date.today():
+    #                     raise ValidationError("Offer not started yet")
+    #                 if self.offer and self.offer.expiration == 'Limited-Time' and self.offer.end_date and self.offer.end_date <= date.today():
+    #                     raise ValidationError("Offer has expired")
     #             else:
-    #                 raise ValidationError("Invalid allow multiple redeem")
+    #                 raise ValidationError("Invalid offer expiration")
+    #             # Raising validation error if offer not started or expired
+    #             if self.offer and self.offer.expiration in ['No-Expiry', 'Limited-Time']:
+    #                 if self.offer and self.offer.start_date and self.offer.start_date >= date.today():
+    #                     raise ValidationError("Offer not started yet")
+    #                 if self.offer and self.offer.expiration == 'Limited-Time' and self.offer.end_date and self.offer.end_date <= date.today():
+    #                     raise ValidationError("Offer has expired")
+    #             else:
+    #                 raise ValidationError("Invalid offer expiration")
 
-                if self.service not in self.offer.services.all():
-                    raise ValidationError(
-                        "Offer not available. Pleases try another one.")
+    #             # Checking redeem count not exceeded
+    #             redeem_temp = False
+    #             if self.offer and self.offer.redemption_type in ['One-Time', 'Limited-Number']:
+    #                 if self.offer.redemption_type == 'One-Time' and self.offer.redeem_count >= 1:
+    #                     raise ValidationError(
+    #                         "Discount / Offer Redeem count exceeded...")
+    #                 elif self.offer.redemption_type == 'Limited-Number' and self.offer.specify_no <= self.offer.redeem_count:
+    #                     raise ValidationError(
+    #                         "Discount / Offer Redeem count exceeded...")
+    #             else:
+    #                 raise ValidationError("Invalid redemption type")
 
-                # Storing the current price on temp
-                temp_price = self.price.price if self.price and self.price.price else 0
-                # Storing the current price on temp
-                temp_price = self.price.price if self.price and self.price.price else 0
+    # #             # Getting the user redeemed count of same service
+    # #             user_redeem_count = Booking.objects.filter(user=self.user, service=self.service,
+    # #                 user=self.user, service=self.service, offer=self.offer).exists() else 0
+    # #             # Allow multiple or single redeem on single service
+    # #             if self.offer.allow_multiple_redeem in ['One-Time', 'Multiple-Time']:
+    # #                 if self.offer.allow_multiple_redeem == 'One-Time' and user_redeem_count <= 1:
+    # #                     raise ValidationError('Offer already redeemed')
+    # #                 elif self.offer.allow_multiple_redeem == 'Multiple-Time' and self.offer.multiple_redeem_specify_no <= user_redeem_count:
+    # #                     raise ValidationError('Offer redeemed exceeded')
+    # #             else:
+    # #                 raise ValidationError("Invalid allow multiple redeem")
 
-                # Storing the offer amount on temp
-                offer_amount = 0
-                # Storing the offer amount on temp
-                offer_amount = 0
+    #             if self.service not in self.offer.services.all():
+    #                 raise ValidationError(
+    #                     "Offer not available. Pleases try another one.")
 
-                # Calculating the offer amount
-                if self.offer.discount_type == 'Percentage':
-                    offer_amount = (
-                        temp_price * self.offer.discount_value) / 100
-                    if offer_amount >= self.offer.up_to_amount:
-                        offer_amount = self.offer.up_to_amount
-                else:
-                    offer_amount = self.offer.discount_value
+    #             # Storing the current price on temp
+    #             temp_price = self.price.price if self.price and self.price.price else 0
+    #             # Storing the current price on temp
+    #             temp_price = self.price.price if self.price and self.price.price else 0
+
+    #             # Storing the offer amount on temp
+    #             offer_amount = 0
+    #             # Storing the offer amount on temp
+    #             offer_amount = 0
+
+    #             # Calculating the offer amount
+    #             if self.offer.discount_type == 'Percentage':
+    #                 offer_amount = (
+    #                     temp_price * self.offer.discount_value) / 100
+    #                 if offer_amount >= self.offer.up_to_amount:
+    #                     offer_amount = self.offer.up_to_amount
+    #             else:
+    #                 offer_amount = self.offer.discount_value
 
     #             # Checking min purchase amount
     #             if self.offer.purchase_requirement and self.offer.min_purchase_amount <= temp_price:

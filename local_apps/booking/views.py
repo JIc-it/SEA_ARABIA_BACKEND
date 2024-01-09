@@ -147,11 +147,12 @@ class BookingCreateView(generics.CreateAPIView):
 
             # get the url for checkout from the json response
 
-            payment_url = authorize_response.get("transaction")['url']
+            payment_url = authorize_response.get(
+                "transaction", {}).get('url', None)
             tap_id = authorize_response.get("id", None)
             payment_status = authorize_response.get("status", None)
-            payment_response_message = authorize_response.get('response')[
-                "message"]
+            payment_response_message = authorize_response.get(
+                'response', {}).get('message', None)
 
             payment_instance = Payment.objects.create(tap_pay_id=tap_id,
                                                       initial_response=authorize_response, amount=total_amount,
@@ -161,7 +162,7 @@ class BookingCreateView(generics.CreateAPIView):
             booking_instance.save()
 
             serializer = BookingSerializer(booking_instance)
-            serialized_data = dict(serializer.data)
+            serialized_data = serializer.data
             serialized_data['payment_url'] = payment_url
             return Response(serialized_data, status=status.HTTP_200_OK)
         except Exception as e:
@@ -228,6 +229,8 @@ class ExportBooking(APIView):
         return response
 
 # Admin CMS & Vendor CMS
+
+
 class BookingCancellation(generics.UpdateAPIView):
     serializer_class = BookingStatusSerializer
     queryset = Booking.objects.all()
@@ -244,10 +247,10 @@ class BookingCancellation(generics.UpdateAPIView):
                 user_details = {
                     "user_id": str(self.request.user.id),
                     "username": self.request.user.username,
-                    "account_id":self.request.user.account_id,
+                    "account_id": self.request.user.account_id,
                     "email": self.request.user.email,
-                    "mobile":self.request.user.mobile,
-                    "role":self.request.user.role,
+                    "mobile": self.request.user.mobile,
+                    "role": self.request.user.role,
 
                     # Add more user details as needed
                 }
@@ -263,7 +266,7 @@ class BookingCancellation(generics.UpdateAPIView):
             return Response({"Booking Status": booking_instance.status}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
+
 
 # Admin CMS
 class InitializeRefund(generics.UpdateAPIView):
@@ -285,10 +288,10 @@ class InitializeRefund(generics.UpdateAPIView):
                 user_details = {
                     "user_id": str(self.request.user.id),
                     "username": self.request.user.username,
-                    "account_id":self.request.user.account_id,
+                    "account_id": self.request.user.account_id,
                     "email": self.request.user.email,
-                    "mobile":self.request.user.mobile,
-                    "role":self.request.user.role,
+                    "mobile": self.request.user.mobile,
+                    "role": self.request.user.role,
 
                     # Add more user details as needed
                 }
@@ -296,7 +299,7 @@ class InitializeRefund(generics.UpdateAPIView):
                 booking_instance.refunded_by = user_details
                 booking_instance.is_refunded = True
                 booking_instance.refund_status = 'Completed'
-                booking_instance.refund_details = refund_details 
+                booking_instance.refund_details = refund_details
                 booking_instance.refund_amount = refund_amount
                 booking_instance.refund_type = refund_type
                 booking_instance.refund_date = timezone.now().isoformat()
@@ -307,7 +310,7 @@ class InitializeRefund(generics.UpdateAPIView):
             return Response({"Refund Status": booking_instance.refund_status}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
+
 
 # class InitializeRefund(generics.UpdateAPIView):
 #     serializer_class = BookingStatusSerializer
@@ -316,7 +319,7 @@ class InitializeRefund(generics.UpdateAPIView):
 
 #     def update(self, request, *args, **kwargs):
 #         try:
-            
+
 #             refund_amount = request.data.get('refund_amount')
 #             refund_details = request.data.get('refund_details')
 #             refund_type = request.data.get('refund_type')
@@ -340,8 +343,6 @@ class InitializeRefund(generics.UpdateAPIView):
 #             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 class PaymentFinalization(generics.UpdateAPIView):
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
@@ -358,7 +359,7 @@ class PaymentFinalization(generics.UpdateAPIView):
                 }
                 response = requests.get(url, headers=headers)
                 final_response = response.json()
-                #! remove the redirect and post url from the response to avoid any security issues
+                #! removing the redirect and post url from the response to avoid any security issues
 
                 if final_response.get('redirect', None):
                     del final_response['redirect']
@@ -369,8 +370,14 @@ class PaymentFinalization(generics.UpdateAPIView):
                 # ? taking the data from the response
 
                 payment_status = final_response.get("status", None)
-                payment_response_message = final_response.get('response')[
-                    "message"]
+                payment_response_message = final_response.get(
+                    'response', {}).get("message", None)  # taking the response from a nested dict
+                payment_response_code = final_response.get(
+                    'response', {}).get('code', None)
+                payment_gateway_reponse_code = final_response.get(
+                    'gateway', {}).get('response', {}).get('code')
+                payment_gateway_reponse_message = final_response.get(
+                    'gateway', {}).get('response', {}).get('message')
 
                 # ? updating the payment instance
 
@@ -378,6 +385,9 @@ class PaymentFinalization(generics.UpdateAPIView):
                 payment_instance.status = payment_status
                 payment_instance.confirmation_response = final_response
                 payment_instance.payment_response_message = payment_response_message
+                payment_instance.response_code = payment_response_code
+                payment_instance.gateway_response_code = payment_gateway_reponse_code
+                payment_instance.gateway_response_message = payment_gateway_reponse_message
 
                 payment_instance.save()
                 return Response(final_response, status=status.HTTP_200_OK)
