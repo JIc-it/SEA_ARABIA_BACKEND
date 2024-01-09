@@ -26,16 +26,6 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    # # Extra fields for mapping ladders with uuid
-    # user_id = serializers.UUIDField(
-    #     source='user.id', allow_null=True, required=False)
-    # guest_id = serializers.UUIDField(source='guest.id',allow_null=True,required=False)
-    # offer_id = serializers.UUIDField(source='offer.id',allow_null=True,required=False)
-    # service_id = serializers.UUIDField(source='service.id',allow_null=True,required=False)
-    # payment_id = serializers.UUIDField(source='payment.id',allow_null=True,required=False)
-    # package_id = serializers.UUIDField(source='package.id',allow_null=True,required=False)
-    # price_id = serializers.UUIDField(source='price.id',allow_null=True,required=False)
-
     # Ladders for extra details
     user = UserSerializer(allow_null=True, required=False)
     guest = GuestSerializer(allow_null=True, required=False)

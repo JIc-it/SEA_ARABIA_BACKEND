@@ -306,7 +306,7 @@ class InitializeRefund(generics.UpdateAPIView):
                 booking_instance.refund_date = timezone.now().isoformat()
                 booking_instance.save()
             else:
-                return Response({"error": "Refund is Alredy Processed."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Cancellation is pending."}, status=status.HTTP_400_BAD_REQUEST)
 
             return Response({"Refund Status": booking_instance.refund_status}, status=status.HTTP_200_OK)
         except Exception as e:
