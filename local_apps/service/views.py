@@ -123,7 +123,6 @@ class ServiceCreate(generics.CreateAPIView):
         try:
             # Serialize the data before the service creation
             value_before = serialize('json', [Service()])
-
             service_prices = request.data.pop('service_price_service', [])
             amenities_list = request.data.pop('amenities', None)
             category = request.data.pop('category', None)
@@ -132,12 +131,17 @@ class ServiceCreate(generics.CreateAPIView):
             # price_id = request.data.pop('price_type', None)
             company_id = request.data.pop('company', None)
 
-            company_instance = Company.objects.get(id=company_id)
-            profit_instance = ProfitMethod.objects.get(id=profit_id)
+            company_instance = Company.objects.get(id=company_id) if Company.objects.filter(
+                id=company_id).exists() else None
+            profit_instance = ProfitMethod.objects.get(id=profit_id) if ProfitMethod.objects.filter(
+                id=profit_id).exists() else None
             # price_instance = PriceType.objects.get(id=price_id)
 
-            service_instance = Service.objects.create(
-                company=company_instance, profit_method=profit_instance, **request.data)
+            if profit_instance and company_instance:
+                service_instance = Service.objects.create(
+                    company=company_instance, profit_method=profit_instance, **request.data)
+            else:
+                raise Exception('Company or Profit method missing')
 
             if category:
                 service_instance.category.add(category)
@@ -157,26 +161,11 @@ class ServiceCreate(generics.CreateAPIView):
                 for service_price in service_prices:
                     """ creating service prices """
 
-                    price_id = service_price.get('id', None)
-                    is_active = service_price.get('is_active', None)
-                    name = service_price.get('name', None)
-                    price = service_price.get('price', None)
-                    is_range = service_price.get('is_range', None)
                     location = service_price.pop('location', None)
-                    duration_hour = service_price.get('duration_hour', None)
-                    duration_minute = service_price.get(
-                        'duration_minute', None)
-                    duration_day = service_price.get('duration_day', None)
-                    end_time = service_price.get('end_time', None)
-                    time = service_price.get('time', None)
-                    day = service_price.get('day', None)
-                    end_day = service_price.get('end_day', None)
-                    date = service_price.get('date', None)
-                    end_date = service_price.get('end_date', None)
 
                     if location:
-                        location_instance = Destination.objects.get(
-                            id=location)
+                        location_instance = Destination.objects.get(id=location) if Destination.objects.filter(
+                            id=location).exists() else None
 
                     Price.objects.create(
                         **service_price, service=service_instance, location=location_instance)
@@ -1351,11 +1340,13 @@ class PackageCountsAPIView(APIView):
 
         return Response(data)
 
+
 class PackageView(generics.RetrieveAPIView):
     queryset = Package.objects.all()
     serializer_class = PackageSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = PackageFilter
+
 
 # class UpdateAvailabilityView(generics.UpdateAPIView):
 #     serializer_class = ServiceAvailabilitySerializer
